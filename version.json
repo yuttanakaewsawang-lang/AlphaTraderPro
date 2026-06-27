@@ -1,7 +1,7 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "patch_only": false,
-  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.2/AlphaTraderPro.exe",
-  "sha256": "DE09B6A5DDC3936EA73C5A70C9DF882D219B4388E3981B20FCBFA284BD13C68A",
-  "notes": "แก้ระบบอัปเดต retry อัตโนมัติ + แก้ R:R Loss เป็น -1.00"
+  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.3/AlphaTraderPro.exe",
+  "sha256": "13B10E79A8ED09FA67A35A40FD9DE5D222944643335A633A5D6200B5B4DF55C6",
+  "notes": "แก้ระบบอัปเดต ไม่ค้างหน้าจอ"
 }
