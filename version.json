@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.17",
+    "version":  "1.0.18",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.17/AlphaTraderPro.exe",
-    "sha256":  "4221012DC4135149E02170044AFF4F5085AD5A24A300DD49739E90F40A2BA9CE",
-    "notes":  "แก้ browse MT5 Terminal Path และ login"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.18/AlphaTraderPro.exe",
+    "sha256":  "3C364D3501FA1D2D8FD42C9ECD430879E5EF76DD31D735FB3197C8229E5C37C9",
+    "notes":  "Strategy loop ทำงานทุก 10 วินาที"
 }
