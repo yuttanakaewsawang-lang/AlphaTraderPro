@@ -1,7 +1,7 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "patch_only": false,
-  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.1/AlphaTraderPro.exe",
-  "sha256": "4970339F535F2CA4465AEA6BD9E081463075D8CB7D8CE09172617368DE9E31D7",
-  "notes": "แก้ R:R Loss เป็น -1.00 ใน Trade Ledger"
+  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.2/AlphaTraderPro.exe",
+  "sha256": "DE09B6A5DDC3936EA73C5A70C9DF882D219B4388E3981B20FCBFA284BD13C68A",
+  "notes": "แก้ระบบอัปเดต retry อัตโนมัติ + แก้ R:R Loss เป็น -1.00"
 }
