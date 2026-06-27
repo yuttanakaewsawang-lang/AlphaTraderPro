@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.9",
+    "version":  "1.0.10",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.9/AlphaTraderPro.exe",
-    "sha256":  "A9D5B000D6C21B0FE5E3EBAE124F7CAEFF2BC1DE5456042B94C5587286CA73E7",
-    "notes":  "แก้เช็คอัปเดตไม่ได้"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.10/AlphaTraderPro.exe",
+    "sha256":  "B545F32A851D24FD086BB3AFE1149782FC1B7FF0F844B0A3CB2D48CC23BD2673",
+    "notes":  "แก้แจ้งเตือนอัปเดตไม่สำเร็จผิดพลาด"
 }
