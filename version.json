@@ -1,7 +1,7 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "patch_only": false,
-  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.4/AlphaTraderPro.exe",
-  "sha256": "69D132B90C894A1F865538F1C04CCEBA79EE1CF8694D8E71A0FAEBAD96FFE804",
-  "notes": "แสดงหมายเหตุการอัปเดตใต้ปุ่ม"
+  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.5/AlphaTraderPro.exe",
+  "sha256": "90FB367F8F13DF68476B366BBE43211C27F3245DC9A1FB7D59FD357ED716B764",
+  "notes": "แก้หน้าต่างอัปเดตค้างรอโปรแกรมเปิดก่อนปิด"
 }
