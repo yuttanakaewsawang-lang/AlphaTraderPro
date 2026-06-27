@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.11",
+    "version":  "1.0.12",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.11/AlphaTraderPro.exe",
-    "sha256":  "BC369735E505451E5868421EB31B251D13F64F15CB26F77EFDAC105CAA7F4E41",
-    "notes":  "แก้ดาวน์โหลดอัปเดตไม่สำเร็จ"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.12/AlphaTraderPro.exe",
+    "sha256":  "601061552EA912DD0EAF8445018659E69BE65FE050FBD4B865D071D4FC919352",
+    "notes":  "debug download error"
 }
