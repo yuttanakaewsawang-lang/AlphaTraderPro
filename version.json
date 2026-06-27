@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.8",
+    "version":  "1.0.9",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.8/AlphaTraderPro.exe",
-    "sha256":  "47838B21ABEE3331C068014A3E5815228D1CA362DE0830E73297D68028C213E5",
-    "notes":  "แก้ภาษาไทยใน notes และโปรแกรมปิดตัวเองหลังอัปเดต"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.9/AlphaTraderPro.exe",
+    "sha256":  "A9D5B000D6C21B0FE5E3EBAE124F7CAEFF2BC1DE5456042B94C5587286CA73E7",
+    "notes":  "แก้เช็คอัปเดตไม่ได้"
 }
