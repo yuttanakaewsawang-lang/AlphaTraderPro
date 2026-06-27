@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.15",
+    "version":  "1.0.16",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.15/AlphaTraderPro.exe",
-    "sha256":  "0B582A561A68585EA2BFB180075660C7DE43A15800466DE0E2C871A0131B6187",
-    "notes":  "เพิ่มช่อง MT5 Terminal Path และเวอร์ชันในหน้า Login"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.16/AlphaTraderPro.exe",
+    "sha256":  "367EBB5EC4262A8153A6FAD07BE8920FF851620F2C4E4956C270941E070C3BB5",
+    "notes":  "แก้ปุ่ม browse Terminal Path"
 }
