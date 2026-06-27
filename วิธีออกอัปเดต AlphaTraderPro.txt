@@ -1,0 +1,139 @@
+================================================================
+  วิธีออกอัปเดต AlphaTraderPro — ทีละขั้นตอน
+================================================================
+
+----------------------------------------------------------------
+ขั้นที่ 1 — แก้เลขเวอร์ชันในโค้ด
+----------------------------------------------------------------
+เปิดไฟล์:  D:\ProjeckEA\version.py
+
+แก้บรรทัด:
+  APP_VERSION = "1.0.0"
+เปลี่ยนเป็น:
+  APP_VERSION = "1.0.1"   (หรือเลขที่ต้องการ)
+
+กฎการเพิ่มเลข:
+  1.0.0 → 1.0.1  แก้ bug เล็กน้อย / ปรับ UI
+  1.0.0 → 1.1.0  เพิ่ม feature ใหม่
+  1.0.0 → 2.0.0  เปลี่ยนโครงสร้างใหญ่
+
+----------------------------------------------------------------
+ขั้นที่ 2 — Build โปรแกรม
+----------------------------------------------------------------
+เปิด PowerShell แล้วรัน:
+
+  cd D:\ProjeckEA\frontend
+  npm run build
+
+  cd D:\ProjeckEA
+  pyinstaller run_app.spec
+
+(รอจนขึ้น "Build complete!")
+
+----------------------------------------------------------------
+ขั้นที่ 3 — เลือกประเภทอัปเดต
+----------------------------------------------------------------
+
+  แก้แค่หน้าจอ (UI/React)            → ใช้ PATCH (ไฟล์เล็ก ~1-5 MB)
+  แก้ Python + UI                     → ใช้ PATCH (ใส่ไฟล์ .py เพิ่ม)
+  เปลี่ยน dependency / โครงสร้างใหม่ → ใช้ FULL EXE (~100 MB)
+
+----------------------------------------------------------------
+ขั้นที่ 4A — ถ้าเป็น PATCH (แนะนำ)
+----------------------------------------------------------------
+
+1) สร้างโฟลเดอร์ patch แล้วจัดไฟล์ดังนี้:
+
+   patch-1.0.1\
+   ├── dist\               ← copy ทั้งโฟลเดอร์มาจาก
+   │   ├── index.html         D:\ProjeckEA\frontend\dist\
+   │   └── assets\
+   └── py\                 ← (ถ้าแก้ไฟล์ Python ด้วย ใส่เฉพาะที่แก้)
+       └── notifications.py
+
+2) zip โฟลเดอร์ patch-1.0.1 → ได้ไฟล์  patch-1.0.1.zip
+
+3) คำนวณ SHA256 (กัน file เสีย):
+   เปิด PowerShell รัน:
+     Get-FileHash patch-1.0.1.zip -Algorithm SHA256
+   copy ตัวเลขที่ได้ไว้ใช้ใน version.json
+
+4) อัปโหลด patch-1.0.1.zip ขึ้น:
+   - GitHub Releases  หรือ
+   - Google Drive / OneDrive (ต้องเป็น direct download link)
+
+5) แก้ไฟล์ version.json (อยู่ที่ D:\ProjeckEA\version.json):
+   {
+     "version": "1.0.1",
+     "patch_only": true,
+     "url": "https://github.com/xxx/AlphaTraderPro/releases/download/v1.0.1/patch-1.0.1.zip",
+     "sha256": "ใส่ตัวเลข SHA256 ที่ได้จากขั้นที่ 3",
+     "notes": "สรุปสิ่งที่เปลี่ยนแปลง เช่น ปรับหน้า Login"
+   }
+
+6) Push version.json ขึ้น GitHub:
+   git add version.json
+   git commit -m "release v1.0.1 patch"
+   git push
+
+----------------------------------------------------------------
+ขั้นที่ 4B — ถ้าเป็น FULL EXE
+----------------------------------------------------------------
+
+1) อัปโหลดไฟล์:
+     D:\ProjeckEA\dist\AlphaTraderPro.exe
+   ขึ้น GitHub Releases
+
+2) คำนวณ SHA256:
+     Get-FileHash dist\AlphaTraderPro.exe -Algorithm SHA256
+
+3) แก้ไฟล์ version.json:
+   {
+     "version": "1.1.0",
+     "patch_only": false,
+     "url": "https://github.com/xxx/AlphaTraderPro/releases/download/v1.1.0/AlphaTraderPro.exe",
+     "sha256": "ใส่ตัวเลข SHA256 ที่ได้",
+     "notes": "สรุปสิ่งที่เปลี่ยนแปลง"
+   }
+
+4) Push version.json ขึ้น GitHub:
+   git add version.json
+   git commit -m "release v1.1.0 full"
+   git push
+
+----------------------------------------------------------------
+ขั้นที่ 5 — ผู้ใช้อัปเดต (ทำเองอัตโนมัติ)
+----------------------------------------------------------------
+
+  เปิดโปรแกรม
+  → กด "ตรวจสอบอัปเดต" ที่ Sidebar ซ้าย
+  → ถ้ามีเวอร์ชันใหม่ จะขึ้นปุ่ม "อัปเดต vX.X.X"
+  → กดปุ่ม → โปรแกรม download + ติดตั้งให้เองอัตโนมัติ
+  → PATCH: reload หน้า | FULL: โปรแกรมปิดแล้วเปิดใหม่เอง
+
+----------------------------------------------------------------
+Checklist ทุกครั้งก่อนออกอัปเดต
+----------------------------------------------------------------
+
+  [ ] แก้ APP_VERSION ใน version.py
+  [ ] npm run build (ใน frontend/)
+  [ ] pyinstaller run_app.spec (ถ้า FULL)
+  [ ] สร้าง patch.zip / copy exe
+  [ ] Get-FileHash → copy SHA256
+  [ ] แก้ version.json (version, url, sha256, patch_only, notes)
+  [ ] git add version.json → commit → push
+  [ ] เปิดโปรแกรมทดสอบกด "ตรวจสอบอัปเดต"
+
+----------------------------------------------------------------
+หมายเหตุ
+----------------------------------------------------------------
+
+- version.json อยู่ที่ GitHub branch: main
+  URL ปัจจุบัน:
+  https://raw.githubusercontent.com/yuttanakaewsawang-lang/AlphaTraderPro/refs/heads/main/version.json
+
+- ถ้าใช้ Google Drive ต้องแปลง link เป็น direct download:
+  จาก: https://drive.google.com/file/d/FILEID/view
+  เป็น: https://drive.google.com/uc?export=download&id=FILEID
+
+================================================================

@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# PyInstaller build
+build/
+dist/
+
+# Frontend build & deps
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Database & logs
+*.db
+*.db-shm
+*.db-wal
+logs/
+zone_cache/
+calendar_cache.json
+keygen_history.json
+
+# Sensitive — ห้าม push ขึ้น GitHub เด็ดขาด
+keygen.py
+keygen_ui.py
+license_manager.py
+backend/app.py
+Strategy.py
+ai_strategy.py
+backtest.py
+find_best_config.py
+main.py
+notifications.py
+database.py
+filters.py
+market_structure.py
+calendar_feed.py
+run_app.py
+run_app.spec
+start.bat
+version.py
+
+# Patch update temp files
+update/
+
+# OS
+.DS_Store
+Thumbs.db
