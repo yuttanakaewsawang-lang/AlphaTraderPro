@@ -1,7 +1,7 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "patch_only": false,
-  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.3/AlphaTraderPro.exe",
-  "sha256": "13B10E79A8ED09FA67A35A40FD9DE5D222944643335A633A5D6200B5B4DF55C6",
-  "notes": "แก้ระบบอัปเดต ไม่ค้างหน้าจอ"
+  "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.4/AlphaTraderPro.exe",
+  "sha256": "69D132B90C894A1F865538F1C04CCEBA79EE1CF8694D8E71A0FAEBAD96FFE804",
+  "notes": "แสดงหมายเหตุการอัปเดตใต้ปุ่ม"
 }
