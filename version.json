@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.18",
+    "version":  "1.0.19",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.18/AlphaTraderPro.exe",
-    "sha256":  "3C364D3501FA1D2D8FD42C9ECD430879E5EF76DD31D735FB3197C8229E5C37C9",
-    "notes":  "Strategy loop ทำงานทุก 10 วินาที"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.19/AlphaTraderPro.exe",
+    "sha256":  "8AD7A487E840AAC0175B3F55D2E3F8E0B9D46842C13C394F17C80E0EC2A5F98B",
+    "notes":  "เพิ่ม SHA256 log เพื่อ debug update"
 }
