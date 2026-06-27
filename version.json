@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.7",
+    "version":  "1.0.8",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.7/AlphaTraderPro.exe",
-    "sha256":  "3AEC968B2BC918D941F0C2F9AFCEBF2E2F6F9D3322A9DC6475C71A88AB39F6DE",
-    "notes":  "??????????????????? (SSL fix)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.8/AlphaTraderPro.exe",
+    "sha256":  "47838B21ABEE3331C068014A3E5815228D1CA362DE0830E73297D68028C213E5",
+    "notes":  "แก้ภาษาไทยใน notes และโปรแกรมปิดตัวเองหลังอัปเดต"
 }
