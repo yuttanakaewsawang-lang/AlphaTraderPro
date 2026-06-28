@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.25",
-    "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.25/patch.zip",
-    "sha256":  "303429DEE8DC0DF1A3323191CF6928B98CA4866964F78F466A0C3DC146834882",
-    "notes":  "ทดสอบ patch update (frontend-only ไม่รีสตาร์ท)"
+    "version":  "1.0.27",
+    "patch_only":  false,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.27/AlphaTraderPro.exe",
+    "sha256":  "D02A6B3B06045BE9962FE5E90558B269E8FCCAE0ED0AA13A0F1E05FB4378E80D",
+    "notes":  "XAUUSD: ปิด engulfing/trend/rule filter, RR 3.5 (backtest 12mo +618R) + ตั้งเป็น default"
 }
