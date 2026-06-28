@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.19",
+    "version":  "1.0.20",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.19/AlphaTraderPro.exe",
-    "sha256":  "8AD7A487E840AAC0175B3F55D2E3F8E0B9D46842C13C394F17C80E0EC2A5F98B",
-    "notes":  "เพิ่ม SHA256 log เพื่อ debug update"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.20/AlphaTraderPro.exe",
+    "sha256":  "4AEEF74DD968BDD1D4B76C5FC8B682C178FAEF2357BE72559BFE8D8027917029",
+    "notes":  "แก้ SSL/TLS error ตอนดาวน์โหลดอัปเดตบน VPS"
 }
