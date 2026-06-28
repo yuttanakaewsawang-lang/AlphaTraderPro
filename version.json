@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.35",
+    "version":  "1.0.36",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.35/AlphaTraderPro.exe",
-    "sha256":  "339191A161BE639C05E1CA9883C0C89931D38F1C9CEE083821A96BDDE9B5E284",
-    "notes":  "Fix Max DD% calc (compound balance), add USD profit to HTML export, multi-month backtest replay, fix chart freeze on month change, remove preset buttons"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.36/AlphaTraderPro.exe",
+    "sha256":  "BA9B4DA216A0DF10CFFF637743FFC436201630D548979A12DDD8B5E8219B6F99",
+    "notes":  "Clean zone/OB overlay, HTML equity curve + monthly/daily breakdown, multi-month replay fixes"
 }
