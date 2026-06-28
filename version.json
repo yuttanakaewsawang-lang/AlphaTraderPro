@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.37",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.37/AlphaTraderPro.exe",
-    "sha256":  "BC2A186B1A9CE33C7CF60933EF40FEF1E39347D19F60DED6AA7D22989E84FF0A",
-    "notes":  "Compound risk per trade (balance updates after each close), skip partial TP when lot \u003c 2x min_lot (e.g. small account with 0.01 min)"
+    "version":  "1.0.38",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.38/patch.zip",
+    "sha256":  "D77CA89AB4C74FA858232144592ED3BF12FC3BDD2622C099F35C5179868A0879",
+    "notes":  "Show running balance in replay stats (compound); balance updates each trade"
 }
