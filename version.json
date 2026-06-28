@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.24",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.24/AlphaTraderPro.exe",
-    "sha256":  "8F559B0DE4A8BF21BD36BE4807E99B414FB46253A6A77649E13A9F5CD0C15ECD",
-    "notes":  "เพิ่มระบบ patch update (frontend zip เล็ก) + กันวนอัปเดต"
+    "version":  "1.0.25",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.25/patch.zip",
+    "sha256":  "303429DEE8DC0DF1A3323191CF6928B98CA4866964F78F466A0C3DC146834882",
+    "notes":  "ทดสอบ patch update (frontend-only ไม่รีสตาร์ท)"
 }
