@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.33",
+    "version":  "1.0.35",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.33/AlphaTraderPro.exe",
-    "sha256":  "44CC6892FD17CC4157825A96FDE9DC06F1B6E98F98E9722719D086781A4EF068",
-    "notes":  "Frontend dist re-seed อัตโนมัติเมื่อ exe ใหม่กว่า (แก้ frontend ค้างของเก่าตอนติดตั้งมือ) — ปุ่ม Recommended Default จะถูกต้องเสมอ"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.35/AlphaTraderPro.exe",
+    "sha256":  "339191A161BE639C05E1CA9883C0C89931D38F1C9CEE083821A96BDDE9B5E284",
+    "notes":  "Fix Max DD% calc (compound balance), add USD profit to HTML export, multi-month backtest replay, fix chart freeze on month change, remove preset buttons"
 }
