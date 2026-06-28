@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.31",
-    "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.31/patch.zip",
-    "sha256":  "AF3FD72EE37C9AB4597EEA6B38DEFE227E83BFF867D3E2E9B25EA1C53876E9A0",
-    "notes":  "แก้ปุ่ม Reset Recommended Default ให้เป็น config ใหม่ (engulfing/trend/rule/trailing ปิด, RR3.5, zone0.3, buffer0.05)"
+    "version":  "1.0.32",
+    "patch_only":  false,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.32/AlphaTraderPro.exe",
+    "sha256":  "8C0379E5188B417DFD6F26E94515437B99C0CD7FA71886FB71C02033D105949E",
+    "notes":  "Align default ทุกแหล่ง: Strategy.__init__ ใช้ค่าที่ดีที่สุด (engulfing/trend/rule/trailing ปิด, RR3.5, zone0.3, buffer0.05, OB on) ครบทั้ง 4 แหล่ง"
 }
