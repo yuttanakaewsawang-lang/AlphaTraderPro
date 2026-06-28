@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.36",
+    "version":  "1.0.37",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.36/AlphaTraderPro.exe",
-    "sha256":  "BA9B4DA216A0DF10CFFF637743FFC436201630D548979A12DDD8B5E8219B6F99",
-    "notes":  "Clean zone/OB overlay, HTML equity curve + monthly/daily breakdown, multi-month replay fixes"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.37/AlphaTraderPro.exe",
+    "sha256":  "BC2A186B1A9CE33C7CF60933EF40FEF1E39347D19F60DED6AA7D22989E84FF0A",
+    "notes":  "Compound risk per trade (balance updates after each close), skip partial TP when lot \u003c 2x min_lot (e.g. small account with 0.01 min)"
 }
