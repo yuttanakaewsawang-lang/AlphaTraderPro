@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.29",
+    "version":  "1.0.30",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.29/AlphaTraderPro.exe",
-    "sha256":  "BBE0D1ECA4CBBFF304C9ED395F956C191034CE023F700D0BEB537CBD00DE524B",
-    "notes":  "XAUUSD: ปิด trailing + zone_atr_mult 0.3 + buffer_atr 0.05 (backtest 12mo \\, หัก spread 11)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.30/AlphaTraderPro.exe",
+    "sha256":  "3A21AC69B2A1A6C7A21F5AF9CD926235D2DC0D0C2DD1ECC3A6D43665DEBDA5B5",
+    "notes":  "Migration v3: บังคับตั้งค่า XAUUSD ที่ดีที่สุดครบทุกฟิลด์ (แก้เครื่องที่ค่าไม่ลง)"
 }
