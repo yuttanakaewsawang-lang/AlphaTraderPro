@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.28",
+    "version":  "1.0.29",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.28/AlphaTraderPro.exe",
-    "sha256":  "5AFEF95BA41C90A3EF3DE1808709364AA46F2A55F2CFE1503574AAF7757D371A",
-    "notes":  "แก้ bug ใหญ่: updater bat เขียนไทยด้วย ascii ทำให้ full update พังเงียบ (เปลี่ยนเป็นอังกฤษ) + ปิดหน้าต่างเด้งตอนโหลด"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.29/AlphaTraderPro.exe",
+    "sha256":  "BBE0D1ECA4CBBFF304C9ED395F956C191034CE023F700D0BEB537CBD00DE524B",
+    "notes":  "XAUUSD: ปิด trailing + zone_atr_mult 0.3 + buffer_atr 0.05 (backtest 12mo \\, หัก spread 11)"
 }
