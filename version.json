@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.22",
+    "version":  "1.0.23",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.22/AlphaTraderPro.exe",
-    "sha256":  "418500A3FD52D8EA4918B39C3B18858AFFBF652A2B2A0616EE6700521CD76DAB",
-    "notes":  "ทดสอบระบบอัปเดต"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.23/AlphaTraderPro.exe",
+    "sha256":  "5DDCBCD6F2E47EAE8DC898E7EEF45342588533CC41FD202445AECA918F9ADC4F",
+    "notes":  "ใช้ curl ดาวน์โหลด (แก้ค้าง) + log ละเอียดทุกขั้นตอน"
 }
