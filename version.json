@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.38",
+    "version":  "1.0.39",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.38/patch.zip",
-    "sha256":  "D77CA89AB4C74FA858232144592ED3BF12FC3BDD2622C099F35C5179868A0879",
-    "notes":  "Show running balance in replay stats (compound); balance updates each trade"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.39/patch.zip",
+    "sha256":  "B9A97C7496E17E0DE96DF643EE0E4BA615FE848D1D2148FDCF7797585D0D438F",
+    "notes":  "เพิ่มปุ่มค้นหา MT5 terminal อัตโนมัติ ป้องกันเชื่อมผิด terminal บน VPS"
 }
