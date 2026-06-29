@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.39",
+    "version":  "1.0.40",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.39/patch.zip",
-    "sha256":  "B9A97C7496E17E0DE96DF643EE0E4BA615FE848D1D2148FDCF7797585D0D438F",
-    "notes":  "เพิ่มปุ่มค้นหา MT5 terminal อัตโนมัติ ป้องกันเชื่อมผิด terminal บน VPS"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.40/patch.zip",
+    "sha256":  "DECA6B5902614D8C996360F53F7B1128CB7F2D79CC78741FC4C5EE29B4C347CB",
+    "notes":  "ล็อก MT5 Terminal Path ต้องเลือกผ่าน browse หรือ detect เท่านั้น ป้องกันเชื่อมผิด terminal บน VPS"
 }
