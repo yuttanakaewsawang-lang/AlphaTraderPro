@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.51",
+    "version":  "1.0.52",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.51/AlphaTraderPro.exe",
-    "sha256":  "95252957E62621F454B399E37CF98EA89FA242269B6E90DA9D08876A3770552C",
-    "notes":  "fix: optimistic lock ป้องกัน order ซ้ำแท่ง, add min_sl_atr=0.3 ป้องกัน SL สั้น, sync MT5 history ทุกเครื่อง"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.52/AlphaTraderPro.exe",
+    "sha256":  "79E8BF22744E4F46243B8EBFD795A820EAB9209751F24B131D99C3BBA36F46CF",
+    "notes":  "fix: startup guards ป้องกัน order fire ทันทีเมื่อเปิดโปรแกรมใหม่"
 }
