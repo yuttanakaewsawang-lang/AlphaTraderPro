@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.48",
-    "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.48/patch.zip",
-    "sha256":  "6EBE510FC3F6ECD9F3A46905E205563399185FCCDAADE6E6AD2CE28C3CB94C08",
-    "notes":  "เพิ่ม Min SL / Max SL (pts) ใน Strategy Config UI"
+    "version":  "1.0.50",
+    "patch_only":  false,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.50/AlphaTraderPro.exe",
+    "sha256":  "6D006C82C201F8CDD85FEFBFDFD22D2EE757A6A6A89648EB08EED113FC5D73E6",
+    "notes":  "refactor: SL now anchors to zone boundary instead of signal candle high/low — lower DD, higher win rate"
 }
