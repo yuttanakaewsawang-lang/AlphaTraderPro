@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.42",
+    "version":  "1.0.43",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.42/AlphaTraderPro.exe",
-    "sha256":  "1E7FDAEFA09256F6B874DEF89981C816AB9CDCBF287FBCE24DECCDCB18C59A36",
-    "notes":  "แจ้งเตือนสถานะบอทใน Discord ทุก 30 นาที (balance, equity, ไม้เปิด, symbol ที่รัน)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.43/AlphaTraderPro.exe",
+    "sha256":  "38CD901680516D5180DFB80112C64CBDDD8A8BFECEB2EA7E022EDDABCEA050A9",
+    "notes":  "เพิ่ม Self-healing watchdog: รีสตาร์ทบอทอัตโนมัติเมื่อหยุดทำงาน/error loop, re-connect MT5, แจ้ง Discord เมื่อแก้เองไม่ได้"
 }
