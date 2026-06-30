@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.41",
+    "version":  "1.0.42",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.41/AlphaTraderPro.exe",
-    "sha256":  "01D88148BBEC810C8F14AA1FC3644D9A0270CC2799B102D668468B39A279D0DB",
-    "notes":  "บังคับเชื่อม MT5 terminal ตัวที่เลือกเท่านั้น + ตรวจสอบยืนยัน ถ้าเชื่อมผิดตัวจะตัดและแจ้งเตือน (แก้ปัญหา VPS หลาย terminal)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.42/AlphaTraderPro.exe",
+    "sha256":  "1E7FDAEFA09256F6B874DEF89981C816AB9CDCBF287FBCE24DECCDCB18C59A36",
+    "notes":  "แจ้งเตือนสถานะบอทใน Discord ทุก 30 นาที (balance, equity, ไม้เปิด, symbol ที่รัน)"
 }
