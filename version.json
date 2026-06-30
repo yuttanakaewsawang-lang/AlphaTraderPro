@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.44",
+    "version":  "1.0.45",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.44/AlphaTraderPro.exe",
-    "sha256":  "F043C65F5D7916CF64A47C21D3FF111DC8930A3AA27C1403A5BA7659240DFF52",
-    "notes":  "ข้อความแจ้งเตือน Discord สไตล์ Breaking News หลายชุดสลับสุ่ม + เพิ่มแจ้ง Online/Offline"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.45/AlphaTraderPro.exe",
+    "sha256":  "DE250BEF2A825CD64E122B25FDF0583FC1809818D80A00FD4E708261D8CD553C",
+    "notes":  "ป้องกัน order ซ้ำ: lock bar_time, cooldown หลัง trade ปิด, ตรวจ SL distance (min/max), เพิ่ม config min_sl_points/max_sl_points"
 }
