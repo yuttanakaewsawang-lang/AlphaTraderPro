@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.53",
-    "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.53/patch.zip",
-    "sha256":  "0A6609A1C63B58E85C1CF22987CD5F6722E1DF5C61604C4003EC3B580BFC7662",
-    "notes":  "minimal dark slate UI, trail mode 1 candle same-direction, OB/FVG distance guard"
+    "version":  "1.0.55",
+    "patch_only":  false,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.55/AlphaTraderPro.exe",
+    "sha256":  "B0C1FA20B447097E735332899A5D7ACA3D2C788AD0B219C1AEF0458E091AD097",
+    "notes":  "trend filter: HH/HL structure mode (backtest +39% R vs EMA50), candle trail same-direction, OB/FVG distance guard, minimal dark slate UI"
 }
