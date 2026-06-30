@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.46",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.46/AlphaTraderPro.exe",
-    "sha256":  "47EC375A0761034664B8EE6F929EE0992945B6ABA888A6B6C9DB5D4CF5C4FD6C",
-    "notes":  "Max trades per zone (1 ไม้/zone), Partial close lock (รอปิดหมดก่อนหา setup ใหม่)"
+    "version":  "1.0.48",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.48/patch.zip",
+    "sha256":  "6EBE510FC3F6ECD9F3A46905E205563399185FCCDAADE6E6AD2CE28C3CB94C08",
+    "notes":  "เพิ่ม Min SL / Max SL (pts) ใน Strategy Config UI"
 }
