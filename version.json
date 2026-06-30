@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.52",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.52/AlphaTraderPro.exe",
-    "sha256":  "79E8BF22744E4F46243B8EBFD795A820EAB9209751F24B131D99C3BBA36F46CF",
-    "notes":  "fix: startup guards ป้องกัน order fire ทันทีเมื่อเปิดโปรแกรมใหม่"
+    "version":  "1.0.53",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.53/patch.zip",
+    "sha256":  "0A6609A1C63B58E85C1CF22987CD5F6722E1DF5C61604C4003EC3B580BFC7662",
+    "notes":  "minimal dark slate UI, trail mode 1 candle same-direction, OB/FVG distance guard"
 }
