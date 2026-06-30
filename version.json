@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.45",
+    "version":  "1.0.46",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.45/AlphaTraderPro.exe",
-    "sha256":  "DE250BEF2A825CD64E122B25FDF0583FC1809818D80A00FD4E708261D8CD553C",
-    "notes":  "ป้องกัน order ซ้ำ: lock bar_time, cooldown หลัง trade ปิด, ตรวจ SL distance (min/max), เพิ่ม config min_sl_points/max_sl_points"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.46/AlphaTraderPro.exe",
+    "sha256":  "47EC375A0761034664B8EE6F929EE0992945B6ABA888A6B6C9DB5D4CF5C4FD6C",
+    "notes":  "Max trades per zone (1 ไม้/zone), Partial close lock (รอปิดหมดก่อนหา setup ใหม่)"
 }
