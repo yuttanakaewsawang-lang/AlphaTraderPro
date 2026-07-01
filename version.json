@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.56",
+    "version":  "1.0.57",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.56/AlphaTraderPro.exe",
-    "sha256":  "DC78C11AEA9EB6E56674EB11C54EE4DC215312BA7F5C0C21984FAD7FA9AF4E51",
-    "notes":  "fix trailing mode 1 candle: sync trail timeframe to zone_timeframe instead of hardcoded M15"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.57/AlphaTraderPro.exe",
+    "sha256":  "08364BF6B082208FBF147D49964220BAD619ADF8B1B33D999529897276DC5B27",
+    "notes":  "Swing SL default ON (tick-mode +37% profit vs row1 SL), fix trailing candle TF, trend filter HH/HL"
 }
