@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.55",
+    "version":  "1.0.56",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.55/AlphaTraderPro.exe",
-    "sha256":  "B0C1FA20B447097E735332899A5D7ACA3D2C788AD0B219C1AEF0458E091AD097",
-    "notes":  "trend filter: HH/HL structure mode (backtest +39% R vs EMA50), candle trail same-direction, OB/FVG distance guard, minimal dark slate UI"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.56/AlphaTraderPro.exe",
+    "sha256":  "DC78C11AEA9EB6E56674EB11C54EE4DC215312BA7F5C0C21984FAD7FA9AF4E51",
+    "notes":  "fix trailing mode 1 candle: sync trail timeframe to zone_timeframe instead of hardcoded M15"
 }
