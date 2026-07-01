@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.59",
+    "version":  "1.0.60",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.59/AlphaTraderPro.exe",
-    "sha256":  "005C147986212F249406C2E147BB43D788AABCEBC18E7FFA8C604C3505ACD86E",
-    "notes":  "fix: Min SL ATR / Max OB-Zone ATR / Swing SL / Trend Filter Mode not saving - missing from API model and DB save/load"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.60/AlphaTraderPro.exe",
+    "sha256":  "00E98DE8A9281BCA97CF81C96C5EF7E35FEA66AAF8305D60A08B5E7923918FB4",
+    "notes":  "add Discord + DB notification when news filter blocks trading (once per news event, includes event time/currency)"
 }
