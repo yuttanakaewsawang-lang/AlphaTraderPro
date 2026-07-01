@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.58",
+    "version":  "1.0.59",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.58/AlphaTraderPro.exe",
-    "sha256":  "DA7D9829196CB31815CF932E6DB043F8341667AED269360E1D68C269DE36E3DF",
-    "notes":  "Login: Account Number becomes dropdown when multiple saved accounts exist (saved_accounts table)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.59/AlphaTraderPro.exe",
+    "sha256":  "005C147986212F249406C2E147BB43D788AABCEBC18E7FFA8C604C3505ACD86E",
+    "notes":  "fix: Min SL ATR / Max OB-Zone ATR / Swing SL / Trend Filter Mode not saving - missing from API model and DB save/load"
 }
