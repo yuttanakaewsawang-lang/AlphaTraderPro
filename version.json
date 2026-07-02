@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.62",
+    "version":  "1.0.63",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.62/AlphaTraderPro.exe",
-    "sha256":  "F5C35A6B74A70F85DDB3CEBDEC7BD132FC728A90C21EF12B6003D10AD94C47F9",
-    "notes":  "Zone Entry Guard default ON (skip entries far from zone edge, tick-mode +59% profit), entry_mode + max_entry_zone_atr config"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.63/AlphaTraderPro.exe",
+    "sha256":  "75F0ECEFD0CE86C5737E2165240DE40361E9FE55B02FFEDD8C924E247435F468",
+    "notes":  "remove Rule Filter entirely (signals pass through directly); add Market Context panel - candle-based trend reading (structure/body/range/ATR) on selected TF + H1 reference, display only"
 }
