@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.69",
+    "version":  "1.0.70",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.69/ApolloAutoTrade.exe",
-    "sha256":  "81B020EED1429DE7DD4A7F872017CC548388E68D261C495AB8859D35470D814C",
-    "notes":  "Rebrand: AlphaTraderPro -\u003e Apollo Auto Trade (UI/exe/data dir/Discord/keygen), remove NYK logo, rotate license HMAC secret"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.70/ApolloAutoTrade.exe",
+    "sha256":  "00FB812325587F1EFCCAA413DA98E6FC4D179486B12EA205002FF2A6647AA2C0",
+    "notes":  "Add real Apollo Auto Trade logo (rocket/astronaut badge), transparent background, new app icon (.ico) and favicon"
 }
