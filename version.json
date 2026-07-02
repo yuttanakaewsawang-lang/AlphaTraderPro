@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.74",
+    "version":  "1.0.75",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.74/patch.zip",
-    "sha256":  "CE76A63EFA54F3EEA91BDEDC30FD4EB0D2D8DF5775F00C865241F3048CBE9AB7",
-    "notes":  "Dashboard: Market Context labels back to muted color, add glow effect behind text"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.75/patch.zip",
+    "sha256":  "17EB706044EEE822F0D2EF9CB04DC93C1FC5973A9BF2F34C6338F3D486FB8BEC",
+    "notes":  "Dashboard: remove glow from factor labels, add light glow to direction badge instead"
 }
