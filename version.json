@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.66",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.66/AlphaTraderPro.exe",
-    "sha256":  "78D671812079DF9FCDAF5C9117213B510924AA19A2EC705E3452FA08F6E89F13",
-    "notes":  "sync 10 default values across all config sources (BE 40/20, M5 entry, news 30min, trail candle mode); Backtest Replay now uses saved DB config as base for tuning"
+    "version":  "1.0.67",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.67/patch.zip",
+    "sha256":  "3FAF9E38132257A96E6D133762ACA53AB6623A5B0FD774A35806709701D5652D",
+    "notes":  "UI redesign: premium iOS-style dark mode across all views"
 }
