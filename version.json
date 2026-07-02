@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.64",
-    "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.64/patch.zip",
-    "sha256":  "669877E8A11BD79B4BFEEA6C1EA636E302180F3875DB626E4AFBC1D1A05681D9",
-    "notes":  "remove leftover Rule Filter menu item from sidebar"
+    "version":  "1.0.65",
+    "patch_only":  false,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.65/AlphaTraderPro.exe",
+    "sha256":  "EE0C7EF65086E64241AD9AC662C05B42A29186937339E0AF3C0A2E93CB66F76A",
+    "notes":  "fix news filter: online feed events never blocked trading (country code vs currency code mismatch), add country-to-currency mapping"
 }
