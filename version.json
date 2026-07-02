@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.72",
+    "version":  "1.0.73",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.72/patch.zip",
-    "sha256":  "135524DF6C5CB2DDBE66EADD4369F55523F048B1D6C6F9AC588B098A1A687CEA",
-    "notes":  "Login page: MT5 Terminal Path field styled with logo\u0027s blue tone"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.73/patch.zip",
+    "sha256":  "A28F87968B4C19C8BCC5CD08C2509CD37C2BCE689C9683A31700791F41A10E48",
+    "notes":  "Dashboard: Market Context panel - add distinct color per factor label"
 }
