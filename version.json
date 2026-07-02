@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.60",
+    "version":  "1.0.61",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.60/AlphaTraderPro.exe",
-    "sha256":  "00E98DE8A9281BCA97CF81C96C5EF7E35FEA66AAF8305D60A08B5E7923918FB4",
-    "notes":  "add Discord + DB notification when news filter blocks trading (once per news event, includes event time/currency)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.61/AlphaTraderPro.exe",
+    "sha256":  "A29E7F0CDEBA952A7B5032760970044E308E74538CF36F333DB58152B50692EA",
+    "notes":  "fix OB re-entry after zone reset; tuned defaults baked in (min_sl_atr 0.5, buffer_atr 0.15, zone_expiry 50) - fresh install or Reset to Recommended gives optimal XAUUSD M5 config"
 }
