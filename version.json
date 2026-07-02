@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.68",
+    "version":  "1.0.69",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.68/AlphaTraderPro.exe",
-    "sha256":  "C188D9AE7CB7B7EABD3C5A615695F8B6DEE46C3D5D7BBE860D67176777179587",
-    "notes":  "notify Discord when signal found but blocked by Zone Entry Guard (price too far from zone edge)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.69/ApolloAutoTrade.exe",
+    "sha256":  "81B020EED1429DE7DD4A7F872017CC548388E68D261C495AB8859D35470D814C",
+    "notes":  "Rebrand: AlphaTraderPro -\u003e Apollo Auto Trade (UI/exe/data dir/Discord/keygen), remove NYK logo, rotate license HMAC secret"
 }
