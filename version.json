@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.73",
+    "version":  "1.0.74",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.73/patch.zip",
-    "sha256":  "A28F87968B4C19C8BCC5CD08C2509CD37C2BCE689C9683A31700791F41A10E48",
-    "notes":  "Dashboard: Market Context panel - add distinct color per factor label"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.74/patch.zip",
+    "sha256":  "CE76A63EFA54F3EEA91BDEDC30FD4EB0D2D8DF5775F00C865241F3048CBE9AB7",
+    "notes":  "Dashboard: Market Context labels back to muted color, add glow effect behind text"
 }
