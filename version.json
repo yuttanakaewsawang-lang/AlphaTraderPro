@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.70",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.70/ApolloAutoTrade.exe",
-    "sha256":  "00FB812325587F1EFCCAA413DA98E6FC4D179486B12EA205002FF2A6647AA2C0",
-    "notes":  "Add real Apollo Auto Trade logo (rocket/astronaut badge), transparent background, new app icon (.ico) and favicon"
+    "version":  "1.0.71",
+    "patch_only":  true,
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.71/patch.zip",
+    "sha256":  "C3B40A035C089D52492E36765834ED53547A545406BF086817488F28FD7B803B",
+    "notes":  "Login page: bigger logo (200x200), title and LOGIN button colors matched to logo\u0027s blue tone"
 }
