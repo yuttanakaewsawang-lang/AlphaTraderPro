@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { RotateCcw, CheckCircle2, AlertTriangle } from 'lucide-react';
 import api from '../api';
 import type { StrategyConfig, ZoneResponse } from '../types/strategy';
 
@@ -19,12 +20,13 @@ const SESSION_OPTIONS: { id: string; th: string }[] = [
 const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
   risk_percent: 1, tp_ratio_rr: 3.5, max_trades_per_day: 10, max_daily_loss_percent: 15,
   max_portfolio_drawdown_pct: 20, max_spread_points: 15, news_filter_minutes: 30,
-  retrain_interval_days: 30, zone_expiry_bars: 100, zone_atr_mult: 0.3,
-  min_candle_atr: 0.3, max_candle_atr: 2.5, buffer_atr: 0.05,
+  retrain_interval_days: 30, zone_expiry_bars: 50, zone_atr_mult: 0.3,
+  min_candle_atr: 0.3, max_candle_atr: 2.5, buffer_atr: 0.15,
   use_trend_filter: 0, trend_filter_mode: 1, require_retest: 1, enable_ob_entry: 1, enable_fvg_entry: 0,
   require_engulfing: 0, use_partial_tp: 1, use_breakeven: 1, enable_trailing: 0,
   be_trigger_pct: 40, be_offset_pips: 20, trail_trigger_pct: 50, trail_mode: 1,
-  trail_candle_offset_pips: 30, enable_rule_filter: 0, min_sl_atr: 0.3, max_ob_zone_atr: 5.0, use_swing_sl: 1,
+  trail_candle_offset_pips: 30, min_sl_atr: 0.5, max_ob_zone_atr: 5.0, use_swing_sl: 1,
+  entry_mode: 1, max_entry_zone_atr: 0.3,
   zone_timeframe: 'M5', entry_timeframe: 'M5', trade_sessions: '',
 };
 
@@ -75,6 +77,8 @@ const CONFIG_FIELDS: {
   { key: 'buffer_atr', label: 'SL Buffer ATR×', desc: 'ระยะ buffer = ATR × ค่านี้ (0 = ใช้ pts)', step: '0.1', group: 'zone' },
   { key: 'min_sl_atr', label: 'Min SL ATR×', desc: 'SL ต้องห่างจาก entry อย่างน้อย ATR × ค่านี้ (0 = ปิด)', step: '0.1', group: 'zone' },
   { key: 'use_swing_sl', label: 'Swing SL', desc: 'วาง SL เหนือ/ใต้ swing high/low ล่าสุด (ปลอดภัยกว่า เลี่ยง stop-hunt)', group: 'zone', toggle: true },
+  { key: 'entry_mode', label: 'Zone Entry Guard', desc: 'เข้าเฉพาะไม้ที่ราคายังใกล้ขอบโซน — ข้ามไม้ที่ราคาวิ่งหนีไปไกลแล้ว (backtest +59%)', group: 'zone', toggle: true },
+  { key: 'max_entry_zone_atr', label: 'Max Entry-Zone ATR×', desc: 'ระยะห่างจากขอบโซนสูงสุดที่ยอมเข้า = ATR × ค่านี้', step: '0.1', group: 'zone', hideWhen: (f) => !Number(f.entry_mode) },
   { key: 'max_ob_zone_atr', label: 'Max OB-Zone ATR×', desc: 'OB/FVG ต้องห่างจาก active zone ไม่เกิน ATR × ค่านี้ (0 = ปิด)', step: '0.5', group: 'zone' },
 
   // ── ตัวกรองสัญญาณ ──
@@ -108,8 +112,6 @@ const CONFIG_FIELDS: {
   { key: 'partial_tp_close_pct', label: 'Partial TP Close (%)', desc: 'ปิดกี่ % ของ position เมื่อ trigger', step: '0.1', group: 'manage',
     disabledWhen: (f) => Number(f['use_partial_tp'] ?? 1) === 0 },
 
-  // ── Rule Filter ──
-  { key: 'enable_rule_filter', label: 'Rule Filter', desc: 'กรองสัญญาณด้วย EMA50 trend + RSI extreme + Expectancy สะสม', group: 'ai', toggle: true },
   // หมายเหตุ: Spread/Commission ย้ายไปแท็บ Backtest; sl_offset_atr/be_offset_atr ยังมีใน DB (0=ใช้ pip เดิม)
 ];
 
@@ -305,13 +307,6 @@ const CONFIG_GROUPS: { id: string; label: string; color: string; accent: string;
     tab: 'border-transparent text-ink-muted hover:text-violet-300',
     tabActive: 'border-violet-400 text-violet-300 bg-violet-500/8',
   },
-  {
-    id: 'ai', label: 'Rule Filter',
-    color: 'text-emerald-400', accent: 'bg-emerald-500/10',
-    border: 'border-emerald-500/30',
-    tab: 'border-transparent text-ink-muted hover:text-emerald-300',
-    tabActive: 'border-emerald-400 text-emerald-300 bg-emerald-500/8',
-  },
 ];
 
 interface StrategyViewProps {
@@ -477,7 +472,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const activeGroup = CONFIG_GROUPS.find((g) => g.id === activeTab)!;
 
   return (
-    <div className="flex flex-col gap-3 h-full overflow-hidden">
+    <div className="ios-fade-in flex flex-col gap-3 h-full overflow-hidden">
 
       {/* ── Header row ── */}
       <div className="flex items-center gap-3 flex-wrap shrink-0">
@@ -526,7 +521,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
                   <td>
                     <button
                       onClick={() => handleClosePosition(p.ticket)}
-                      className="text-red-400 hover:text-red-300 text-xs border border-red-500/40 hover:border-red-500/70 rounded-md px-2 py-0.5 transition-colors"
+                      className="ios-pressable text-red-400 hover:text-red-300 text-xs border border-red-500/40 hover:border-red-500/70 rounded-full px-2.5 py-0.5"
                     >
                       CLOSE
                     </button>
@@ -561,15 +556,16 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
             </div>
           </div>
 
-          {/* Tab bar */}
-          <div className="flex gap-1 px-4 pt-2 shrink-0 border-b border-[var(--hairline)]">
+          {/* Tab bar — iOS segmented control */}
+          <div className="flex gap-1 mx-4 mt-3 mb-1 p-1 rounded-xl shrink-0" style={{ background: 'var(--color-surface-3)' }}>
             {CONFIG_GROUPS.map((g) => (
               <button
                 key={g.id}
                 onClick={() => setActiveTab(g.id)}
-                className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors rounded-t-md -mb-px ${
-                  activeTab === g.id ? g.tabActive : g.tab
+                className={`ios-pressable flex-1 px-3 py-1.5 text-sm font-medium rounded-lg ${
+                  activeTab === g.id ? `${g.accent} ${g.color}` : 'text-ink-muted'
                 }`}
+                style={{ transition: 'background-color 0.25s var(--ease-ios), color 0.25s var(--ease-ios)' }}
               >
                 {g.label}
               </button>
@@ -679,13 +675,22 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
             <button
               onClick={handleResetDefault}
               disabled={resetting}
-              className="px-4 py-2 text-sm rounded-lg border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50 transition-colors"
+              className="ios-pressable flex items-center gap-1.5 px-4 py-2 text-sm rounded-xl border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
               title="Reset เป็นค่า Recommended จาก backtest Apr–Jun 2025"
             >
-              {resetting ? 'Resetting...' : '↺ Recommended Default'}
+              <RotateCcw size={13} strokeWidth={2.2} className={resetting ? 'animate-spin' : ''} />
+              {resetting ? 'Resetting...' : 'Recommended Default'}
             </button>
-            {saved && <span className="text-green-400 text-sm">Saved ✓</span>}
-            {saveError && <span className="text-red-400 text-sm">Error: {saveError}</span>}
+            {saved && (
+              <span className="flex items-center gap-1.5 text-sm" style={{ color: '#30D158' }}>
+                <CheckCircle2 size={14} strokeWidth={2.3} /> Saved
+              </span>
+            )}
+            {saveError && (
+              <span className="flex items-center gap-1.5 text-sm" style={{ color: '#FF453A' }}>
+                <AlertTriangle size={14} strokeWidth={2.3} /> Error: {saveError}
+              </span>
+            )}
           </div>
         </div>
       )}

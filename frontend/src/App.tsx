@@ -5,7 +5,6 @@ import Login from './components/Login';
 import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
 import StrategyView from './components/StrategyView';
-import AIView from './components/AIView';
 import HistoryView from './components/HistoryView';
 import LedgerView from './components/LedgerView';
 import StatsView from './components/StatsView';
@@ -98,10 +97,9 @@ const App: React.FC = () => {
           setSymbol={setSymbol}
           onLicenseExpired={() => { setLoggedIn(false); setLicensed(false); }}
         />
-        <div className="flex-1 overflow-auto p-4">
+        <div key={activeTab} className="ios-fade-in flex-1 overflow-auto p-4">
           {activeTab === 'dashboard' && <DashboardView symbol={symbol} />}
           {activeTab === 'strategy' && <StrategyView symbol={symbol} />}
-          {activeTab === 'ai' && <AIView symbol={symbol} />}
           {activeTab === 'livechart' && <LiveChartView symbol={symbol} />}
           {activeTab === 'replay' && <BacktestReplayView symbol={symbol} />}
           {activeTab === 'calendar' && <CalendarView />}

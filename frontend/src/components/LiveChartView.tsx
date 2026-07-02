@@ -114,10 +114,10 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
   const shiftHours = 7 - brokerOffset; // โบรกเกอร์ -> เวลาไทย (UTC+7)
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="ios-fade-in flex flex-col gap-3 h-full">
       <div className="flex items-center gap-3 flex-wrap shrink-0">
         <h1 className="lux-h1">Live Chart — {symbol}</h1>
-        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
           isRunning ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-ink-muted'
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-green-400 agent-pulse' : 'bg-ink-faint'}`} />
@@ -136,7 +136,7 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
           ))}
         </div>
         <label className="flex items-center gap-2 lux-label cursor-pointer select-none">
-          <input type="checkbox" checked={showOverlays} onChange={(e) => setShowOverlays(e.target.checked)} className="w-4 h-4 accent-[#D9933B]" />
+          <input type="checkbox" checked={showOverlays} onChange={(e) => setShowOverlays(e.target.checked)} className="w-4 h-4 accent-[#0A84FF]" />
           แสดง Order Block
         </label>
         <span className="lux-label">เวลาไทย</span>
@@ -186,13 +186,13 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
         </div>
         {openPos ? (
           <div className="flex flex-wrap items-center gap-3 mt-3 text-sm tabular-nums">
-            <span className={`font-semibold px-2 py-0.5 rounded text-xs ${openPos.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+            <span className={`font-semibold px-2.5 py-0.5 rounded-full text-xs ${openPos.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
               {openPos.type}
             </span>
             {openPos.volume != null && (
               <span className="text-ink-muted text-xs">{openPos.volume} lot</span>
             )}
-            <span>Entry <span className="text-[#3498DB] font-medium">{openPos.entry}</span></span>
+            <span>Entry <span className="text-[#0A84FF] font-medium">{openPos.entry}</span></span>
             <span>SL <span className="text-red-400 font-medium">{openPos.sl}</span></span>
             <span>TP <span className="text-green-400 font-medium">{openPos.tp}</span></span>
             {openPos.profit != null && (

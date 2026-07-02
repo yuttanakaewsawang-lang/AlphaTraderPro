@@ -51,7 +51,6 @@ export interface StrategyConfig {
   be_offset_pips: number;
   enable_trailing: number;
   sl_offset_pips: number;
-  enable_rule_filter: number;
   max_portfolio_drawdown_pct: number;
   news_filter_minutes: number;
   trade_sessions: string;
@@ -62,6 +61,8 @@ export interface StrategyConfig {
   min_sl_atr: number;
   max_ob_zone_atr: number;
   use_swing_sl: number;
+  entry_mode: number;
+  max_entry_zone_atr: number;
 }
 
 // Partial config sent to POST /api/strategy/config (รวม zone_timeframe/entry_timeframe ที่ปรับได้แล้ว)

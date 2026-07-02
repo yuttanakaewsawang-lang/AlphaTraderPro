@@ -17,8 +17,8 @@ const TitleBar: React.FC = () => {
     <div
       className="flex items-center h-10 px-3 select-none shrink-0"
       style={{
-        background: 'rgba(10,14,26,0.98)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(11,11,13,0.98)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
         // ให้ทั้งแถบ drag ได้ ยกเว้นปุ่ม (override ด้วย no-drag)
         WebkitAppRegion: 'drag',
       } as React.CSSProperties}
@@ -48,7 +48,7 @@ const TitleBar: React.FC = () => {
         {/* Minimize */}
         <button
           onClick={() => window.pywebview!.api.minimize()}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="ios-pressable w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white"
           title="Minimize"
         >
           <svg width="12" height="2" viewBox="0 0 12 2" fill="currentColor">
@@ -62,7 +62,7 @@ const TitleBar: React.FC = () => {
             if (isMaximized) { window.pywebview!.api.restore(); setIsMaximized(false); }
             else { window.pywebview!.api.maximize(); setIsMaximized(true); }
           }}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="ios-pressable w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white"
           title={isMaximized ? 'Restore' : 'Maximize'}
         >
           {isMaximized ? (
@@ -80,7 +80,7 @@ const TitleBar: React.FC = () => {
         {/* Close */}
         <button
           onClick={() => window.pywebview!.api.close()}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-500 text-white/60 hover:text-white transition-colors"
+          className="ios-pressable w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#FF453A] text-white/60 hover:text-white"
           title="Close"
         >
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.8">

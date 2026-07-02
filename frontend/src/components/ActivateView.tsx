@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Check, Copy } from 'lucide-react';
 import LineContact from './LineContact';
 
 const API_BASE = window.location.origin;
@@ -46,7 +47,7 @@ const ActivateView: React.FC<Props> = ({ onActivated }) => {
   };
 
   return (
-    <div className="h-screen bg-glow flex flex-col items-center justify-center p-4">
+    <div className="ios-fade-in h-screen bg-glow flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[400px] flex flex-col items-center gap-5">
         <img src="/logo.png" alt="Logo" className="w-20 h-20 object-contain" />
         <div className="text-center">
@@ -65,9 +66,9 @@ const ActivateView: React.FC<Props> = ({ onActivated }) => {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="px-3 h-10 lux-btn-primary text-sm shrink-0"
+                className="ios-pressable px-3 h-10 lux-btn-primary text-sm shrink-0 flex items-center gap-1.5"
               >
-                {copied ? '✓ Copied' : 'Copy'}
+                {copied ? <><Check size={14} strokeWidth={2.4} /> Copied</> : <><Copy size={14} strokeWidth={2.2} /> Copy</>}
               </button>
             </div>
           </div>

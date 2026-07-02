@@ -100,7 +100,7 @@ const EquityCurve: React.FC<{ points: EquityPoint[] }> = ({ points }) => {
   const y = (v: number) => pad + (1 - (v - min) / range) * (H - 2 * pad);
   const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.cumulative).toFixed(1)}`).join(' ');
   const last = values[values.length - 1];
-  const stroke = last >= 0 ? '#2ECC71' : '#E74C3C';
+  const stroke = last >= 0 ? '#30D158' : '#FF453A';
   const zeroY = y(0);
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 180 }} preserveAspectRatio="none">
@@ -149,7 +149,7 @@ const HistoryView: React.FC = () => {
     : [];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="ios-fade-in flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="lux-h1">Trade History</h1>
         <select
@@ -208,7 +208,7 @@ const HistoryView: React.FC = () => {
                     <td className="font-medium text-ink whitespace-nowrap">{r.symbol}</td>
                     <td>
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                        className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
                           r.type === 'BUY' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'
                         }`}
                       >
@@ -217,7 +217,7 @@ const HistoryView: React.FC = () => {
                     </td>
                     <td>
                       {PATTERN_STYLE[r.source] ? (
-                        <span className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold ${PATTERN_STYLE[r.source]}`}>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${PATTERN_STYLE[r.source]}`}>
                           {r.source}
                         </span>
                       ) : (

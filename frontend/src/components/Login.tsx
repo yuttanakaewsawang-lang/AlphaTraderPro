@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Eye, EyeOff, Search, FolderOpen, ListChecks, AlertTriangle } from 'lucide-react';
 
 const API_BASE = window.location.origin;
 
@@ -130,11 +131,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-glow px-4">
+    <div className="ios-fade-in flex flex-col items-center justify-center min-h-screen bg-glow px-4">
       <div className="mb-8 text-center">
         <img src="/logo.png" alt="Logo" width={72} height={72} className="mx-auto mb-4 drop-shadow-lg" />
-        <div className="text-xl font-bold tracking-wide" style={{ color: '#F0F4FF' }}>Alpha Trader Pro</div>
-        <div className="text-xs tracking-widest mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>TRADING TERMINAL</div>
+        <div className="text-xl font-bold tracking-wide" style={{ color: '#FFFFFF' }}>Alpha Trader Pro</div>
+        <div className="text-xs tracking-widest mt-1" style={{ color: 'rgba(235,235,245,0.38)' }}>TRADING TERMINAL</div>
       </div>
 
       <div className="w-full max-w-sm lux-card p-6 shadow-2xl">
@@ -166,8 +167,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                       if (savedAccounts.length === 1) handleSelectAccount(savedAccounts[0].login);
                     }}
                     title="เลือกจากบัญชีที่บันทึกไว้"
-                    className="h-10 px-3 text-sm lux-btn-ghost shrink-0">
-                    📋
+                    className="ios-pressable h-10 px-3 text-sm lux-btn-ghost shrink-0 flex items-center justify-center">
+                    <ListChecks size={15} strokeWidth={2.2} />
                   </button>
                 )}
               </div>
@@ -182,9 +183,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 className="w-full h-10 lux-input px-3 text-sm pr-12"
               />
               <button type="button" onClick={() => setShowPassword(s => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                style={{ color: '#82B1FF' }}>
-                {showPassword ? 'hide' : 'show'}
+                className="ios-pressable absolute right-3 top-1/2 -translate-y-1/2"
+                style={{ color: '#0A84FF' }}>
+                {showPassword ? <EyeOff size={15} strokeWidth={2.2} /> : <Eye size={15} strokeWidth={2.2} />}
               </button>
             </div>
           </div>
@@ -203,52 +204,52 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5 lux-label">
-              MT5 Terminal Path <span style={{ color: '#FF5252' }}>*</span>
+              MT5 Terminal Path <span style={{ color: '#FF453A' }}>*</span>
             </label>
             <div className="flex gap-1.5">
               <div
                 className="flex-1 h-10 lux-input px-3 text-sm flex items-center truncate cursor-default select-none"
-                style={{ color: terminalPath ? '#00E676' : 'rgba(255,255,255,0.28)' }}
+                style={{ color: terminalPath ? '#30D158' : 'rgba(235,235,245,0.30)' }}
                 title={terminalPath || 'ยังไม่ได้เลือก terminal'}
               >
-                {terminalPath || 'ยังไม่ได้เลือก — กด 🔍 หรือ ...'}
+                {terminalPath || 'ยังไม่ได้เลือก — กดปุ่มค้นหา'}
               </div>
               <button type="button" onClick={detectTerminals} disabled={detectingTerminals}
                 title="ค้นหา MT5 terminal ที่รันอยู่"
-                className="h-10 px-3 text-sm lux-btn-ghost shrink-0 disabled:opacity-60">
-                {detectingTerminals ? '…' : '🔍'}
+                className="ios-pressable h-10 px-3 text-sm lux-btn-ghost shrink-0 disabled:opacity-60 flex items-center justify-center">
+                <Search size={15} strokeWidth={2.2} className={detectingTerminals ? 'animate-spin' : ''} />
               </button>
               <button type="button" onClick={browseMT5}
                 title="เลือกไฟล์ terminal64.exe"
-                className="h-10 px-3 text-sm lux-btn-ghost shrink-0">
-                ...
+                className="ios-pressable h-10 px-3 text-sm lux-btn-ghost shrink-0 flex items-center justify-center">
+                <FolderOpen size={15} strokeWidth={2.2} />
               </button>
             </div>
             {showTerminalDropdown && detectedTerminals.length > 1 && (
               <div className="mt-1.5 lux-card overflow-hidden">
                 <div className="px-3 py-1.5 text-[11px] border-b lux-label"
-                  style={{ borderColor: 'rgba(255,215,64,0.20)', color: '#FFD740' }}>
+                  style={{ borderColor: 'rgba(255,214,10,0.20)', color: '#FFD60A' }}>
                   พบ {detectedTerminals.length} terminal — เลือก 1 ตัว
                 </div>
                 {detectedTerminals.map((t, i) => (
                   <button key={i} type="button"
                     onClick={() => { setTerminalPath(t); setShowTerminalDropdown(false); }}
                     className="w-full text-left px-3 py-2 text-xs hover:bg-white/[0.06] truncate"
-                    style={{ color: '#F0F4FF' }}>
+                    style={{ color: '#FFFFFF' }}>
                     {t}
                   </button>
                 ))}
               </div>
             )}
             {detectedTerminals.length === 0 && !detectingTerminals && !terminalPath && (
-              <p className="mt-1 text-[11px]" style={{ color: '#FF5252' }}>ต้องเลือก terminal ก่อน login</p>
+              <p className="mt-1 text-[11px]" style={{ color: '#FF453A' }}>ต้องเลือก terminal ก่อน login</p>
             )}
           </div>
 
           <div className="flex items-center justify-between pt-1">
             <label className="flex items-center gap-2 text-xs cursor-pointer select-none lux-label">
               <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)}
-                className="w-3 h-3" style={{ accentColor: '#82B1FF' }} />
+                className="w-3 h-3" style={{ accentColor: '#0A84FF' }} />
               Remember Me
             </label>
             <button type="submit" disabled={loading}
@@ -257,17 +258,19 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </button>
           </div>
           {error && (
-            <div className="text-xs text-center px-3 py-2 rounded-lg"
-              style={{ color: '#FF5252', background: 'rgba(255,82,82,0.10)', border: '1px solid rgba(255,82,82,0.25)' }}>
+            <div className="flex items-center gap-1.5 text-xs text-center px-3 py-2 rounded-xl"
+              style={{ color: '#FF453A', background: 'rgba(255,69,58,0.10)', border: '1px solid rgba(255,69,58,0.25)' }}>
+              <AlertTriangle size={13} strokeWidth={2.3} className="shrink-0" />
               {error}
             </div>
           )}
         </form>
       </div>
 
-      <div className="mt-4 text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>v{version || '—'}</div>
-      <div className="mt-1.5 text-xs text-center max-w-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.25)' }}>
-        ⚠ คำเตือน: การเทรด CFD มีความเสี่ยงสูงมากที่จะสูญเสียเงินลงทุนทั้งหมดอย่างรวดเร็ว
+      <div className="mt-4 text-[10px]" style={{ color: 'rgba(235,235,245,0.28)' }}>v{version || '—'}</div>
+      <div className="mt-1.5 text-xs text-center max-w-xs leading-relaxed flex items-center gap-1.5 justify-center" style={{ color: 'rgba(235,235,245,0.28)' }}>
+        <AlertTriangle size={11} strokeWidth={2.2} className="shrink-0" />
+        คำเตือน: การเทรด CFD มีความเสี่ยงสูงมากที่จะสูญเสียเงินลงทุนทั้งหมดอย่างรวดเร็ว
       </div>
     </div>
   );

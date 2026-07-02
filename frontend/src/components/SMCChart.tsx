@@ -45,19 +45,19 @@ interface SMCChartProps {
   showOverlays?: boolean;    // false = ซ่อน Order Block เหลือแค่โซน + retest
 }
 
-const WIN_COLOR = '#2ECC71';
-const LOSS_COLOR = '#E74C3C';
-const OPEN_MARK_COLOR = '#95A5A6';
-const RETEST_COLOR = '#F1C40F';
+const WIN_COLOR = '#30D158';
+const LOSS_COLOR = '#FF453A';
+const OPEN_MARK_COLOR = '#98989D';
+const RETEST_COLOR = '#FFD60A';
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-const SBR_COLOR = 'rgba(231, 76, 60, 0.18)'; // red - sell zone (SBR)
-const RBS_COLOR = 'rgba(46, 204, 113, 0.18)'; // green - buy zone (RBS)
+const SBR_COLOR = 'rgba(255, 69, 58, 0.18)'; // red - sell zone (SBR)
+const RBS_COLOR = 'rgba(48, 209, 88, 0.18)'; // green - buy zone (RBS)
 
-const BULLISH_COLOR = '#2ECC71';
-const BEARISH_COLOR = '#E74C3C';
-const BULLISH_OB_FILL = 'rgba(46, 204, 113, 0.12)';
-const BEARISH_OB_FILL = 'rgba(231, 76, 60, 0.12)';
+const BULLISH_COLOR = '#30D158';
+const BEARISH_COLOR = '#FF453A';
+const BULLISH_OB_FILL = 'rgba(48, 209, 88, 0.12)';
+const BEARISH_OB_FILL = 'rgba(255, 69, 58, 0.12)';
 // OB ที่ยังไม่ถูกแตะ (fresh) = ขอบสว่าง+หนา+มีป้าย; OB เก่า (mitigated) = ขอบจาง
 const OB_FRESH_BULL = 'rgba(46, 204, 113, 0.95)';
 const OB_FRESH_BEAR = 'rgba(231, 76, 60, 0.95)';
@@ -142,11 +142,11 @@ const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, can
     });
 
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: '#2ECC71',
-      downColor: '#E74C3C',
+      upColor: '#30D158',
+      downColor: '#FF453A',
       borderVisible: false,
-      wickUpColor: '#2ECC71',
-      wickDownColor: '#E74C3C',
+      wickUpColor: '#30D158',
+      wickDownColor: '#FF453A',
     });
 
     const zonePrimitive = new ZoneBandPrimitive();
@@ -428,7 +428,7 @@ const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, can
         priceLinesRef.current.push(
           series.createPriceLine({ price, color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title })
         );
-      add(preview.entry, '#3498DB', 'Entry');
+      add(preview.entry, '#0A84FF', 'Entry');
       add(preview.sl, BEARISH_COLOR, 'SL');
       add(preview.tp, BULLISH_COLOR, 'TP');
     }

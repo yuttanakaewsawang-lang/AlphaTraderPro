@@ -101,16 +101,16 @@ const CalendarView: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="ios-fade-in flex flex-col gap-3 h-full">
       <div className="flex items-center justify-between shrink-0 flex-wrap gap-2">
         <h1 className="lux-h1">Calendar — ปฏิทินข่าวเศรษฐกิจ</h1>
-        <button onClick={() => load(true)} disabled={loading} className="lux-btn-ghost px-3 h-8 text-xs disabled:opacity-50">
+        <button onClick={() => load(true)} disabled={loading} className="ios-pressable lux-btn-ghost px-3 h-8 text-xs disabled:opacity-50">
           {loading ? 'กำลังโหลด…' : 'รีเฟรช'}
         </button>
       </div>
 
       {/* Countdown ข่าวแรงตัวถัดไป */}
-      <div className="lux-panel p-4 shrink-0 flex items-center gap-4 flex-wrap" style={{ borderLeft: '3px solid #E74C3C' }}>
+      <div className="lux-panel p-4 shrink-0 flex items-center gap-4 flex-wrap" style={{ borderLeft: '3px solid #FF453A' }}>
         <div>
           <p className="lux-label">ข่าวแรงตัวถัดไป (อีก)</p>
           <p className="text-2xl font-bold text-red-400 tabular-nums mt-0.5">{countdown ?? '—'}</p>
@@ -134,7 +134,7 @@ const CalendarView: React.FC = () => {
         <span className="lux-label">Impact:</span>
         {(['high', 'medium', 'all'] as const).map((i) => (
           <button key={i} onClick={() => setImpactFilter(i)}
-            className={`px-3 h-7 rounded-md border ${impactFilter === i ? 'bg-gold/15 text-gold border-gold/40' : 'border-white/10 text-ink-muted hover:text-ink'}`}>
+            className={`ios-pressable px-3 h-7 rounded-full border ${impactFilter === i ? 'bg-gold/15 text-gold border-gold/40' : 'border-white/10 text-ink-muted hover:text-ink'}`}>
             {i === 'high' ? 'สูงเท่านั้น' : i === 'medium' ? 'กลาง+สูง' : 'ทั้งหมด'}
           </button>
         ))}
@@ -180,7 +180,7 @@ const CalendarView: React.FC = () => {
                         <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap text-ink-muted">{hhmm(e.time_utc)}</td>
                         <td className="py-1.5 pr-3 font-semibold text-ink">{e.currency}</td>
                         <td className="py-1.5 pr-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${st.color}`}>{st.label}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${st.color}`}>{st.label}</span>
                         </td>
                         <td className="py-1.5 pr-3 text-ink-muted truncate">{e.title}</td>
                         <td className={`py-1.5 pr-3 text-right tabular-nums ${actualColor(e)}`}>{e.actual || '—'}</td>

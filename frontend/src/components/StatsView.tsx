@@ -39,7 +39,7 @@ const StatsView: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="ios-fade-in flex flex-col gap-6">
       <h1 className="lux-h1">Statistics</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { LogOut } from 'lucide-react';
 import api from '../api';
 import LineContact from './LineContact';
 
@@ -43,13 +44,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="ios-fade-in flex flex-col gap-3 h-full">
       <h1 className="lux-h1">Settings</h1>
 
       <div className="lux-card p-6 max-w-[560px] space-y-3">
         <div>
           <h2 className="lux-title">Discord Notifications</h2>
-          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <p className="text-xs mt-1" style={{ color: 'rgba(235,235,245,0.38)' }}>
             แจ้งเตือนเปิด/ปิดไม้ + สรุปพอร์ตรายวัน ผ่าน Discord webhook
           </p>
         </div>
@@ -65,7 +66,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
             {saving ? 'SAVING...' : 'SAVE'}
           </button>
           <button type="button" onClick={handleTest} className="h-10 px-6 lux-btn-ghost text-sm">TEST</button>
-          {message && <span className="self-center text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{message}</span>}
+          {message && <span className="self-center text-sm" style={{ color: 'rgba(235,235,245,0.55)' }}>{message}</span>}
         </div>
       </div>
 
@@ -76,14 +77,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
       <div className="lux-card p-6 max-w-[560px] space-y-3">
         <div>
           <h2 className="lux-title">Account</h2>
-          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>ออกจากระบบและกลับไปหน้า Login</p>
+          <p className="text-xs mt-1" style={{ color: 'rgba(235,235,245,0.38)' }}>ออกจากระบบและกลับไปหน้า Login</p>
         </div>
         <button
           type="button"
           onClick={onLogout}
-          className="h-10 px-6 lux-btn-ghost text-sm"
-          style={{ color: '#FF5252' }}
+          className="ios-pressable h-10 px-6 lux-btn-ghost text-sm flex items-center gap-2"
+          style={{ color: '#FF453A' }}
         >
+          <LogOut size={14} strokeWidth={2.2} />
           LOGOUT
         </button>
       </div>

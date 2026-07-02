@@ -1,22 +1,26 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { History, Settings, TrendingUp, BarChart2, Receipt, Bot, LayoutDashboard, CalendarDays, CandlestickChart, Play } from 'lucide-react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  History, Settings, TrendingUp, BarChart2, Receipt, LayoutDashboard,
+  CalendarDays, CandlestickChart, Play, Zap, Wallet, LineChart, Activity,
+  AlertTriangle, RefreshCw, ChevronRight, CheckCircle2,
+} from 'lucide-react';
 import api from '../api';
 import type { ZoneResponse } from '../types/strategy';
 
 const LicenseCountdown: React.FC<{ expiry: string; onExpired: () => void }> = ({ expiry, onExpired }) => {
   const [remaining, setRemaining] = useState('');
-  const [color, setColor] = useState('#26A69A');
+  const [color, setColor] = useState('#30D158');
   const ref = useRef<ReturnType<typeof setInterval> | null>(null);
   const expiredFired = useRef(false);
 
   useEffect(() => {
     expiredFired.current = false;
-    if (expiry === 'ไม่จำกัด') { setRemaining('∞ Unlimited'); setColor('#26A69A'); return; }
+    if (expiry === 'ไม่จำกัด') { setRemaining('∞ Unlimited'); setColor('#30D158'); return; }
     const tick = () => {
       const ms = new Date(expiry).getTime() - Date.now();
       if (ms <= 0) {
         setRemaining('หมดอายุแล้ว');
-        setColor('#EF5350');
+        setColor('#FF453A');
         if (!expiredFired.current) { expiredFired.current = true; onExpired(); }
         return;
       }
@@ -27,7 +31,7 @@ const LicenseCountdown: React.FC<{ expiry: string; onExpired: () => void }> = ({
       setRemaining(d > 0
         ? `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
         : `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
-      setColor(d <= 7 ? '#EF5350' : d <= 30 ? '#FFD740' : '#26A69A');
+      setColor(d <= 7 ? '#FF453A' : d <= 30 ? '#FFD60A' : '#30D158');
     };
     tick();
     ref.current = setInterval(tick, 1000);
@@ -35,10 +39,10 @@ const LicenseCountdown: React.FC<{ expiry: string; onExpired: () => void }> = ({
   }, [expiry]);
 
   return (
-    <div className="flex items-center justify-between px-2 py-1.5 rounded-lg"
-      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}>
-      <span className="text-[10px] uppercase tracking-widest lux-label">License</span>
-      <span className="text-[11px] font-medium tabular-nums" style={{ color }}>{remaining}</span>
+    <div className="flex items-center justify-between px-3 py-2 rounded-xl"
+      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <span className="text-[10px] uppercase tracking-wider lux-label">License</span>
+      <span className="text-[11px] font-semibold tabular-nums" style={{ color }}>{remaining}</span>
     </div>
   );
 };
@@ -54,16 +58,15 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'dashboard',  label: 'Dashboard',       icon: <LayoutDashboard size={18} /> },
-  { id: 'strategy',   label: 'Strategy',        icon: <TrendingUp size={18} /> },
-  { id: 'ai',         label: 'Rule Filter',     icon: <Bot size={18} /> },
-  { id: 'livechart',  label: 'Live Chart',      icon: <CandlestickChart size={18} /> },
-  { id: 'replay',     label: 'Backtest Replay', icon: <Play size={18} /> },
-  { id: 'calendar',   label: 'Calendar',        icon: <CalendarDays size={18} /> },
-  { id: 'history',    label: 'History',         icon: <History size={18} /> },
-  { id: 'ledger',     label: 'Trade Ledger',    icon: <Receipt size={18} /> },
-  { id: 'stats',      label: 'Statistics',      icon: <BarChart2 size={18} /> },
-  { id: 'settings',   label: 'Settings',        icon: <Settings size={18} /> },
+  { id: 'dashboard',  label: 'Dashboard',       icon: LayoutDashboard },
+  { id: 'strategy',   label: 'Strategy',        icon: TrendingUp },
+  { id: 'livechart',  label: 'Live Chart',      icon: CandlestickChart },
+  { id: 'replay',     label: 'Backtest Replay', icon: Play },
+  { id: 'calendar',   label: 'Calendar',        icon: CalendarDays },
+  { id: 'history',    label: 'History',         icon: History },
+  { id: 'ledger',     label: 'Trade Ledger',    icon: Receipt },
+  { id: 'stats',      label: 'Statistics',      icon: BarChart2 },
+  { id: 'settings',   label: 'Settings',        icon: Settings },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -79,6 +82,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [updating, setUpdating] = useState(false);
   const [checking, setChecking] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'latest' | 'available' | 'error'>('idle');
+
+  const navRef = useRef<HTMLElement | null>(null);
+  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [pill, setPill] = useState({ top: 0, height: 0, ready: false });
+
+  useLayoutEffect(() => {
+    const el = itemRefs.current[activeTab];
+    if (el) setPill({ top: el.offsetTop, height: el.offsetHeight, ready: true });
+  }, [activeTab]);
 
   const checkUpdate = async () => {
     setChecking(true);
@@ -173,93 +185,114 @@ const Sidebar: React.FC<SidebarProps> = ({
   const profitPos = (account?.profit_total ?? 0) >= 0;
 
   return (
-    <div id="sidebar" className="w-[260px] h-screen flex flex-col shrink-0 border-r"
-      style={{
-        background: '#161B27',
-        borderColor: 'rgba(255,255,255,0.07)',
-      }}>
+    <div id="sidebar" className="ios-glass w-[264px] h-screen flex flex-col shrink-0 border-r"
+      style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
       <div className="flex-1 overflow-y-auto scrollbar-none">
 
         {/* ── Header: Brand + Symbol ── */}
-        <div className="px-4 pt-5 pb-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+        <div className="px-4 pt-5 pb-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gradient-gold font-bold text-base tracking-tight">Alpha Trader Pro</span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+            <div className="flex items-center gap-2.5">
+              <div className="ios-icon-tile w-8 h-8 shrink-0"
+                style={{ background: 'linear-gradient(135deg, #0A84FF, #0060DF)', boxShadow: '0 4px 12px -3px rgba(10,132,255,0.55)' }}>
+                <Zap size={16} color="#fff" strokeWidth={2.4} fill="#fff" />
+              </div>
+              <div className="leading-tight">
+                <p className="font-semibold text-[13.5px] tracking-tight" style={{ color: '#FFFFFF' }}>Alpha Trader Pro</p>
+                <p className="text-[10px]" style={{ color: 'rgba(235,235,245,0.38)' }}>Trading Assistant</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0"
               style={isRunning
-                ? { background: 'rgba(38,166,154,0.12)', color: '#26A69A', border: '1px solid rgba(38,166,154,0.22)' }
-                : { background: 'rgba(255,255,255,0.05)', color: 'rgba(232,234,240,0.30)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              {isRunning ? '● LIVE' : '○ OFF'}
+                ? { background: 'rgba(48,209,88,0.14)', color: '#30D158', border: '1px solid rgba(48,209,88,0.25)' }
+                : { background: 'rgba(255,255,255,0.06)', color: 'rgba(235,235,245,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'agent-pulse' : ''}`} style={{ background: isRunning ? '#30D158' : 'rgba(235,235,245,0.35)' }} />
+              {isRunning ? 'LIVE' : 'OFF'}
             </span>
           </div>
           <select
             value={symbol}
             onChange={(e) => setSymbol(e.target.value)}
-            className="w-full h-8 lux-input px-2 text-sm font-semibold tabular-nums"
+            className="w-full h-9 lux-input px-3 text-sm font-semibold tabular-nums"
           >
             {symbols.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
 
         {/* ── Account Panel ── */}
-        <div className="px-4 py-4 border-b space-y-3" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-          <div className="flex items-center gap-1.5" style={{ color: 'rgba(232,234,240,0.30)' }}>
-            <Settings size={11} />
-            <span className="text-[10px] uppercase tracking-widest truncate">{account?.broker || '---'}</span>
+        <div className="px-4 py-4 border-b space-y-2" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-1.5 mb-1" style={{ color: 'rgba(235,235,245,0.35)' }}>
+            <span className="text-[10px] uppercase tracking-wider truncate">{account?.broker || '---'}</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[9px] uppercase tracking-widest mb-0.5 lux-label">Balance</p>
-              <p className="font-semibold text-sm tabular-nums" style={{ color: '#E8EAF0' }}>
+            <div className="lux-inset px-3 py-2.5">
+              <div className="ios-icon-tile w-6 h-6 mb-1.5" style={{ background: 'rgba(10,132,255,0.16)' }}>
+                <Wallet size={12} color="#0A84FF" strokeWidth={2.3} />
+              </div>
+              <p className="text-[9px] uppercase tracking-wider mb-0.5 lux-label">Balance</p>
+              <p className="font-semibold text-sm tabular-nums" style={{ color: '#FFFFFF' }}>
                 ${account?.balance?.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
               </p>
             </div>
-            <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[9px] uppercase tracking-widest mb-0.5 lux-label">Equity</p>
-              <p className="text-gradient-gold font-semibold text-sm tabular-nums">
+            <div className="lux-inset px-3 py-2.5">
+              <div className="ios-icon-tile w-6 h-6 mb-1.5" style={{ background: 'rgba(191,90,242,0.16)' }}>
+                <LineChart size={12} color="#BF5AF2" strokeWidth={2.3} />
+              </div>
+              <p className="text-[9px] uppercase tracking-wider mb-0.5 lux-label">Equity</p>
+              <p className="font-semibold text-sm tabular-nums" style={{ color: '#FFFFFF' }}>
                 ${account?.equity?.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
               </p>
             </div>
           </div>
-          <div className="flex items-center justify-between px-1">
-            <div>
-              <p className="text-[9px] uppercase tracking-widest mb-0.5 lux-label">P&L</p>
-              <p className="font-semibold text-sm tabular-nums"
-                style={{ color: profitPos ? '#26A69A' : '#EF5350' }}>
-                {profitPos ? '+' : ''}${account?.profit_total?.toFixed(2) || '0.00'}
-              </p>
+          <div className="flex items-center justify-between px-1 pt-1">
+            <div className="flex items-center gap-2">
+              {profitPos
+                ? <TrendingUp size={13} color="#30D158" strokeWidth={2.4} />
+                : <TrendingUp size={13} color="#FF453A" strokeWidth={2.4} style={{ transform: 'scaleY(-1)' }} />}
+              <div>
+                <p className="text-[9px] uppercase tracking-wider mb-0.5 lux-label">P&L</p>
+                <p className="font-semibold text-sm tabular-nums"
+                  style={{ color: profitPos ? '#30D158' : '#FF453A' }}>
+                  {profitPos ? '+' : ''}${account?.profit_total?.toFixed(2) || '0.00'}
+                </p>
+              </div>
             </div>
-            <div className="h-6 w-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-widest mb-0.5 lux-label">Trades</p>
-              <p className="font-semibold text-sm tabular-nums" style={{ color: '#E8EAF0' }}>{account?.trades_total || '0'}</p>
+            <div className="flex items-center gap-2 text-right">
+              <div>
+                <p className="text-[9px] uppercase tracking-wider mb-0.5 lux-label">Trades</p>
+                <p className="font-semibold text-sm tabular-nums" style={{ color: '#FFFFFF' }}>{account?.trades_total || '0'}</p>
+              </div>
+              <Activity size={13} color="rgba(235,235,245,0.35)" strokeWidth={2.3} />
             </div>
           </div>
         </div>
 
         {/* ── Navigation ── */}
-        <nav className="py-3 px-2 space-y-0.5">
+        <nav ref={navRef} className="relative py-3 px-2 space-y-0.5">
+          {pill.ready && (
+            <span
+              className="absolute left-2 right-2 rounded-xl pointer-events-none"
+              style={{
+                top: pill.top,
+                height: pill.height,
+                background: 'rgba(10,132,255,0.16)',
+                border: '1px solid rgba(10,132,255,0.30)',
+                transition: 'top 0.35s var(--ease-ios), height 0.35s var(--ease-ios)',
+              }}
+            />
+          )}
           {menuItems.map((item) => {
             const active = activeTab === item.id;
+            const Icon = item.icon;
             return (
               <button
                 key={item.id}
+                ref={(el) => { itemRefs.current[item.id] = el; }}
                 onClick={() => setActiveTab(item.id)}
-                className="relative w-full flex items-center gap-3 px-3 py-2 text-sm transition-all rounded-xl"
-                style={active ? {
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  color: '#E8EAF0',
-                  fontWeight: 500,
-                } : {
-                  border: '1px solid transparent',
-                  color: 'rgba(232,234,240,0.40)',
-                }}
+                className="ios-pressable relative z-10 w-full flex items-center gap-3 px-3 py-2 text-sm rounded-xl"
+                style={{ color: active ? '#FFFFFF' : 'rgba(235,235,245,0.45)', fontWeight: active ? 600 : 500 }}
               >
-                {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-[3px] rounded-full"
-                    style={{ background: '#26A69A' }} />
-                )}
-                <span style={{ color: active ? '#E8EAF0' : 'rgba(232,234,240,0.32)' }}>{item.icon}</span>
+                <Icon size={17} strokeWidth={2.2} color={active ? '#0A84FF' : 'rgba(235,235,245,0.38)'} />
                 <span className="flex-1 text-left">{item.label}</span>
               </button>
             );
@@ -268,19 +301,19 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* ── Bottom: Auto Trade + Status ── */}
-      <div className="p-4 border-t shrink-0 space-y-3" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+      <div className="p-4 border-t shrink-0 space-y-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
         {running.mt5_connected === false && (
-          <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
-            style={{ background: 'rgba(255,82,82,0.10)', border: '1px solid rgba(255,82,82,0.25)' }}>
-            <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#EF5350' }} />
-            <span className="text-[11px] font-medium" style={{ color: '#EF5350' }}>MT5 ขาดการเชื่อมต่อ</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(255,69,58,0.12)', border: '1px solid rgba(255,69,58,0.25)' }}>
+            <AlertTriangle size={13} color="#FF453A" strokeWidth={2.3} className="shrink-0" />
+            <span className="text-[11px] font-medium" style={{ color: '#FF453A' }}>MT5 ขาดการเชื่อมต่อ</span>
           </div>
         )}
         {running.algo_trading === false && (
-          <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
-            style={{ background: 'rgba(255,215,64,0.10)', border: '1px solid rgba(255,215,64,0.25)' }}>
-            <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#FFD740' }} />
-            <span className="text-[11px] font-medium" style={{ color: '#FFD740' }}>Algo Trading ปิดอยู่ — เปิด AutoTrading ใน MT5</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(255,214,10,0.12)', border: '1px solid rgba(255,214,10,0.25)' }}>
+            <AlertTriangle size={13} color="#FFD60A" strokeWidth={2.3} className="shrink-0" />
+            <span className="text-[11px] font-medium" style={{ color: '#FFD60A' }}>Algo Trading ปิดอยู่ — เปิด AutoTrading ใน MT5</span>
           </div>
         )}
         {running.smc.length > 0 && (
@@ -292,11 +325,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   key={`smc-${s}`}
                   onClick={() => stopSymbol(s)}
                   title="คลิกเพื่อหยุด"
-                  className="group inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors text-[11px] font-medium"
-                  style={{ background: 'rgba(38,166,154,0.10)', border: '1px solid rgba(0,230,118,0.25)', color: '#F0F4FF' }}>
-                  <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#26A69A' }} />
+                  className="ios-pressable group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                  style={{ background: 'rgba(48,209,88,0.12)', border: '1px solid rgba(48,209,88,0.28)', color: '#F0F4FF' }}>
+                  <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#30D158' }} />
                   <span className="tabular-nums">{s}</span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#EF5350' }}>✕</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#FF453A' }}>✕</span>
                 </button>
               ))}
             </div>
@@ -306,9 +339,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={toggleAutoTrade}
           disabled={toggling}
-          className={`w-full h-11 text-sm tracking-wide active:scale-[0.98] disabled:opacity-50 ${
+          className={`w-full h-11 text-sm tracking-wide disabled:opacity-50 ${
             isRunning ? 'lux-btn-danger' : 'lux-btn-primary'
           }`}
+          style={{ transitionTimingFunction: 'var(--ease-ios)' }}
         >
           {isRunning ? 'STOP AUTO TRADE' : 'START AUTO TRADE'}
         </button>
@@ -316,42 +350,48 @@ const Sidebar: React.FC<SidebarProps> = ({
         {licenseExpiry && <LicenseCountdown expiry={licenseExpiry} onExpired={onLicenseExpired ?? (() => {})} />}
 
         <div className="flex items-center justify-between pt-1">
-          <span className="text-[10px] tabular-nums" style={{ color: 'rgba(255,255,255,0.28)' }}>
+          <span className="text-[10px] tabular-nums" style={{ color: 'rgba(235,235,245,0.32)' }}>
             v{update?.current ?? '—'}
           </span>
           {update?.has_update ? (
             <div className="flex flex-col items-end gap-0.5">
               <button onClick={applyUpdate} disabled={updating}
-                className="text-[11px] font-medium disabled:opacity-50 flex items-center gap-1"
-                style={{ color: '#FFD740' }}>
-                <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#FFD740' }} />
+                className="ios-pressable text-[11px] font-medium disabled:opacity-50 flex items-center gap-1"
+                style={{ color: '#FFD60A' }}>
+                <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#FFD60A' }} />
                 {updating ? 'กำลังติดตั้ง…' : `อัปเดต v${update.latest}`}
               </button>
               {update.notes && (
-                <span className="text-[9px] text-right max-w-[120px] leading-tight" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                <span className="text-[9px] text-right max-w-[120px] leading-tight" style={{ color: 'rgba(235,235,245,0.32)' }}>
                   {update.notes}
                 </span>
               )}
             </div>
           ) : (
             <button onClick={checkUpdate} disabled={checking || updating}
-              className="text-[11px] disabled:opacity-40"
-              style={{ color: 'rgba(255,255,255,0.40)' }}>
+              className="ios-pressable text-[11px] disabled:opacity-40 flex items-center gap-1"
+              style={{ color: 'rgba(235,235,245,0.45)' }}>
+              <RefreshCw size={11} className={checking ? 'animate-spin' : ''} />
               {checking ? 'กำลังเช็ค…' : 'ตรวจสอบอัปเดต'}
             </button>
           )}
         </div>
         {updateStatus === 'latest' && (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#26A69A' }}>✓ เวอร์ชันล่าสุดแล้ว</div>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#30D158' }}>
+            <CheckCircle2 size={11} strokeWidth={2.3} /> เวอร์ชันล่าสุดแล้ว
+          </div>
         )}
         {updateStatus === 'available' && (
-          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#FFD740' }}>
-            <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#FFD740' }} />
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#FFD60A' }}>
+            <span className="w-1.5 h-1.5 rounded-full agent-pulse" style={{ background: '#FFD60A' }} />
             มีเวอร์ชันใหม่ v{update?.latest}
+            <ChevronRight size={11} />
           </div>
         )}
         {updateStatus === 'error' && (
-          <div className="text-[10px]" style={{ color: '#EF5350' }}>⚠ เช็คไม่ได้ — ตรวจสอบการเชื่อมต่อ</div>
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#FF453A' }}>
+            <AlertTriangle size={11} strokeWidth={2.3} /> เช็คไม่ได้ — ตรวจสอบการเชื่อมต่อ
+          </div>
         )}
       </div>
     </div>

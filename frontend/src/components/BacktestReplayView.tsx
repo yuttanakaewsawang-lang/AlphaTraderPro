@@ -169,9 +169,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       autoSize: true,
     });
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: '#2ECC71', downColor: '#E74C3C',
+      upColor: '#30D158', downColor: '#FF453A',
       borderVisible: false,
-      wickUpColor: '#2ECC71', wickDownColor: '#E74C3C',
+      wickUpColor: '#30D158', wickDownColor: '#FF453A',
     });
     chartRef.current = chart;
     candleSeriesRef.current = series;
@@ -295,7 +295,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         if (showWarmup && res.data.month_start_ts) {
           monthStartMarkers.push({
             time: (res.data.month_start_ts) as Time,
-            position: 'aboveBar', color: '#F59E0B',
+            position: 'aboveBar', color: '#FF9F0A',
             shape: 'arrowDown', text: `▶ ${m}`, size: 2,
           });
         }
@@ -437,7 +437,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       candleSeriesRef.current.applyOptions({ upColor: '#374151', downColor: '#374151', wickUpColor: '#374151', wickDownColor: '#374151' });
     } else if (idx > 0 && data.candles[idx - 1]?.warmup) {
       // คืนสีปกติเมื่อผ่านพ้น warmup
-      candleSeriesRef.current.applyOptions({ upColor: '#2ECC71', downColor: '#E74C3C', wickUpColor: '#2ECC71', wickDownColor: '#E74C3C' });
+      candleSeriesRef.current.applyOptions({ upColor: '#30D158', downColor: '#FF453A', wickUpColor: '#30D158', wickDownColor: '#FF453A' });
     }
     candleSeriesRef.current.update({ ...c, time: c.time as Time });
 
@@ -452,7 +452,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       markersRef.current.push({
         time: c.time as Time,
         position: t.type === 'BUY' ? 'belowBar' : 'aboveBar',
-        color: t.type === 'BUY' ? '#2ECC71' : '#E74C3C',
+        color: t.type === 'BUY' ? '#30D158' : '#FF453A',
         shape: t.type === 'BUY' ? 'arrowUp' : 'arrowDown',
         text: `${t.type} ${t.entry.toFixed(2)}`,
         size: 2,
@@ -462,12 +462,12 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       if (series) {
         // SL line (red dashed)
         priceLinesRef.current.push(series.createPriceLine({
-          price: t.sl, color: '#E74C3C', lineWidth: 1,
+          price: t.sl, color: '#FF453A', lineWidth: 1,
           lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: 'SL',
         }));
         // TP line (green dashed)
         priceLinesRef.current.push(series.createPriceLine({
-          price: t.tp, color: '#2ECC71', lineWidth: 1,
+          price: t.tp, color: '#30D158', lineWidth: 1,
           lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: 'TP',
         }));
         // Entry level (white dotted)
@@ -515,7 +515,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       markersRef.current.push({
         time: c.time as Time,
         position: t.type === 'BUY' ? 'aboveBar' : 'belowBar',
-        color: t.r > 0 ? '#2ECC71' : '#E74C3C',
+        color: t.r > 0 ? '#30D158' : '#FF453A',
         shape: 'circle',
         text: `${t.result} ${t.r > 0 ? '+' : ''}${t.r.toFixed(2)}R`,
         size: 1,
@@ -657,13 +657,13 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
   const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex items-center gap-2 text-sm text-ink-muted cursor-pointer select-none">
       <input type="checkbox" checked={value} onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 accent-[#D9933B]" />
+        className="w-4 h-4 accent-[#0A84FF]" />
       {label}
     </label>
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="ios-fade-in flex flex-col gap-4">
       <h1 className="lux-h1">Backtest Replay</h1>
 
       {/* ── SMC Strategy Setup ────────────────────────────────────────────── */}
@@ -885,7 +885,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
           {/* Progress */}
           <div className="flex-1 flex items-center gap-2 min-w-[160px]">
             <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full rounded-full bg-gradient-to-r from-[#D9933B] to-[#F1C40F]"
+              <div className="h-full rounded-full bg-gradient-to-r from-[#0A84FF] to-[#40C8E0]"
                 style={{ width: `${pct}%` }} />
             </div>
             <span className="text-ink-faint text-xs tabular-nums">{pct}%</span>
