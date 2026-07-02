@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.71",
+    "version":  "1.0.72",
     "patch_only":  true,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.71/patch.zip",
-    "sha256":  "C3B40A035C089D52492E36765834ED53547A545406BF086817488F28FD7B803B",
-    "notes":  "Login page: bigger logo (200x200), title and LOGIN button colors matched to logo\u0027s blue tone"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.72/patch.zip",
+    "sha256":  "135524DF6C5CB2DDBE66EADD4369F55523F048B1D6C6F9AC588B098A1A687CEA",
+    "notes":  "Login page: MT5 Terminal Path field styled with logo\u0027s blue tone"
 }
