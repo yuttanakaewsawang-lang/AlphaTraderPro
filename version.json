@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.65",
+    "version":  "1.0.66",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.65/AlphaTraderPro.exe",
-    "sha256":  "EE0C7EF65086E64241AD9AC662C05B42A29186937339E0AF3C0A2E93CB66F76A",
-    "notes":  "fix news filter: online feed events never blocked trading (country code vs currency code mismatch), add country-to-currency mapping"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.66/AlphaTraderPro.exe",
+    "sha256":  "78D671812079DF9FCDAF5C9117213B510924AA19A2EC705E3452FA08F6E89F13",
+    "notes":  "sync 10 default values across all config sources (BE 40/20, M5 entry, news 30min, trail candle mode); Backtest Replay now uses saved DB config as base for tuning"
 }
