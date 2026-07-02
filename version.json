@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.61",
+    "version":  "1.0.62",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.61/AlphaTraderPro.exe",
-    "sha256":  "A29E7F0CDEBA952A7B5032760970044E308E74538CF36F333DB58152B50692EA",
-    "notes":  "fix OB re-entry after zone reset; tuned defaults baked in (min_sl_atr 0.5, buffer_atr 0.15, zone_expiry 50) - fresh install or Reset to Recommended gives optimal XAUUSD M5 config"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.62/AlphaTraderPro.exe",
+    "sha256":  "F5C35A6B74A70F85DDB3CEBDEC7BD132FC728A90C21EF12B6003D10AD94C47F9",
+    "notes":  "Zone Entry Guard default ON (skip entries far from zone edge, tick-mode +59% profit), entry_mode + max_entry_zone_atr config"
 }
