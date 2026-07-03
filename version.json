@@ -1,7 +1,6 @@
 {
-    "version":  "1.0.84",
-    "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.84/ApolloAutoTrade.exe",
-    "sha256":  "8951200905EAF595E38601169F461F04D3FB76CA2856BE785DD7F7138B355E45",
-    "notes":  "History: เปลี่ยนเป็นปฏิทินรายเดือนแสดง PnL รายวัน (เพิ่ม /api/history/calendar)"
+    "version":  "1.0.85",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.85/ApolloAutoTrade.exe",
+    "sha256":  "A0DD46D456054B1C4843BA5504F3FF119BEF44B9565043D145BFD7870F3F1BD8",
+    "notes":  "ตัดระบบ patch/frontend-cache ทิ้งทั้งหมด - แก้บั๊ก copy exe ใหม่ลง VPS แล้ว frontend ไม่อัปเดต (single-file update เสมอ)"
 }
