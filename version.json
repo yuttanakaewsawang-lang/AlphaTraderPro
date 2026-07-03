@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.82",
+    "version":  "1.0.83",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.82/ApolloAutoTrade.exe",
-    "sha256":  "76944F765005753380020D4071645B6417F95C4C483C2390B3C9D735AA118D05",
-    "notes":  "Fix Zone Entry Guard สแปมบล็อกซ้ำในแท่งเดียวกัน (regression v1.0.80) — บล็อกแท่งละครั้งเดียว + dedupe แจ้งเตือน ZONE_NEW/ZONE_RETEST สำหรับโซนเดิม — Guard คงค่า 0.3xATR ตาม backtest ยืนยัน (0.3 ชนะทุกค่าที่ผ่อน)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.83/ApolloAutoTrade.exe",
+    "sha256":  "4F7D153509309E9812332C4A718099A2AF60BC5E1BBFB28D5A7EE58F8E0A2C21",
+    "notes":  "Multi-instance: เปิดหลายหน้าต่างคนละโบรกเกอร์บนเครื่องเดียวด้วย --instance \u003cชื่อ\u003e — data/DB/สถานะแยกกันสนิท ไม่ปนกันอีก, license เดิมใช้ได้ทุกหน้าต่าง, มี badge ชื่อ instance บน title bar"
 }
