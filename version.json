@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.86",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.86/ApolloAutoTrade.exe",
-    "sha256":  "FEB6488AB83DD3B01F6F9BC8C93ACCE0521BFB44429A7A615E4EB0E93AA84929",
-    "notes":  "History: จำกัดความกว้างสูงสุดของปฏิทิน กันไม่ให้ขยายใหญ่เกินบนจอ fullscreen/จอกว้าง"
+    "version":  "1.0.87",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.87/ApolloAutoTrade.exe",
+    "sha256":  "C327E921FBCC2F0CC7BE08A6B917FA62C6AD5D1F93BB6727F11DC8E7CFB3197E",
+    "notes":  "History: ขยายตัวเลขกำไร/ขาดทุนในปฏิทินให้ใหญ่ขึ้น อ่านง่ายขึ้น"
 }
