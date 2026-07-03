@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.77",
+    "version":  "1.0.78",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.77/ApolloAutoTrade.exe",
-    "sha256":  "229D1830679FE6669E21A4D83BECDD433689E161A11AC7A134737F0B49DEC4D5",
-    "notes":  "Full build: Dashboard Market Context glow tweaks + Live Pipeline node light-state fixes (patches v1.0.73-76 baked into exe)"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.78/ApolloAutoTrade.exe",
+    "sha256":  "3F09B8C08A560C670E1DED6FC9F6563E235951ECB5CB4D253A86637DF9B3375C",
+    "notes":  "Fix zone invalidation ใช้แท่งกำลังก่อตัว (close_0) -\u003e เปลี่ยนเป็นแท่งปิดล่าสุด (close_1) ตรง backtest — แก้โซนกระพริบ/ZONE_NEW สแปม/retest ถูกล้างทิ้งกลางคัน"
 }
