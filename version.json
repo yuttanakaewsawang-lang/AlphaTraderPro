@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.83",
+    "version":  "1.0.84",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.83/ApolloAutoTrade.exe",
-    "sha256":  "4F7D153509309E9812332C4A718099A2AF60BC5E1BBFB28D5A7EE58F8E0A2C21",
-    "notes":  "Multi-instance: เปิดหลายหน้าต่างคนละโบรกเกอร์บนเครื่องเดียวด้วย --instance \u003cชื่อ\u003e — data/DB/สถานะแยกกันสนิท ไม่ปนกันอีก, license เดิมใช้ได้ทุกหน้าต่าง, มี badge ชื่อ instance บน title bar"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.84/ApolloAutoTrade.exe",
+    "sha256":  "8951200905EAF595E38601169F461F04D3FB76CA2856BE785DD7F7138B355E45",
+    "notes":  "History: เปลี่ยนเป็นปฏิทินรายเดือนแสดง PnL รายวัน (เพิ่ม /api/history/calendar)"
 }
