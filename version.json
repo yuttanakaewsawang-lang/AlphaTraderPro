@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.79",
+    "version":  "1.0.80",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.79/ApolloAutoTrade.exe",
-    "sha256":  "3EE0163E4D0B6434736BD95DF6B35E1051EE701EE8C00ADA9C68ABEA299F8FC5",
-    "notes":  "Zone Entry Guard block ลงบันทึก Live decisions + นับใน Today counts (บล็อก) บน Dashboard — Discord แจ้งเหมือนเดิม"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.80/ApolloAutoTrade.exe",
+    "sha256":  "B0AF940518E161B9C30CDA6F4D99C61DEB3E34568AD0456B5953116156B61CFE",
+    "notes":  "Sync live-backtest: backtest zone detection ใช้แท่งปิดล่าสุดตรง live (เห็นโซนเร็วขึ้น 1 แท่ง), live retest ใช้ high/low แท่งปิดแตะโซนแบบ backtest (เดิม tick ณ จังหวะ loop พลาด wick), broken_time ชี้แท่ง break จริง — tick-mode 4mo ยืนยัน: +\\ vs +\\, WR 43.5%, DD เท่าเดิม"
 }
