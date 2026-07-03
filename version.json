@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.85",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.85/ApolloAutoTrade.exe",
-    "sha256":  "A0DD46D456054B1C4843BA5504F3FF119BEF44B9565043D145BFD7870F3F1BD8",
-    "notes":  "ตัดระบบ patch/frontend-cache ทิ้งทั้งหมด - แก้บั๊ก copy exe ใหม่ลง VPS แล้ว frontend ไม่อัปเดต (single-file update เสมอ)"
+    "version":  "1.0.86",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.86/ApolloAutoTrade.exe",
+    "sha256":  "FEB6488AB83DD3B01F6F9BC8C93ACCE0521BFB44429A7A615E4EB0E93AA84929",
+    "notes":  "History: จำกัดความกว้างสูงสุดของปฏิทิน กันไม่ให้ขยายใหญ่เกินบนจอ fullscreen/จอกว้าง"
 }
