@@ -1,7 +1,7 @@
 {
-    "version":  "1.0.78",
+    "version":  "1.0.79",
     "patch_only":  false,
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.78/ApolloAutoTrade.exe",
-    "sha256":  "3F09B8C08A560C670E1DED6FC9F6563E235951ECB5CB4D253A86637DF9B3375C",
-    "notes":  "Fix zone invalidation ใช้แท่งกำลังก่อตัว (close_0) -\u003e เปลี่ยนเป็นแท่งปิดล่าสุด (close_1) ตรง backtest — แก้โซนกระพริบ/ZONE_NEW สแปม/retest ถูกล้างทิ้งกลางคัน"
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.79/ApolloAutoTrade.exe",
+    "sha256":  "3EE0163E4D0B6434736BD95DF6B35E1051EE701EE8C00ADA9C68ABEA299F8FC5",
+    "notes":  "Zone Entry Guard block ลงบันทึก Live decisions + นับใน Today counts (บล็อก) บน Dashboard — Discord แจ้งเหมือนเดิม"
 }
