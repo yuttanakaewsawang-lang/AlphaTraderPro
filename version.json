@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.92",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.92/ApolloAutoTrade.exe",
-    "sha256":  "85B008F248118B36EA0F0FFB857A66CF0447227F76399B95C86A95EABBE7AD6A",
-    "notes":  "Replay fixes: return all trades (was capped at last 100 - first-of-month trades missing from replay), fix double time-shift on entry markers, unify entry/exit time base, remove unnecessary Warm Cache button (cache auto-saves on every run)"
+    "version":  "1.0.93",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.93/ApolloAutoTrade.exe",
+    "sha256":  "AE70265AC1E3072CAC7080E220F600534C9450C1B43586B099747253CF9E8E4E",
+    "notes":  "Backtest Replay: Every Tick (real ticks) now always on (removed toggle), added profit/loss percentage next to USD amount in live stats"
 }
