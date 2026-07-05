@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.89",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.89/ApolloAutoTrade.exe",
-    "sha256":  "0E09336348D523D0E3C586BF25308B8D87288DE48BF454764159FB7E70EB6DD6",
-    "notes":  "Live-backtest parity fixes: reconstruct_zone_state missing sweep config after restart, forming-bar leak in swing/ATR calc (zone detection, candle filter, SL buffer, zone guard), zone expiry off-by-one, replay session filter broker-time offset"
+    "version":  "1.0.90",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.90/ApolloAutoTrade.exe",
+    "sha256":  "8CA3DB12A28483131712CFEE094B712AD8AFA3C71605A335484438DB92219588",
+    "notes":  "แก้หน้า Login/Activate: สีเวอร์ชันตรงธีมแอป, จัดคำเตือนให้ตรงกึ่งกลาง, คำเตือนสีแดงเงาขาว, ปุ่ม Activate ใช้สีน้ำเงินแบบ Login"
 }
