@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.91",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.91/ApolloAutoTrade.exe",
-    "sha256":  "5D2453BF744F5FE714677CF198BEC3E55E140135B0F50CEC4525CFB0E020A4BC",
-    "notes":  "Fix broker UTC offset returning garbage when market closed (weekend/holiday) - replay session filter now correct; offset derived from Sunday market-open boundary in H1 candles (IUX measured UTC+1)"
+    "version":  "1.0.92",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.92/ApolloAutoTrade.exe",
+    "sha256":  "85B008F248118B36EA0F0FFB857A66CF0447227F76399B95C86A95EABBE7AD6A",
+    "notes":  "Replay fixes: return all trades (was capped at last 100 - first-of-month trades missing from replay), fix double time-shift on entry markers, unify entry/exit time base, remove unnecessary Warm Cache button (cache auto-saves on every run)"
 }
