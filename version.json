@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.88",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.88/ApolloAutoTrade.exe",
-    "sha256":  "48865439FA16CE3CAEA5ADD1652E0A00D2EF553AF4B04A37B634412CAFEE069A",
-    "notes":  "Liquidity Sweep filter (backtest 12mo: +9.3% profit) + Backtest Replay bugfixes (Reset trade loss, exit beyond month, zone overlay drift, stale zone colors) + iOS UI cleanup"
+    "version":  "1.0.89",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.89/ApolloAutoTrade.exe",
+    "sha256":  "0E09336348D523D0E3C586BF25308B8D87288DE48BF454764159FB7E70EB6DD6",
+    "notes":  "Live-backtest parity fixes: reconstruct_zone_state missing sweep config after restart, forming-bar leak in swing/ATR calc (zone detection, candle filter, SL buffer, zone guard), zone expiry off-by-one, replay session filter broker-time offset"
 }
