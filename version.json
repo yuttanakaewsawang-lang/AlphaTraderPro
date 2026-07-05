@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.90",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.90/ApolloAutoTrade.exe",
-    "sha256":  "8CA3DB12A28483131712CFEE094B712AD8AFA3C71605A335484438DB92219588",
-    "notes":  "แก้หน้า Login/Activate: สีเวอร์ชันตรงธีมแอป, จัดคำเตือนให้ตรงกึ่งกลาง, คำเตือนสีแดงเงาขาว, ปุ่ม Activate ใช้สีน้ำเงินแบบ Login"
+    "version":  "1.0.91",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.91/ApolloAutoTrade.exe",
+    "sha256":  "5D2453BF744F5FE714677CF198BEC3E55E140135B0F50CEC4525CFB0E020A4BC",
+    "notes":  "Fix broker UTC offset returning garbage when market closed (weekend/holiday) - replay session filter now correct; offset derived from Sunday market-open boundary in H1 candles (IUX measured UTC+1)"
 }
