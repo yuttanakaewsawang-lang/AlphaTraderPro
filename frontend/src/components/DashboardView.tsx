@@ -11,6 +11,12 @@ interface ContextFactor { key: string; label: string; score: number; weight: num
 interface MarketCtx { direction: 'BULLISH' | 'BEARISH' | 'SIDEWAYS'; confidence: number; factors: ContextFactor[] }
 interface MarketContextResponse { tf: string; context: MarketCtx | null; h1: MarketCtx | null }
 
+const DIRECTION_GLOW: Record<'BULLISH' | 'BEARISH' | 'SIDEWAYS', string> = {
+  BULLISH: '#30D158',
+  BEARISH: '#FF453A',
+  SIDEWAYS: '#8E8E93',
+};
+
 interface AccountInfo {
   success: boolean;
   balance?: number;
@@ -50,6 +56,7 @@ const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> =
   SESSION:        { label: 'นอก session',  bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   DAILY_LIMIT:    { label: 'ลิมิตรายวัน', bg: 'bg-red-500/15',     text: 'text-red-400' },
   PORTFOLIO_KILL: { label: 'หยุดพอร์ต',   bg: 'bg-red-500/15',     text: 'text-red-400' },
+  ZONE_GUARD:     { label: 'Zone Guard',   bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   POSITION_OPEN:  { label: 'มีไม้เปิด',    bg: 'bg-sky-500/15',     text: 'text-sky-400' },
   SEARCHING:      { label: 'กำลังหา',     bg: 'bg-white/5',        text: 'text-ink-muted' },
 };
@@ -225,7 +232,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   const cOpened   = todayCounts.EXECUTED ?? 0;
   const cRejected = todayCounts.AI_REJECT ?? 0;
   const cBlocked  = (todayCounts.NEWS ?? 0) + (todayCounts.SESSION ?? 0)
-    + (todayCounts.DAILY_LIMIT ?? 0) + (todayCounts.PORTFOLIO_KILL ?? 0);
+    + (todayCounts.DAILY_LIMIT ?? 0) + (todayCounts.PORTFOLIO_KILL ?? 0)
+    + (todayCounts.ZONE_GUARD ?? 0);
 
   const pipeActive = (a: boolean, b: boolean) => a && b;
 
@@ -345,15 +353,15 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
             state={latestEvent ? (latestEvent.direction === 'bearish' ? 'warn' : 'active') : 'idle'}
             flash={flash.structure}
           />
-          <Arrow active={pipeActive(!!latestEvent, smcRunning)} color="#FF9F0A" />
+          <Arrow active={pipeActive(!!latestEvent, smcRunning && !!az)} color="#FF9F0A" />
           <PipeNode
             color="#FF9F0A" title="SMC Strategy"
             value={smcRunning ? `RUNNING · ${zone?.zone_timeframe ?? 'M5'}` : 'STOPPED'}
             sub={az ? zoneLabel(az.zone_type) : 'กำลังหาโซน'}
-            state={smcRunning ? 'active' : 'idle'}
+            state={smcRunning && az ? 'active' : 'idle'}
             flash={flash.smc}
           />
-          <Arrow active={pipeActive(smcRunning, !!ctx)} color="#BF5AF2" />
+          <Arrow active={pipeActive(smcRunning && !!az, !!ctx)} color="#BF5AF2" />
           <PipeNode
             color="#BF5AF2" title={`Market Context (${mctx?.tf ?? '-'})`}
             value={ctx ? `${ctx.direction} ${ctx.confidence}%` : 'รอข้อมูล'}
@@ -361,12 +369,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
             state={ctx ? (ctx.direction === 'BEARISH' ? 'warn' : ctx.direction === 'BULLISH' ? 'active' : 'idle') : 'idle'}
             flash={flash.review}
           />
-          <Arrow active={pipeActive(smcRunning, smcRunning)} color="#40C8E0" />
+          <Arrow active={pipeActive(!!ctx, positions.length > 0)} color="#40C8E0" />
           <PipeNode
             color="#40C8E0" title="Execution"
             value={`Risk ${cfg?.risk_percent ?? '-'}% / ไม้`}
             sub={lastEntry ? `${lastEntry.type} @ ${lastEntry.price} · ${lastEntry.source}` : 'ยังไม่มีไม้'}
-            state={smcRunning ? 'active' : 'idle'}
+            state={positions.length > 0 ? 'active' : 'idle'}
           />
           <Arrow active={pipeActive(positions.length > 0, positions.length > 0)} color="#30D158" />
           <PipeNode
@@ -390,7 +398,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
           ) : (
             <div className="flex-1 overflow-y-auto min-h-0 space-y-3">
               <div className="flex items-center gap-3">
-                <span className={`text-xl font-bold tabular-nums ${
+                <span
+                  style={{ textShadow: `0 0 10px ${DIRECTION_GLOW[ctx.direction]}55` }}
+                  className={`text-xl font-bold tabular-nums ${
                   ctx.direction === 'BULLISH' ? 'text-emerald-400'
                   : ctx.direction === 'BEARISH' ? 'text-red-400' : 'text-ink-muted'}`}>
                   {ctx.direction === 'BULLISH' ? '▲ BULLISH' : ctx.direction === 'BEARISH' ? '▼ BEARISH' : '◆ SIDEWAYS'} {ctx.confidence}%

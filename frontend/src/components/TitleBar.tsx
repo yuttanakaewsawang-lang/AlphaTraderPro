@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 declare global {
   interface Window {
@@ -10,6 +10,14 @@ const isPyWebView = () => !!window.pywebview;
 
 const TitleBar: React.FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
+  const [instance, setInstance] = useState('');
+
+  useEffect(() => {
+    fetch('/api/version')
+      .then((r) => r.json())
+      .then((d) => setInstance(d.instance ?? ''))
+      .catch(() => {});
+  }, []);
 
   if (!isPyWebView()) return null;
 
@@ -34,8 +42,16 @@ const TitleBar: React.FC = () => {
         className="text-sm font-semibold text-white/80 tracking-wide"
         style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
       >
-        Alpha Trader Pro
+        Apollo Auto Trade
       </span>
+      {instance && (
+        <span
+          className="ml-2 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#0A84FF]/20 text-[#0A84FF] tracking-wide"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
+          {instance}
+        </span>
+      )}
 
       {/* spacer — drag ได้ */}
       <div className="flex-1 h-full" />

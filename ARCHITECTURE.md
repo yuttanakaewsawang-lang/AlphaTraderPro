@@ -1,4 +1,4 @@
-# Alpha Trader Pro — Architecture Overview
+# Apollo Auto Trade — Architecture Overview
 
 **AI-powered trading bot** — SMC (Smart Money Concepts) strategy + AI Review gate + backtesting engine
 
@@ -31,7 +31,7 @@
                           ↓
 ┌──────────────────────────────────────────────────────────────────┐
 │                    📊 DATABASE (SQLite)                          │
-│  %APPDATA%\AlphaTraderPro\trading_data.db                        │
+│  %APPDATA%\ApolloAutoTrade\trading_data.db                        │
 │  • strategy_config — per-symbol settings                        │
 │  • backtest_trades — tick-replay results                        │
 │  • live_pattern_outcomes — pattern stats from live              │
@@ -85,11 +85,11 @@ D:\ProjeckEA\
 │   └── package.json           # npm dependencies + build scripts
 │
 ├── installer/
-│   ├── AlphaTraderPro.iss     # 📦 Inno Setup installer script
+│   ├── ApolloAutoTrade.iss     # 📦 Inno Setup installer script
 │   └── Output/                # Generated .exe installer
 │
 └── dist/                      # 🔧 PyInstaller output
-    └── AlphaTraderPro.exe     # Standalone executable (frontend embedded)
+    └── ApolloAutoTrade.exe     # Standalone executable (frontend embedded)
 ```
 
 ---
@@ -177,7 +177,7 @@ User clicks "Update v1.0.1"
   └─→ api.post("/api/update/apply")
       └─→ Backend
           ├─ Download exe from GitHub Releases
-          ├─ Write: %APPDATA%\AlphaTraderPro\update\AlphaTraderPro_new.exe
+          ├─ Write: %APPDATA%\ApolloAutoTrade\update\ApolloAutoTrade_new.exe
           ├─ Spawn: apply_update.bat (detached process)
           │  ├─ Wait 2s for app to close
           │  ├─ Move new exe over old exe
@@ -254,10 +254,10 @@ Other tables: zones, order_blocks, fvgs, equity_history, ai_review_log, ...
 ## 🚀 Deployment
 
 ### **Distribution**
-1. **Installer**: `AlphaTraderPro-Setup-1.0.0.exe` (Inno Setup)
-   - Installs to: `C:\Program Files\AlphaTraderPro` (user tier, no admin)
-   - Data: `%APPDATA%\AlphaTraderPro\` (user-writable)
-2. **Standalone exe**: `AlphaTraderPro.exe` (from dist/)
+1. **Installer**: `ApolloAutoTrade-Setup-1.0.0.exe` (Inno Setup)
+   - Installs to: `C:\Program Files\ApolloAutoTrade` (user tier, no admin)
+   - Data: `%APPDATA%\ApolloAutoTrade\` (user-writable)
+2. **Standalone exe**: `ApolloAutoTrade.exe` (from dist/)
    - Portable; carries frontend + Python + all deps
 
 ### **Updates (Auto-Update)**
@@ -268,7 +268,7 @@ Other tables: zones, order_blocks, fvgs, equity_history, ai_review_log, ...
    ```json
    {
      "version": "1.0.1",
-     "url": "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.1/AlphaTraderPro.exe",
+     "url": "https://github.com/yuttanakaewsawang-lang/ApolloAutoTrade/releases/download/v1.0.1/ApolloAutoTrade.exe",
      "notes": "Fixed: ..."
    }
    ```
@@ -298,11 +298,11 @@ npm run dev  # Vite dev server :3000 (HMR)
 npm run build  # → dist/
 
 # Backend (exe)
-pyinstaller run_app.spec  # → dist/AlphaTraderPro.exe
+pyinstaller run_app.spec  # → dist/ApolloAutoTrade.exe
 
 # Installer
-"C:\Program Files\Inno Setup 7\ISCC.exe" installer/AlphaTraderPro.iss
-# → installer/Output/AlphaTraderPro-Setup-1.0.0.exe
+"C:\Program Files\Inno Setup 7\ISCC.exe" installer/ApolloAutoTrade.iss
+# → installer/Output/ApolloAutoTrade-Setup-1.0.0.exe
 ```
 
 ---
@@ -324,7 +324,7 @@ pyinstaller run_app.spec  # → dist/AlphaTraderPro.exe
 ## 📞 Common Questions
 
 **Q: Where is my data stored?**
-- `%APPDATA%\AlphaTraderPro\trading_data.db` (Windows) — persists across updates
+- `%APPDATA%\ApolloAutoTrade\trading_data.db` (Windows) — persists across updates
 
 **Q: Can I share my config?**
 - ❌ No — MT5 credentials are encrypted per machine (DPAPI)

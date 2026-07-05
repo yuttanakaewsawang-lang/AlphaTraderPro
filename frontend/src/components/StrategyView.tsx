@@ -27,6 +27,7 @@ const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
   be_trigger_pct: 40, be_offset_pips: 20, trail_trigger_pct: 50, trail_mode: 1,
   trail_candle_offset_pips: 30, min_sl_atr: 0.5, max_ob_zone_atr: 5.0, use_swing_sl: 1,
   entry_mode: 1, max_entry_zone_atr: 0.3,
+  enable_liquidity_sweep: 1, sweep_tolerance_atr: 0.3, sweep_lookback_bars: 40,
   zone_timeframe: 'M5', entry_timeframe: 'M5', trade_sessions: '',
 };
 
@@ -80,6 +81,9 @@ const CONFIG_FIELDS: {
   { key: 'entry_mode', label: 'Zone Entry Guard', desc: 'เข้าเฉพาะไม้ที่ราคายังใกล้ขอบโซน — ข้ามไม้ที่ราคาวิ่งหนีไปไกลแล้ว (backtest +59%)', group: 'zone', toggle: true },
   { key: 'max_entry_zone_atr', label: 'Max Entry-Zone ATR×', desc: 'ระยะห่างจากขอบโซนสูงสุดที่ยอมเข้า = ATR × ค่านี้', step: '0.1', group: 'zone', hideWhen: (f) => !Number(f.entry_mode) },
   { key: 'max_ob_zone_atr', label: 'Max OB-Zone ATR×', desc: 'OB/FVG ต้องห่างจาก active zone ไม่เกิน ATR × ค่านี้ (0 = ปิด)', step: '0.5', group: 'zone' },
+  { key: 'enable_liquidity_sweep', label: 'Liquidity Sweep Filter', desc: 'ต้องเห็น double-top/bottom (equal-high/low) sweep ก่อนยอมรับ zone break (backtest 12mo: +9.3% กำไร)', group: 'zone', toggle: true },
+  { key: 'sweep_tolerance_atr', label: 'Sweep Tolerance ATR×', desc: 'สอง swing ถือว่า "เท่ากัน" (liquidity pool) ถ้าห่างกันไม่เกิน ATR × ค่านี้', step: '0.1', group: 'zone', hideWhen: (f) => !Number(f.enable_liquidity_sweep) },
+  { key: 'sweep_lookback_bars', label: 'Sweep Lookback (bars)', desc: 'ค้นหา swing ย้อนหลังกี่แท่งก่อนจุด break', group: 'zone', hideWhen: (f) => !Number(f.enable_liquidity_sweep) },
 
   // ── ตัวกรองสัญญาณ ──
   { key: 'use_trend_filter', label: 'Trend Filter', desc: 'กรองทิศตาม Trend Filter ที่เลือก', group: 'filter', toggle: true },

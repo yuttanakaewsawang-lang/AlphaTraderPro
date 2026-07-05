@@ -15,20 +15,20 @@ def _now() -> str:
 
 def msg_online() -> str:
     return _pick([
-        f"🟢 **BREAKING** | AlphaTraderPro กลับมาแล้ว! ตลาดรอด้วยความหวาดผวา [{_now()}]",
+        f"🟢 **BREAKING** | Apollo Auto Trade กลับมาแล้ว! ตลาดรอด้วยความหวาดผวา [{_now()}]",
         f"🚀 **ON AIR** | บอทตื่นแล้ว! ใครกล้าสู้กับตลาดวันนี้? [{_now()}]",
         f"⚡ **LIVE** | ระบบ Online เรียบร้อย — เงินจะเดินหรือหยุดอยู่ที่นี่ [{_now()}]",
-        f"🎯 **ALERT** | AlphaTraderPro พร้อมล่าแล้ว ตลาดไม่รู้ตัวหรอก [{_now()}]",
+        f"🎯 **ALERT** | Apollo Auto Trade พร้อมล่าแล้ว ตลาดไม่รู้ตัวหรอก [{_now()}]",
         f"💻 **SYSTEM UP** | บอทออนไลน์แล้ว ใครกลัวก็หลีกทาง [{_now()}]",
     ])
 
 
 def msg_offline() -> str:
     return _pick([
-        f"🔴 **BREAKING** | AlphaTraderPro ออฟไลน์แล้ว — ตลาดหายใจได้แล้วนะ [{_now()}]",
+        f"🔴 **BREAKING** | Apollo Auto Trade ออฟไลน์แล้ว — ตลาดหายใจได้แล้วนะ [{_now()}]",
         f"💤 **SIGN OFF** | บอทปิดตัวแล้ว ไปนอนพักก่อน เดี๋ยวค่อยมาใหม่ [{_now()}]",
         f"🛑 **OFF AIR** | ระบบปิดแล้ว ใครจะเทรดต่อ… ระวังด้วยนะ [{_now()}]",
-        f"🌙 **SHUTDOWN** | AlphaTraderPro ออกไปพักแล้ว ฝากตลาดไว้กับคุณ [{_now()}]",
+        f"🌙 **SHUTDOWN** | Apollo Auto Trade ออกไปพักแล้ว ฝากตลาดไว้กับคุณ [{_now()}]",
         f"👋 **BYE** | บอทวางไม้แล้ว บัญชีวันนี้เป็นยังไงบ้าง? [{_now()}]",
     ])
 
@@ -184,14 +184,6 @@ def msg_portfolio_kill(reason: str) -> str:
 
 
 # ── UPDATES ──────────────────────────────────────────────────────────────────
-
-def msg_update_patch(version: str) -> str:
-    return _pick([
-        f"⬆️ **UPDATE** | v{version} ติดตั้งแล้ว (patch) — รีโหลดหน้าเพื่อใช้เวอร์ชันใหม่",
-        f"✨ **UPGRADED** | อัปเดต v{version} สำเร็จ! รีเฟรชหน้าได้เลย",
-        f"🆕 **NEW VERSION** | v{version} พร้อมแล้ว — reload เพื่อสัมผัสของใหม่",
-    ])
-
 
 def msg_update_full(version: str) -> str:
     return _pick([

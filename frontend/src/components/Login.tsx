@@ -133,8 +133,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   return (
     <div className="ios-fade-in flex flex-col items-center justify-center min-h-screen bg-glow px-4">
       <div className="mb-8 text-center">
-        <img src="/logo.png" alt="Logo" width={72} height={72} className="mx-auto mb-4 drop-shadow-lg" />
-        <div className="text-xl font-bold tracking-wide" style={{ color: '#FFFFFF' }}>Alpha Trader Pro</div>
+        <img src="/logo.png" alt="Logo" width={200} height={200} className="mx-auto mb-4 drop-shadow-lg" />
+        <div className="text-xl font-bold tracking-wide" style={{ color: '#1B75FD' }}>Apollo Auto Trade</div>
         <div className="text-xs tracking-widest mt-1" style={{ color: 'rgba(235,235,245,0.38)' }}>TRADING TERMINAL</div>
       </div>
 
@@ -209,7 +209,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             <div className="flex gap-1.5">
               <div
                 className="flex-1 h-10 lux-input px-3 text-sm flex items-center truncate cursor-default select-none"
-                style={{ color: terminalPath ? '#30D158' : 'rgba(235,235,245,0.30)' }}
+                style={{
+                  color: terminalPath ? '#1B75FD' : 'rgba(235,235,245,0.30)',
+                  background: 'rgba(27,117,253,0.08)',
+                  borderColor: 'rgba(27,117,253,0.35)',
+                }}
                 title={terminalPath || 'ยังไม่ได้เลือก terminal'}
               >
                 {terminalPath || 'ยังไม่ได้เลือก — กดปุ่มค้นหา'}
@@ -253,7 +257,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               Remember Me
             </label>
             <button type="submit" disabled={loading}
-              className="h-9 px-6 text-sm lux-btn-primary disabled:opacity-60">
+              className="h-9 px-6 text-sm login-btn-primary disabled:opacity-60">
               {loading ? '...' : 'LOGIN'}
             </button>
           </div>
@@ -267,11 +271,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </form>
       </div>
 
-      <div className="mt-4 text-[10px]" style={{ color: 'rgba(235,235,245,0.28)' }}>v{version || '—'}</div>
-      <div className="mt-1.5 text-xs text-center max-w-xs leading-relaxed flex items-center gap-1.5 justify-center" style={{ color: 'rgba(235,235,245,0.28)' }}>
-        <AlertTriangle size={11} strokeWidth={2.2} className="shrink-0" />
+      <div className="mt-4 text-[10px] font-semibold" style={{ color: 'rgba(27,117,253,0.55)' }}>v{version || '—'}</div>
+      <p
+        className="mt-1.5 text-xs text-center max-w-xs leading-relaxed mx-auto"
+        style={{ color: '#FF453A', textShadow: '0 0 6px rgba(255,255,255,0.35)' }}
+      >
+        <AlertTriangle size={11} strokeWidth={2.2} className="inline-block align-text-bottom mr-1" />
         คำเตือน: การเทรด CFD มีความเสี่ยงสูงมากที่จะสูญเสียเงินลงทุนทั้งหมดอย่างรวดเร็ว
-      </div>
+      </p>
     </div>
   );
 };

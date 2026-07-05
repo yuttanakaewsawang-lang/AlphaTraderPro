@@ -202,6 +202,20 @@ body {
 .lux-btn-primary:active { transform: scale(0.97); }
 .lux-btn-primary:disabled { opacity: 0.5; }
 
+/* Login page primary button — matches Apollo Auto Trade logo blue tone */
+.login-btn-primary {
+  background: linear-gradient(135deg, #1B75FD 0%, #01388C 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 1px solid rgba(27, 117, 253, 0.35);
+  box-shadow: 0 6px 18px -6px rgba(27, 117, 253, 0.45);
+  transition: filter 0.2s var(--ease-ios), transform 0.15s var(--ease-ios), opacity 0.2s var(--ease-ios), box-shadow 0.2s var(--ease-ios);
+}
+.login-btn-primary:hover { filter: brightness(1.1); box-shadow: 0 8px 22px -6px rgba(27, 117, 253, 0.55); }
+.login-btn-primary:active { transform: scale(0.97); }
+.login-btn-primary:disabled { opacity: 0.5; }
+
 .lux-btn-danger {
   background: linear-gradient(135deg, #FF6961 0%, #D6291F 100%);
   color: #fff;

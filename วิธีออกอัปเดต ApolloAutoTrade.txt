@@ -1,5 +1,5 @@
 ================================================================
-  วิธีออกอัปเดต AlphaTraderPro — ทีละขั้นตอน
+  วิธีออกอัปเดต ApolloAutoTrade — ทีละขั้นตอน
 ================================================================
 
 ----------------------------------------------------------------
@@ -66,7 +66,7 @@
    {
      "version": "1.0.1",
      "patch_only": true,
-     "url": "https://github.com/xxx/AlphaTraderPro/releases/download/v1.0.1/patch-1.0.1.zip",
+     "url": "https://github.com/xxx/ApolloAutoTrade/releases/download/v1.0.1/patch-1.0.1.zip",
      "sha256": "ใส่ตัวเลข SHA256 ที่ได้จากขั้นที่ 3",
      "notes": "สรุปสิ่งที่เปลี่ยนแปลง เช่น ปรับหน้า Login"
    }
@@ -81,17 +81,17 @@
 ----------------------------------------------------------------
 
 1) อัปโหลดไฟล์:
-     D:\ProjeckEA\dist\AlphaTraderPro.exe
+     D:\ProjeckEA\dist\ApolloAutoTrade.exe
    ขึ้น GitHub Releases
 
 2) คำนวณ SHA256:
-     Get-FileHash dist\AlphaTraderPro.exe -Algorithm SHA256
+     Get-FileHash dist\ApolloAutoTrade.exe -Algorithm SHA256
 
 3) แก้ไฟล์ version.json:
    {
      "version": "1.1.0",
      "patch_only": false,
-     "url": "https://github.com/xxx/AlphaTraderPro/releases/download/v1.1.0/AlphaTraderPro.exe",
+     "url": "https://github.com/xxx/ApolloAutoTrade/releases/download/v1.1.0/ApolloAutoTrade.exe",
      "sha256": "ใส่ตัวเลข SHA256 ที่ได้",
      "notes": "สรุปสิ่งที่เปลี่ยนแปลง"
    }
@@ -130,7 +130,7 @@ Checklist ทุกครั้งก่อนออกอัปเดต
 
 - version.json อยู่ที่ GitHub branch: main
   URL ปัจจุบัน:
-  https://raw.githubusercontent.com/yuttanakaewsawang-lang/AlphaTraderPro/refs/heads/main/version.json
+  https://raw.githubusercontent.com/yuttanakaewsawang-lang/ApolloAutoTrade/refs/heads/main/version.json
 
 - ถ้าใช้ Google Drive ต้องแปลง link เป็น direct download:
   จาก: https://drive.google.com/file/d/FILEID/view

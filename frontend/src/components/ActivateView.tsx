@@ -51,7 +51,7 @@ const ActivateView: React.FC<Props> = ({ onActivated }) => {
       <div className="w-full max-w-[400px] flex flex-col items-center gap-5">
         <img src="/logo.png" alt="Logo" className="w-20 h-20 object-contain" />
         <div className="text-center">
-          <h1 className="text-gradient-gold text-xl font-semibold tracking-tight">Alpha Trader Pro</h1>
+          <h1 className="text-gradient-gold text-xl font-semibold tracking-tight">Apollo Auto Trade</h1>
           <p className="text-ink-muted text-sm mt-1">กรุณา Activate License ก่อนใช้งาน</p>
         </div>
 
@@ -66,7 +66,7 @@ const ActivateView: React.FC<Props> = ({ onActivated }) => {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="ios-pressable px-3 h-10 lux-btn-primary text-sm shrink-0 flex items-center gap-1.5"
+                className="ios-pressable px-3 h-10 login-btn-primary text-sm shrink-0 flex items-center gap-1.5"
               >
                 {copied ? <><Check size={14} strokeWidth={2.4} /> Copied</> : <><Copy size={14} strokeWidth={2.2} /> Copy</>}
               </button>
@@ -89,7 +89,7 @@ const ActivateView: React.FC<Props> = ({ onActivated }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-11 lux-btn-primary text-sm tracking-wide"
+              className="ios-pressable w-full h-11 login-btn-primary text-sm tracking-wide"
             >
               {loading ? 'กำลังตรวจสอบ...' : 'ACTIVATE'}
             </button>

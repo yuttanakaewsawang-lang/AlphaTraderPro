@@ -63,6 +63,9 @@ export interface StrategyConfig {
   use_swing_sl: number;
   entry_mode: number;
   max_entry_zone_atr: number;
+  enable_liquidity_sweep: number;
+  sweep_tolerance_atr: number;
+  sweep_lookback_bars: number;
 }
 
 // Partial config sent to POST /api/strategy/config (รวม zone_timeframe/entry_timeframe ที่ปรับได้แล้ว)

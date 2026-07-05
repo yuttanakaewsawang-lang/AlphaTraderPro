@@ -11,6 +11,7 @@ import {
   type Time,
   LineStyle,
 } from 'lightweight-charts';
+import { Play, Pause, RotateCcw, Download, X, RefreshCw, CheckCircle2 } from 'lucide-react';
 import api from '../api';
 import type { StrategyConfig } from '../types/strategy';
 
@@ -18,7 +19,7 @@ interface ReplayCandle { time: number; open: number; high: number; low: number; 
 interface ReplayTrade {
   time: number; exit_time: number; type: 'BUY' | 'SELL';
   entry: number; sl: number; tp: number; result: 'TP' | 'SL' | 'TRAIL';
-  r: number; pattern: string; review?: 'APPROVE' | 'REJECT';
+  r: number; pattern: string;
   zone_top?: number; zone_bottom?: number;
 }
 type IPriceLine = ReturnType<ISeriesApi<'Candlestick', Time>['createPriceLine']>;
@@ -56,6 +57,15 @@ const SPEEDS = [
 
 const TF_OPTIONS = ['M1', 'M5', 'M15', 'M30', 'H1'];
 
+// สี candle ปกติ/warmup (แชร์ระหว่าง init chart กับ tick loop)
+const CANDLE_COLORS = { upColor: '#30D158', downColor: '#FF453A', wickUpColor: '#30D158', wickDownColor: '#FF453A' };
+const WARMUP_COLORS = { upColor: '#374151', downColor: '#374151', wickUpColor: '#374151', wickDownColor: '#374151' };
+// สไตล์เส้นโซนก่อน retest (dashed dim) — ใช้ทั้งตอน init/reset/transition ให้สีไม่ค้างข้ามรอบ
+const ZONE_DIM = {
+  sbr: { lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#F8717160' },
+  rbs: { lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#4ADE8060' },
+};
+
 interface CacheMonth { month: string; status: 'none' | 'saved' | 'active'; zone_type: number | null; high: number | null; low: number | null; }
 interface Props { symbol: string; }
 
@@ -66,19 +76,19 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
   // ── setup form ────────────────────────────────────────────────────────────
   const [selectedMonths, setSelectedMonths] = useState<string[]>([MONTH_OPTIONS[0].value]);
-  const _month = selectedMonths[0] ?? MONTH_OPTIONS[0].value; void _month; // kept for future compat
   const toggleMonth = (m: string) => setSelectedMonths((prev) =>
     prev.includes(m) ? (prev.length > 1 ? prev.filter((x) => x !== m) : prev) : [...prev, m].sort()
   );
-  const [useRealTicks, setUseRealTicks] = useState(false);
-  const [simulateReview, setSimulateReview] = useState(false);
-  const [rr, setRr] = useState('3.0');
+  // Every Tick (real tick fill/cost) เปิดตายตัวเสมอ — ให้ผลแม่นสุด ไม่มีเหตุผลให้ปิด จึงตัด toggle ออก
+  const useRealTicks = true;
+  // defaults ตรง RECOMMENDED live config — จะถูกทับด้วยค่าจริงจาก DB ตอนโหลด (กันกรณี API ล้มแล้วค่าเพี้ยน)
+  const [rr, setRr] = useState('3.5');
   const [entryTf, setEntryTf] = useState('M5');
   const [zoneTf, setZoneTf] = useState('M5');
   const [trendFilter, setTrendFilter] = useState(false);
   const [obEntry, setObEntry] = useState(true);
-  const [engulfing, setEngulfing] = useState(true);
-  const [retest, setRetest] = useState(false);
+  const [engulfing, setEngulfing] = useState(false);
+  const [retest, setRetest] = useState(true);
   const [spread, setSpread] = useState('0');
   const [commission, setCommission] = useState('0');
   const [startBalance, setStartBalance] = useState('200');
@@ -91,8 +101,6 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
   // ── replay state ──────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [warmingCache, setWarmingCache] = useState(false);
-  const [warmCacheResult, setWarmCacheResult] = useState<string>('');
   const [cacheMonths, setCacheMonths] = useState<CacheMonth[]>([]);
   const [replayData, setReplayData] = useState<ReplayData | null>(null);
   const [cursor, setCursor] = useState(0);
@@ -117,8 +125,11 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
   const dataRef = useRef<ReplayData | null>(null);
   const openTradeRef = useRef<ReplayTrade | null>(null);
   // precomputed: candle index → trades that ENTER / EXIT at that candle
+  // (สร้างครั้งเดียวตอนโหลดข้อมูล — reset replay ไม่ล้าง เพราะ derive จาก data ไม่ใช่ playback state)
   const entryMapRef = useRef<Map<number, ReplayTrade[]>>(new Map());
   const exitMapRef = useRef<Map<number, ReplayTrade[]>>(new Map());
+  // zone state ต่อแท่ง keyed ด้วย timestamp (ไม่ใช่ index — index เพี้ยนตอน multi-month + warmup dedup)
+  const zoneMapRef = useRef<Map<number, ZoneState>>(new Map());
   // annotation state (accumulated markers + active price lines)
   const seriesMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const markersRef = useRef<SeriesMarker<Time>[]>([]);
@@ -168,21 +179,17 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       timeScale: { borderColor: '#374151', timeVisible: true, secondsVisible: false },
       autoSize: true,
     });
-    const series = chart.addSeries(CandlestickSeries, {
-      upColor: '#30D158', downColor: '#FF453A',
-      borderVisible: false,
-      wickUpColor: '#30D158', wickDownColor: '#FF453A',
-    });
+    const series = chart.addSeries(CandlestickSeries, { ...CANDLE_COLORS, borderVisible: false });
     chartRef.current = chart;
     candleSeriesRef.current = series;
     seriesMarkersPluginRef.current = createSeriesMarkers(series, []);
 
     const zoneLineOpts = { lineWidth: 1 as const, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false };
     // SMC zone: เส้นขอบบน/ล่าง สีหรี่ (dim) ตอนยังไม่ retest → สว่างตอน retest
-    sbrTopRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, color: '#F8717160', lineStyle: LineStyle.Dashed });
-    sbrBotRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, color: '#F8717160', lineStyle: LineStyle.Dashed });
-    rbsTopRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, color: '#4ADE8060', lineStyle: LineStyle.Dashed });
-    rbsBotRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, color: '#4ADE8060', lineStyle: LineStyle.Dashed });
+    sbrTopRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, ...ZONE_DIM.sbr });
+    sbrBotRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, ...ZONE_DIM.sbr });
+    rbsTopRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, ...ZONE_DIM.rbs });
+    rbsBotRef.current = chart.addSeries(LineSeries, { ...zoneLineOpts, ...ZONE_DIM.rbs });
     // OB zones: subtle dotted — เล็กกว่า zone เพื่อไม่รกกราฟ
     const obOpts = { ...zoneLineOpts, lineWidth: 1 as const, lineStyle: LineStyle.Dotted };
     obBullTopRef.current = chart.addSeries(LineSeries, { ...obOpts, color: '#D97706' });
@@ -205,36 +212,6 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
   useEffect(() => { fetchCacheStatus(); }, [fetchCacheStatus]);
 
-  // ── warm zone cache for past 6 months ────────────────────────────────────
-  const warmCache = async () => {
-    setWarmingCache(true);
-    setWarmCacheResult('กำลังรัน backtest 6 เดือนย้อนหลัง…');
-    try {
-      const res = await api.get<{
-        success: boolean; months_processed?: number;
-        results?: Array<{ month: string; success: boolean; trades: number; cache_saved: boolean; cache_broken: boolean; error?: string }>;
-      }>('/api/backtest/warm-cache', { params: { symbol, months: 6 } });
-      const d = res.data;
-      if (d.success && Array.isArray(d.results)) {
-        const lines = d.results
-          .map((r) => {
-            if (!r.success) return `${r.month} ❌ ${r.error ?? 'failed'}`;
-            const cacheIcon = r.cache_broken ? '🔵' : r.cache_saved ? '⚪' : '—';
-            return `${r.month} ✅ ${r.trades} trades  cache:${cacheIcon}`;
-          })
-          .join('\n');
-        setWarmCacheResult(`✅ เสร็จแล้ว (${d.months_processed} เดือน)\n${lines}`);
-      } else {
-        setWarmCacheResult('❌ warm cache ล้มเหลว');
-      }
-    } catch (e: any) {
-      setWarmCacheResult(`❌ ${e?.response?.data?.detail ?? String(e)}`);
-    } finally {
-      setWarmingCache(false);
-      fetchCacheStatus();
-    }
-  };
-
   // ── fetch & run backtest (single or multi-month) ─────────────────────────
   const fetchData = async () => {
     setLoading(true);
@@ -246,7 +223,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     setStatProfitUsd(0);
     peakRRef.current = 0; peakBalanceRef.current = 0; runningBalanceRef.current = 0; maxDDPctRef.current = 0;
     setOpenTrade(null); openTradeRef.current = null;
-    entryMapRef.current = new Map(); exitMapRef.current = new Map();
+    entryMapRef.current = new Map(); exitMapRef.current = new Map(); zoneMapRef.current = new Map();
     clearAnnotations();
     candleSeriesRef.current?.setData([]);
 
@@ -254,7 +231,6 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     const commonParams = {
       symbol,
       use_real_ticks: useRealTicks,
-      simulate_review: simulateReview,
       tp_ratio_rr: Number(rr),
       entry_timeframe: entryTf,
       zone_timeframe: zoneTf,
@@ -272,7 +248,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     try {
       let allCandles: ReplayCandle[] = [];
       let allTrades: ReplayTrade[] = [];
-      let allZoneData: any[] = [];
+      let allZoneData: ZoneState[] = [];
       let allObZones: OBZone[] = [];
       let lastData: ReplayData | null = null;
       let monthStartMarkers: SeriesMarker<Time>[] = [];
@@ -336,11 +312,19 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       combined.trades.forEach((t) => {
         const ei = candles.findIndex((c) => c.time >= t.time);
         if (ei >= 0) eMap.set(ei, [...(eMap.get(ei) ?? []), t]);
+        // tick-mode sim ปิดไม้ได้ถึง 14 วันหลัง entry — อาจเลยแท่งสุดท้ายของเดือน
+        // ถ้าเลยช่วง chart ให้ปิดที่แท่งสุดท้ายแทน ไม่งั้นไม้ค้าง (W/L ไม่ครบ + banner ค้าง)
         const xi = candles.findIndex((c) => c.time >= t.exit_time);
-        if (xi >= 0) xMap.set(xi, [...(xMap.get(xi) ?? []), t]);
+        const xIdx = xi >= 0 ? xi : candles.length - 1;
+        xMap.set(xIdx, [...(xMap.get(xIdx) ?? []), t]);
       });
       entryMapRef.current = eMap;
       exitMapRef.current = xMap;
+
+      // zone state keyed ด้วย timestamp — ทนต่อ candle dedup ตอน multi-month + warmup
+      const zMap = new Map<number, ZoneState>();
+      allZoneData.forEach((z) => zMap.set(z.t, z));
+      zoneMapRef.current = zMap;
 
       // precompute OB map
       const obMap = new Map<number, { top: number; bot: number; dir: 'bullish' | 'bearish' } | null>();
@@ -399,26 +383,26 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     rbsTopRef.current?.setData([]);
     rbsBotRef.current?.setData([]);
     zoneRetestRef.current = false;
-    // reset zone line styles to dashed (pre-retest)
-    const dashOpts = { lineStyle: LineStyle.Dashed, lineWidth: 1 as const };
-    sbrTopRef.current?.applyOptions(dashOpts);
-    sbrBotRef.current?.applyOptions(dashOpts);
-    rbsTopRef.current?.applyOptions(dashOpts);
-    rbsBotRef.current?.applyOptions(dashOpts);
+    // reset zone line styles กลับ dashed dim — รวมสีด้วย ไม่งั้นสีสว่าง (retest) จากรอบก่อนค้างมารอบใหม่
+    sbrTopRef.current?.applyOptions(ZONE_DIM.sbr);
+    sbrBotRef.current?.applyOptions(ZONE_DIM.sbr);
+    rbsTopRef.current?.applyOptions(ZONE_DIM.rbs);
+    rbsBotRef.current?.applyOptions(ZONE_DIM.rbs);
     // clear OB overlay
     obBullTopRef.current?.setData([]);
     obBullBotRef.current?.setData([]);
     obBearTopRef.current?.setData([]);
     obBearBotRef.current?.setData([]);
+    // คืนสี candle ปกติ (เผื่อหยุดค้างช่วง warmup สีเทา)
+    candleSeriesRef.current?.applyOptions(CANDLE_COLORS);
   }, []);
 
   const resetStats = useCallback(() => {
     setCursor(0); cursorRef.current = 0;
     setStatR(0); setStatWins(0); setStatLosses(0); setStatMaxDDPct(0);
-    setStatProfitUsd(0); setStatMaxDDPct(0);
+    setStatProfitUsd(0);
     peakRRef.current = 0; peakBalanceRef.current = 0; runningBalanceRef.current = 0; maxDDPctRef.current = 0;
     setOpenTrade(null); openTradeRef.current = null;
-    entryMapRef.current = new Map(); exitMapRef.current = new Map();
     setDone(false);
     clearAnnotations();
     candleSeriesRef.current?.setData([]);
@@ -434,10 +418,10 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     // warmup candles แสดงเป็นสีเทาหรี่ เพื่อแยกออกจากช่วงเดือนจริง
     const isWarmup = c.warmup === true;
     if (isWarmup) {
-      candleSeriesRef.current.applyOptions({ upColor: '#374151', downColor: '#374151', wickUpColor: '#374151', wickDownColor: '#374151' });
+      candleSeriesRef.current.applyOptions(WARMUP_COLORS);
     } else if (idx > 0 && data.candles[idx - 1]?.warmup) {
       // คืนสีปกติเมื่อผ่านพ้น warmup
-      candleSeriesRef.current.applyOptions({ upColor: '#30D158', downColor: '#FF453A', wickUpColor: '#30D158', wickDownColor: '#FF453A' });
+      candleSeriesRef.current.applyOptions(CANDLE_COLORS);
     }
     candleSeriesRef.current.update({ ...c, time: c.time as Time });
 
@@ -483,12 +467,11 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       setStatR((prev) => {
         const next = +(prev + t.r).toFixed(3);
         if (next > peakRRef.current) peakRRef.current = next;
-        // R-based DD tracked via maxDDPctRef (USD-based)
         return next;
       });
       // คำนวณ USD แบบ compound
-      const bal0 = (dataRef.current?.start_balance ?? 0) || Number(startBalance) || 200;
-      const riskPctNum = (dataRef.current?.risk_percent ?? 0) || Number(riskPct) || 1.0;
+      const bal0 = (dataRef.current?.start_balance ?? 0) || 200;
+      const riskPctNum = (dataRef.current?.risk_percent ?? 0) || 1.0;
       setStatProfitUsd((prevUsd) => {
         const curBalance = bal0 + prevUsd;
         const riskAmt = curBalance * riskPctNum / 100;
@@ -533,9 +516,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
     // ── zone overlay ─────────────────────────────────────────────────────────
     // State 1 – broken, รอ retest  : dashed ──── dim color
-    // State 2 – retested, พร้อมเข้า : solid ════ bright color  ← เปลี่ยนตรงนี้
+    // State 2 – retested, พร้อมเข้า : solid ════ bright color
     // State 3 – used / expired      : ไม่มีเส้น (whitespace)
-    const zs = data.zone_data?.[idx];
+    const zs = zoneMapRef.current.get(c.time);
     if (zs) {
       const t = c.time as Time;
       const active = zs.h !== null && zs.h > 0;
@@ -558,10 +541,10 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         rbsBotRef.current?.update({ time: t });
         if (zoneRetestRef.current) {
           zoneRetestRef.current = false;
-          sbrTopRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#F8717160' });
-          sbrBotRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#F8717160' });
-          rbsTopRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#4ADE8060' });
-          rbsBotRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#4ADE8060' });
+          sbrTopRef.current?.applyOptions(ZONE_DIM.sbr);
+          sbrBotRef.current?.applyOptions(ZONE_DIM.sbr);
+          rbsTopRef.current?.applyOptions(ZONE_DIM.rbs);
+          rbsBotRef.current?.applyOptions(ZONE_DIM.rbs);
         }
       }
 
@@ -580,10 +563,10 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       // State 2 → 1: zone ใหม่เกิด (rt reset → false) → กลับ dashed dim
       if (active && !zs.rt && zoneRetestRef.current) {
         zoneRetestRef.current = false;
-        sbrTopRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#F8717160' });
-        sbrBotRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#F8717160' });
-        rbsTopRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#4ADE8060' });
-        rbsBotRef.current?.applyOptions({ lineStyle: LineStyle.Dashed, lineWidth: 1 as const, color: '#4ADE8060' });
+        sbrTopRef.current?.applyOptions(ZONE_DIM.sbr);
+        sbrBotRef.current?.applyOptions(ZONE_DIM.sbr);
+        rbsTopRef.current?.applyOptions(ZONE_DIM.rbs);
+        rbsBotRef.current?.applyOptions(ZONE_DIM.rbs);
       }
     }
 
@@ -644,6 +627,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
   useEffect(() => {
     stopReplay(); setReplayData(null); dataRef.current = null;
+    entryMapRef.current = new Map(); exitMapRef.current = new Map(); zoneMapRef.current = new Map();
     candleSeriesRef.current?.setData([]); resetStats();
   }, [symbol]); // eslint-disable-line
 
@@ -654,12 +638,15 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
   const totalTrades = statWins + statLosses;
   const winPct = totalTrades ? ((statWins / totalTrades) * 100).toFixed(1) : '—';
 
+  // iOS-style pill switch (ตรงกับ StrategyView)
   const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) => (
-    <label className="flex items-center gap-2 text-sm text-ink-muted cursor-pointer select-none">
-      <input type="checkbox" checked={value} onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 accent-[#0A84FF]" />
-      {label}
-    </label>
+    <button type="button" onClick={() => onChange(!value)}
+      className="inline-flex items-center gap-2 text-sm select-none ios-pressable">
+      <span className={`relative w-8 h-4 rounded-full transition-colors shrink-0 ${value ? 'bg-green-500/70' : 'bg-white/15'}`}>
+        <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${value ? 'left-4' : 'left-0.5'}`} />
+      </span>
+      <span className={value ? 'text-ink' : 'text-ink-muted'}>{label}</span>
+    </button>
   );
 
   return (
@@ -668,14 +655,15 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
       {/* ── SMC Strategy Setup ────────────────────────────────────────────── */}
       <div className="lux-card p-4 space-y-3">
-        <p className="lux-title">SMC Strategy Setup
-          {configLoaded && <span className="ml-2 text-[10px] text-ink-faint font-normal">(โหลดจาก live config แล้ว)</span>}
-        </p>
+        <div className="flex items-baseline gap-2">
+          <p className="lux-title">SMC Strategy Setup</p>
+          {configLoaded && <span className="text-[10px] text-ink-faint">โหลดจาก live config แล้ว — ค่าอื่นๆ (Zone Guard, Liquidity Sweep ฯลฯ) ใช้ตาม Strategy config อัตโนมัติ</span>}
+        </div>
 
         <div className="flex flex-wrap gap-x-6 gap-y-3 items-end">
           {/* Month */}
           <div className="flex flex-col gap-1">
-            <span className="lux-label">เดือน {selectedMonths.length > 1 && <span className="text-gold">({selectedMonths.length} เดือน)</span>}</span>
+            <span className="lux-label">เดือน {selectedMonths.length > 1 && <span className="text-[var(--accent-blue)]">({selectedMonths.length} เดือน)</span>}</span>
             <select value={selectedMonths.length === 1 ? selectedMonths[0] : ''}
               onChange={(e) => setSelectedMonths([e.target.value])}
               className="lux-input px-3 h-9 text-sm">
@@ -685,9 +673,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             {selectedMonths.length > 1 && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {selectedMonths.map((m) => (
-                  <span key={m} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-gold/10 text-gold border border-gold/30">
+                  <span key={m} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-[#0A84FF]/10 text-[var(--accent-blue)] border border-[#0A84FF]/30">
                     {m}
-                    <button onClick={() => toggleMonth(m)} className="hover:text-red-400 leading-none">✕</button>
+                    <button onClick={() => toggleMonth(m)} className="hover:text-red-400 leading-none"><X size={10} /></button>
                   </span>
                 ))}
               </div>
@@ -750,34 +738,26 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         </div>
 
         {/* Toggles row */}
-        <div className="flex flex-wrap gap-5 pt-1">
+        <div className="flex flex-wrap items-center gap-5 pt-1">
           <Toggle label="OB Entry" value={obEntry} onChange={setObEntry} />
           <Toggle label="Engulfing" value={engulfing} onChange={setEngulfing} />
           <Toggle label="Retest Zone" value={retest} onChange={setRetest} />
           <Toggle label="Trend Filter" value={trendFilter} onChange={setTrendFilter} />
-          <Toggle label="Every Tick (Real Ticks)" value={useRealTicks} onChange={setUseRealTicks} />
-          <Toggle label="Simulate AI Review" value={simulateReview} onChange={setSimulateReview} />
-          <Toggle label="แสดง Warmup 14 วัน (เทาหรี่)" value={showWarmup} onChange={setShowWarmup} />
+          <Toggle label="แสดง Warmup (เทาหรี่)" value={showWarmup} onChange={setShowWarmup} />
+          <span
+            title="จำลอง fill/cost จาก tick จริงเสมอ (แม่นสุด) — ปิดไม่ได้"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            Every Tick (Real Ticks)
+          </span>
         </div>
 
         <div className="flex flex-wrap gap-3 mt-1 items-start">
-          <button onClick={fetchData} disabled={loading || warmingCache}
-            className="h-10 px-6 lux-btn-primary text-sm">
+          <button onClick={fetchData} disabled={loading}
+            className="h-10 px-6 lux-btn-primary text-sm ios-pressable">
             {loading ? 'กำลังโหลด — รัน backtest อยู่…' : 'โหลดข้อมูล & เริ่ม Replay'}
           </button>
-
-          <button onClick={warmCache} disabled={loading || warmingCache}
-            title="รัน backtest 6 เดือนย้อนหลังเพื่อ populate zone cache — ให้แต่ละเดือนเริ่มจาก cache แทน warmup 14 วัน"
-            className="h-10 px-4 lux-btn-ghost text-sm border border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
-            {warmingCache ? '⏳ กำลัง warm cache…' : '🔥 Warm Cache 6M'}
-          </button>
         </div>
-
-        {warmCacheResult && (
-          <pre className="text-xs text-slate-300 bg-slate-800/60 rounded p-2 mt-1 whitespace-pre-wrap leading-5">
-            {warmCacheResult}
-          </pre>
-        )}
 
         {/* ── Zone Cache Status grid ──────────────────────────────────────── */}
         {cacheMonths.length > 0 && (
@@ -789,7 +769,10 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
                 <span><span className="inline-block w-2 h-2 rounded-sm bg-sky-500/40 mr-1" />Saved</span>
                 <span><span className="inline-block w-2 h-2 rounded-sm bg-white/10 mr-1" />ไม่มี cache</span>
               </div>
-              <button onClick={fetchCacheStatus} className="ml-auto text-[10px] text-ink-faint hover:text-ink">↻ รีเฟรช</button>
+              <button onClick={fetchCacheStatus}
+                className="ml-auto inline-flex items-center gap-1 text-[10px] text-ink-faint hover:text-ink ios-pressable">
+                <RefreshCw size={10} /> รีเฟรช
+              </button>
             </div>
             <p className="text-[10px] text-ink-faint mb-1">คลิกเพื่อเลือก/ยกเลิกเดือน (เลือกได้หลายเดือน)</p>
             <div className="grid grid-cols-6 gap-1.5">
@@ -806,7 +789,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
                       isActive ? `Active zone${zoneLabel ? ` (${zoneLabel})` : ''} · ${m.high?.toFixed(2)} / ${m.low?.toFixed(2)}` :
                       isSaved  ? `Saved${zoneLabel ? ` (${zoneLabel})` : ''}` : 'ไม่มี cache'
                     }
-                    className={`relative rounded-md px-1.5 py-2 text-center transition-all border ${
+                    className={`relative rounded-md px-1.5 py-2 text-center transition-all border ios-pressable ${
                       isSelected
                         ? 'border-[var(--accent-blue)] ring-1 ring-[var(--accent-blue)]/40'
                         : 'border-[var(--hairline)] hover:border-white/20'
@@ -837,21 +820,23 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         <div className="lux-card p-3 flex flex-wrap items-center gap-3">
           {/* Play/Pause */}
           <button onClick={togglePlay}
-            className={`h-10 w-10 flex items-center justify-center rounded-lg text-xl font-bold transition-colors ${
+            className={`h-10 w-10 flex items-center justify-center rounded-xl transition-colors ios-pressable ${
               playing ? 'bg-yellow-500/20 text-yellow-400' : 'lux-btn-primary'}`}>
-            {playing ? '⏸' : '▶'}
+            {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
 
           {/* Reset */}
           <button onClick={() => { stopReplay(); resetStats(); }}
-            className="h-10 px-3 lux-btn-ghost text-sm" title="รีเซ็ต">↩</button>
+            className="h-10 w-10 flex items-center justify-center lux-btn-ghost rounded-xl ios-pressable" title="รีเซ็ต">
+            <RotateCcw size={16} />
+          </button>
 
-          {/* Speed */}
-          <div className="flex gap-1">
+          {/* Speed — iOS segmented control */}
+          <div className="flex gap-0.5 bg-white/5 rounded-lg p-0.5">
             {SPEEDS.map((s, i) => (
               <button key={s.label} onClick={() => setSpeedIdx(i)}
-                className={`h-8 px-2.5 text-xs rounded-md border transition-colors ${
-                  i === speedIdx ? 'border-gold text-gold bg-gold/10' : 'border-[var(--hairline)] text-ink-muted hover:text-ink'
+                className={`h-7 px-2.5 text-xs rounded-md transition-colors ios-pressable ${
+                  i === speedIdx ? 'bg-[var(--accent-blue)] text-white font-medium' : 'text-ink-muted hover:text-ink'
                 }`}>
                 {s.label}
               </button>
@@ -863,7 +848,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             <button
               onClick={() => setShowZoneOverlay((v) => !v)}
               title="ปิด/เปิด SMC Zone overlay (เส้นแดง/เขียว)"
-              className={`h-8 px-2.5 text-xs rounded-md border transition-colors ${
+              className={`h-8 px-2.5 text-xs rounded-md border transition-colors ios-pressable ${
                 showZoneOverlay
                   ? 'border-rose-500/60 text-rose-400 bg-rose-500/10'
                   : 'border-[var(--hairline)] text-ink-faint'
@@ -873,7 +858,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             <button
               onClick={() => setShowObOverlay((v) => !v)}
               title="ปิด/เปิด OB overlay (เส้นอำพัน/ส้ม)"
-              className={`h-8 px-2.5 text-xs rounded-md border transition-colors ${
+              className={`h-8 px-2.5 text-xs rounded-md border transition-colors ios-pressable ${
                 showObOverlay
                   ? 'border-amber-500/60 text-amber-400 bg-amber-500/10'
                   : 'border-[var(--hairline)] text-ink-faint'
@@ -889,7 +874,11 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
                 style={{ width: `${pct}%` }} />
             </div>
             <span className="text-ink-faint text-xs tabular-nums">{pct}%</span>
-            {done && <span className="text-green-400 text-xs font-medium">✅ เสร็จ</span>}
+            {done && (
+              <span className="inline-flex items-center gap-1 text-green-400 text-xs font-medium">
+                <CheckCircle2 size={12} /> เสร็จ
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -899,7 +888,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
           {[
             { label: 'แท่ง', value: `${cursor}/${total}` },
-            { label: 'ไม้', value: `${data.total_trades}` },
+            { label: 'ไม้ (ปิดแล้ว/ทั้งหมด)', value: `${totalTrades}/${data.total_trades}` },
             { label: 'W/L', value: `${statWins}/${statLosses}` },
             { label: 'Win%', value: totalTrades ? `${winPct}%` : '—' },
             { label: 'R สะสม', value: statR !== 0 ? `${statR >= 0 ? '+' : ''}${statR.toFixed(2)}` : '0.00', color: statR >= 0 ? 'text-green-400' : 'text-red-400' },
@@ -912,17 +901,22 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
                 color: curBal >= bal0n ? 'text-green-400' : 'text-red-400',
               };
             })(),
-            {
-              label: 'กำไร/ขาดทุน USD',
-              value: statProfitUsd !== 0 ? `${statProfitUsd >= 0 ? '+' : ''}$${statProfitUsd.toFixed(2)}` : '$0.00',
-              color: statProfitUsd >= 0 ? 'text-green-400' : 'text-red-400',
-            },
+            (() => {
+              const bal0n = (dataRef.current?.start_balance || Number(startBalance) || 200);
+              const pctPnl = bal0n > 0 ? (statProfitUsd / bal0n) * 100 : 0;
+              return {
+                label: 'กำไร/ขาดทุน (USD · %)',
+                value: statProfitUsd !== 0
+                  ? `${statProfitUsd >= 0 ? '+' : ''}$${statProfitUsd.toFixed(2)} (${pctPnl >= 0 ? '+' : ''}${pctPnl.toFixed(1)}%)`
+                  : '$0.00 (0.0%)',
+                color: statProfitUsd >= 0 ? 'text-green-400' : 'text-red-400',
+              };
+            })(),
             {
               label: 'Max DD%',
               value: statMaxDDPct > 0 ? `-${statMaxDDPct.toFixed(1)}%` : '0.0%',
               color: statMaxDDPct > 0 ? 'text-red-400' : 'text-ink',
             },
-            { label: 'สถานะ', value: done ? 'จบ' : playing ? '▶ กำลังเล่น' : cursor === 0 ? 'รอ' : 'หยุด' },
           ].map((c) => (
             <div key={c.label} className="lux-card p-2.5">
               <p className="lux-label text-[10px] mb-0.5 leading-tight">{c.label}</p>
@@ -942,11 +936,6 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
           <span className="text-ink-muted text-xs">Entry <span className="text-ink tabular-nums">{openTrade.entry}</span></span>
           <span className="text-ink-muted text-xs">SL <span className="text-red-400 tabular-nums">{openTrade.sl}</span></span>
           <span className="text-ink-muted text-xs">TP <span className="text-green-400 tabular-nums">{openTrade.tp}</span></span>
-          {openTrade.review && (
-            <span className={`ml-auto text-xs font-medium ${openTrade.review === 'APPROVE' ? 'text-green-400' : 'text-red-400'}`}>
-              AI: {openTrade.review}
-            </span>
-          )}
         </div>
       )}
 
@@ -961,7 +950,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#0C0C0E]/90">
             <div className="text-center space-y-2">
-              <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-6 h-6 border-2 border-[var(--accent-blue)] border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-ink-muted text-sm">กำลังรัน backtest {selectedMonths.length > 1 ? `(${selectedMonths.length} เดือน)` : ''} — รอสักครู่…</p>
             </div>
           </div>
@@ -991,7 +980,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
           const gross_loss = Math.abs(data.trades.filter(t => t.r <= 0).reduce((s, t) => s + t.r, 0));
           return gross_loss > 0 ? (gross_win / gross_loss).toFixed(2) : '∞';
         })();
-        const configStr = `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}${simulateReview?' | AI Review':''}`;
+        const configStr = `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`;
 
         const exportHTML = async () => {
           setExporting(true);
@@ -1017,9 +1006,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
               start_balance: bal0,
               risk_percent: riskPctNum,
             });
-            setExportMsg(`✅ บันทึกแล้ว: ${res.data.path}`);
+            setExportMsg(`บันทึกแล้ว: ${res.data.path}`);
           } catch (e: any) {
-            setExportMsg(`❌ ${e?.response?.data?.detail ?? 'export ไม่สำเร็จ'}`);
+            setExportMsg(e?.response?.data?.detail ?? 'export ไม่สำเร็จ');
           } finally {
             setExporting(false);
           }
@@ -1028,11 +1017,12 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         return (
         <div className="lux-card p-4 space-y-3">
           <p className="lux-title">สรุปผล {data.month} — {data.entry_tf}</p>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             {[
               { label: 'ไม้ทั้งหมด', value: `${data.total_trades}` },
               { label: 'Win Rate', value: `${winRate}%` },
               { label: 'Total R', value: `${data.total_r >= 0 ? '+' : ''}${data.total_r.toFixed(2)}R`, color: data.total_r >= 0 ? 'text-green-400' : 'text-red-400' },
+              { label: 'Profit Factor', value: profitFactor },
               { label: 'Max DD%', value: `-${maxDDPct}%`, color: maxDDPctFinal > 0 ? 'text-red-400' : 'text-ink' },
               { label: 'Expectancy', value: `${data.expectancy_r.toFixed(3)}R` },
             ].map((c) => (
@@ -1048,20 +1038,12 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
           <button
             onClick={exportHTML}
             disabled={exporting}
-            className="w-full h-11 rounded-xl text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all disabled:opacity-60"
-            style={{
-              background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
-              color: '#fff',
-              border: '1px solid #1E40AF',
-              boxShadow: '0 2px 8px rgba(37,99,235,0.45)',
-            }}
-          >
-            <span>⬇</span>
-            <span>📋</span>
-            <span>{exporting ? 'กำลัง Export...' : 'EXPORT REPORT (HTML)'}</span>
+            className="w-full h-11 lux-btn-primary rounded-xl text-sm font-semibold tracking-wide flex items-center justify-center gap-2 ios-pressable disabled:opacity-60">
+            <Download size={16} />
+            <span>{exporting ? 'กำลัง Export…' : 'Export Report (HTML)'}</span>
           </button>
           {exportMsg && (
-            <p className="text-xs text-center mt-1" style={{ color: exportMsg.startsWith('✅') ? '#22c55e' : '#ef4444', wordBreak: 'break-all' }}>
+            <p className={`text-xs text-center mt-1 break-all ${exportMsg.startsWith('บันทึก') ? 'text-green-400' : 'text-red-400'}`}>
               {exportMsg}
             </p>
           )}

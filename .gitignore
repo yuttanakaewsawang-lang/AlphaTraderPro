@@ -23,6 +23,9 @@ calendar_cache.json
 keygen_history.json
 
 # Sensitive — ห้าม push ขึ้น GitHub เด็ดขาด
+*token2*
+license.json
+news_events.json
 keygen.py
 keygen_ui.py
 license_manager.py

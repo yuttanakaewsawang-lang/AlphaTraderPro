@@ -112,13 +112,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (!confirm('ดาวน์โหลดและติดตั้งเวอร์ชันใหม่?')) return;
     setUpdating(true);
     try {
-      const res = await api.post('/api/update/apply');
-      if (res.data.patch_only) {
-        alert('ติดตั้งสำเร็จ — กด OK เพื่อ reload');
-        window.location.reload();
-      } else {
-        alert('กำลังติดตั้ง — แอปจะปิดและเปิดใหม่เองอัตโนมัติ');
-      }
+      await api.post('/api/update/apply');
+      alert('กำลังติดตั้ง — แอปจะปิดและเปิดใหม่เองอัตโนมัติ');
     } catch (err: any) {
       if (!err.response) return;
       alert(err.response?.data?.detail || 'อัปเดตไม่สำเร็จ');
@@ -198,7 +193,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <Zap size={16} color="#fff" strokeWidth={2.4} fill="#fff" />
               </div>
               <div className="leading-tight">
-                <p className="font-semibold text-[13.5px] tracking-tight" style={{ color: '#FFFFFF' }}>Alpha Trader Pro</p>
+                <p className="font-semibold text-[13.5px] tracking-tight" style={{ color: '#FFFFFF' }}>Apollo Auto Trade</p>
                 <p className="text-[10px]" style={{ color: 'rgba(235,235,245,0.38)' }}>Trading Assistant</p>
               </div>
             </div>

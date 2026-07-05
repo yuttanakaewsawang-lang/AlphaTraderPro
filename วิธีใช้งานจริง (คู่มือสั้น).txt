@@ -1,0 +1,12 @@
+วิธีใช้งานจริง (คู่มือสั้น)
+แจกครั้งแรก:
+
+pyinstaller run_app.spec → ได้ dist\ApolloAutoTrade.exe
+ติดตั้ง Inno Setup → เปิด .iss → Build → ได้ installer\Output\ApolloAutoTrade-Setup-1.0.0.exe ส่งให้ผู้ใช้
+ออกแพตช์ใหม่ (ไม่ต้องลงใหม่):
+
+แก้โค้ด → เพิ่ม APP_VERSION (เช่น 1.1.0) → build exe
+อัปโหลด exe ขึ้น GitHub Releases
+อัปเดตไฟล์ version.json (ชี้ไป exe ใหม่) ที่ URL ใน UPDATE_MANIFEST_URL
+ผู้ใช้กดปุ่ม "อัปเดต" ในแอป → ติดตั้งเอง
+สิ่งที่ต้องตั้งครั้งเดียวก่อนเปิดใช้ auto-update:

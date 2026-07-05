@@ -1,0 +1,15 @@
+แจกครั้งแรก:
+ส่งไฟล์ ApolloAutoTrade-Setup-1.0.0.exe ให้ผู้ใช้
+ผู้ใช้ดับเบิลคลิก → ติดตั้งลงเครื่อง
+ข้อมูล (DB/config) จะเก็บใน %APPDATA%\ApolloAutoTrade (ปลอดภัย)
+ออกแพตช์อัปเดต (ไม่ต้องลงใหม่):
+แก้โค้ด → เพิ่มเวอร์ชัน version.py (เช่น 1.0.1)
+pyinstaller run_app.spec → build exe ใหม่
+Upload exe ขึ้น GitHub Releases (tag v1.0.1)
+แก้ version.json บน repo:
+{
+  "version": "1.0.1",
+  "url": "https://github.com/yuttanakaewsawang-lang/ApolloAutoTrade/releases/download/v1.0.1/ApolloAutoTrade.exe",
+  "notes": "แก้ไข: ..."
+}
+ผู้ใช้เปิดแอป → กดปุ่ม "อัปเดต v1.0.1" ใน Sidebar → ติดตั้งอัตโนมัติ ✅
