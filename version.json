@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.93",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.93/ApolloAutoTrade.exe",
-    "sha256":  "AE70265AC1E3072CAC7080E220F600534C9450C1B43586B099747253CF9E8E4E",
-    "notes":  "Backtest Replay: Every Tick (real ticks) now always on (removed toggle), added profit/loss percentage next to USD amount in live stats"
+    "version":  "1.0.94",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.94/ApolloAutoTrade.exe",
+    "sha256":  "506DE6666B663650C782F57ECF6F35E083FF94EAE90144B8085B767F73F936E6",
+    "notes":  "Backtest Replay: add always-on badge indicating Every Tick (Real Ticks) mode is active, since the toggle was removed in v1.0.93"
 }
