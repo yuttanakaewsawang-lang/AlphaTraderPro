@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.97",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.97/ApolloAutoTrade.exe",
-    "sha256":  "914DA58D7EA8A88B00CBBA46B27D3DC7D9620ABA99274F0B0F4CDADBE055A7F0",
-    "notes":  "History: raykarn mai lae equity curve trong tam dueang na pratitin taeng, mai kang thi window 90 wan tayta lae si equity curve mai kang khadthun/kamfai dueang kon na"
+    "version":  "1.0.98",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.98/ApolloAutoTrade.exe",
+    "sha256":  "C75C5955E8237947FB0BF2C3308D6197B257A4690A5C5B33A01E801540073B9A",
+    "notes":  "Backtest/Replay parity fix: OB/FVG multi-candidate tie-break now always picks newest first (matches live unconditionally, was gated behind a dead flag). Trailing candle-mode bar size now derived from zone_timeframe instead of hardcoded M5. No effect on default config (M5, trailing off) - verified identical trade-by-trade output before/after on a real backtest month."
 }
