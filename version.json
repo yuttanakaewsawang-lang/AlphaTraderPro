@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.96",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.96/ApolloAutoTrade.exe",
-    "sha256":  "6CEC2F9E2BB3EDF3B61DC0DAA9196F22620007DED4EBC5D049831D63F3218C3F",
-    "notes":  "History: จัดสัดส่วนปฏิทินรายเดือน (กรอบกว้างเท่าเมนูอื่น, ช่องวันสมส่วน) + ปรับกราฟ Equity Curve ให้แบนราบขึ้น"
+    "version":  "1.0.97",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.97/ApolloAutoTrade.exe",
+    "sha256":  "914DA58D7EA8A88B00CBBA46B27D3DC7D9620ABA99274F0B0F4CDADBE055A7F0",
+    "notes":  "History: raykarn mai lae equity curve trong tam dueang na pratitin taeng, mai kang thi window 90 wan tayta lae si equity curve mai kang khadthun/kamfai dueang kon na"
 }
