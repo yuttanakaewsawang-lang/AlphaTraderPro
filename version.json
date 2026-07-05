@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.95",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.95/ApolloAutoTrade.exe",
-    "sha256":  "C5551DBC0841E4926C1CE107A8B1E3EC9DF174FB6127C72BAFC407699315C86E",
-    "notes":  "แก้บั๊ก startup guard กันเข้าไม้ซ้ำโซนเดิมหลัง restart (magic ผิดตัว + ลำดับผิด), sync ค่า default database.py ครบ 4 แหล่ง, กัน AttributeError ตอน MT5 หลุดกลางลูป, เติมปฏิทินข่าว NFP/FOMC ครึ่งปีหลัง 2026"
+    "version":  "1.0.96",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.96/ApolloAutoTrade.exe",
+    "sha256":  "6CEC2F9E2BB3EDF3B61DC0DAA9196F22620007DED4EBC5D049831D63F3218C3F",
+    "notes":  "History: จัดสัดส่วนปฏิทินรายเดือน (กรอบกว้างเท่าเมนูอื่น, ช่องวันสมส่วน) + ปรับกราฟ Equity Curve ให้แบนราบขึ้น"
 }
