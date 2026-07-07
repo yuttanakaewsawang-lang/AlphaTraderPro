@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.101",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.101/ApolloAutoTrade.exe",
-    "sha256":  "A172AF8BF673C4F0881B0A31C8CE51A8D199EFA7C008A2C6BB4510A16C81AC7E",
-    "notes":  "Sniper config UI (view/edit cross-instance) + Live Chart OB/FVG display distance now scales with ATR instead of a fixed 2%"
+    "version":  "1.0.102",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.102/ApolloAutoTrade.exe",
+    "sha256":  "56C76109FF1BD59D27207E88CED8DB62C4410F5DC25F55867356798AAA1D28F0",
+    "notes":  "Fix Zone Entry Guard measuring gap against live tick price that drifts during 10s poll loop (block-reset-redetect cycle could stretch lag to ~5min) instead of the confirmation candle\u0027s own close price -- live was blocking almost every signal that backtest replay would pass"
 }
