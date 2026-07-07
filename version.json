@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.103",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.103/ApolloAutoTrade.exe",
-    "sha256":  "3FD8D2FEB3CF0C8569B3C5DEC926B7CDCECCB8D569696A5A80F4EA08E6CFDF90",
-    "notes":  "Fix: live retest confirmed too early (same closing bar as zone break) causing the retest dashed line to vanish on Live Chart and require_retest to pass prematurely vs backtest"
+    "version":  "1.0.104",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.104/ApolloAutoTrade.exe",
+    "sha256":  "8133B21064E62FB3B3F48A21D03BEE1898FBB612C712E3E1CEB6E87F195E851C",
+    "notes":  "Sync backtest retest semantics with live v1.0.103: the zone-break bar no longer counts as its own retest in Backtest Replay (must be a new bar after the break) - restores live/backtest parity; 12-month tick-mode validation showed ~0.7%R difference (noise)"
 }
