@@ -1,6 +1,6 @@
 """ชุดข้อความแจ้งเตือน Discord สไตล์ Breaking News — สลับสุ่มไม่ซ้ำ"""
 import random
-from datetime import datetime
+from database import thai_now
 
 
 def _pick(pool: list[str]) -> str:
@@ -8,7 +8,8 @@ def _pick(pool: list[str]) -> str:
 
 
 def _now() -> str:
-    return datetime.now().strftime("%H:%M")
+    """เวลาไทย (UTC+7) แสดงในเนื้อข้อความ Discord — ไม่ใช้เวลาเครื่อง/OS ตรงๆ"""
+    return thai_now().strftime("%H:%M")
 
 
 # ── ONLINE / OFFLINE ──────────────────────────────────────────────────────────

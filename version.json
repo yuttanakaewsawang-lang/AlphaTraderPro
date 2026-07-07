@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.99",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.99/ApolloAutoTrade.exe",
-    "sha256":  "A3774BC7E2433FE811A53D11A7BBF1F9DFD4EC9D9672D0426FEEA541933F4422",
-    "notes":  "Zone Entry Guard notify format fix (GBPUSD/non-XAU precision) + force Thai time (UTC+7) across all logs, Discord messages, and chart markers instead of relying on machine/VPS OS timezone"
+    "version":  "1.0.100",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.100/ApolloAutoTrade.exe",
+    "sha256":  "8298444BD161FE19D03CCBD324EEB865924050B588CBE00D0EF6269E49EE5E24",
+    "notes":  "Fix: zone ค้างรอแท่งยืนยันไม่มีกำหนดหลัง retest (เพิ่ม expiry หลัง retest กันเข้าไม้ไม่ได้เมื่อราคาวิ่งหนีไกล)"
 }
