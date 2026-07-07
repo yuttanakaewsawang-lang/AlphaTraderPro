@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.102",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.102/ApolloAutoTrade.exe",
-    "sha256":  "56C76109FF1BD59D27207E88CED8DB62C4410F5DC25F55867356798AAA1D28F0",
-    "notes":  "Fix Zone Entry Guard measuring gap against live tick price that drifts during 10s poll loop (block-reset-redetect cycle could stretch lag to ~5min) instead of the confirmation candle\u0027s own close price -- live was blocking almost every signal that backtest replay would pass"
+    "version":  "1.0.103",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.103/ApolloAutoTrade.exe",
+    "sha256":  "3FD8D2FEB3CF0C8569B3C5DEC926B7CDCECCB8D569696A5A80F4EA08E6CFDF90",
+    "notes":  "Fix: live retest confirmed too early (same closing bar as zone break) causing the retest dashed line to vanish on Live Chart and require_retest to pass prematurely vs backtest"
 }
