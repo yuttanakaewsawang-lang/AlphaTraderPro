@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RotateCcw, CheckCircle2, AlertTriangle } from 'lucide-react';
 import api from '../api';
 import type { StrategyConfig, ZoneResponse } from '../types/strategy';
+import SniperConfigPanel from './SniperConfigPanel';
 
 // TF ที่เลือกได้สำหรับ zone/entry ใน Strategy Configuration (ต้องตรงกับ TIMEFRAME_LABELS ฝั่ง backend)
 const CONFIG_TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1'];
@@ -31,9 +32,11 @@ const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
   zone_timeframe: 'M5', entry_timeframe: 'M5', trade_sessions: '',
 };
 
-// รายการกลยุทธ์ที่เลือกได้บน dashboard - ตอนนี้มีแค่ SMC แต่เผื่ออนาคตเพิ่มกลยุทธ์อื่นได้
+// รายการกลยุทธ์ที่เลือกได้บนหน้านี้ — ดู/แก้ config ของ logic ไหนก็ได้จากทุก instance
+// (แก้แล้วมีผลทันทีเฉพาะ logic ที่ instance นี้รัน APOLLO_STRATEGY ตรงกันอยู่จริง)
 const STRATEGIES: { id: string; name: string; title: string }[] = [
   { id: 'smc', name: 'SMC', title: 'SMC (Smart Money Concepts) Monitor' },
+  { id: 'sniper', name: 'Sniper', title: 'Sniper (N-bar Breakout) Monitor' },
 ];
 
 interface Position {
@@ -327,6 +330,15 @@ const GROUP_DOT: Record<string, string> = {
 };
 
 const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
+  // instance นี้รัน engine ไหน (SMC หรือ Sniper) — อ่านจาก /api/version ครั้งเดียว
+  // default 'smc' ไว้ก่อนจนกว่าจะรู้จริง เพื่อไม่เปลี่ยนพฤติกรรมของ instance SMC ที่มีอยู่แล้ว
+  const [engine, setEngine] = useState<'smc' | 'sniper'>('smc');
+  useEffect(() => {
+    api.get<{ strategy_engine?: string }>('/api/version')
+      .then((res) => { if (res.data.strategy_engine === 'sniper') setEngine('sniper'); })
+      .catch(() => {});
+  }, []);
+
   const [config, setConfig] = useState<StrategyConfig | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -334,6 +346,9 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const [saveError, setSaveError] = useState('');
   const [resetting, setResetting] = useState(false);
   const [strategyId, setStrategyId] = useState(STRATEGIES[0].id);
+  // เปิดหน้าด้วย logic ที่ instance นี้รันอยู่จริงเป็นค่าเริ่มต้น — ผู้ใช้ยังสลับ dropdown ดู/แก้
+  // config ของอีก logic ได้เสมอ ไม่ผูกกับ engine ที่รันจริง (แค่ engine เดียวที่แก้แล้วมีผลทันที)
+  useEffect(() => { setStrategyId(engine); }, [engine]);
   const [positions, setPositions] = useState<Position[]>([]);
   // TF ของ zone/entry ที่ปรับได้
   const [zoneTf, setZoneTf] = useState('M5');
@@ -360,13 +375,20 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   };
 
   useEffect(() => {
+    if (strategyId !== 'smc') return;
     loadedSymbolRef.current = null;
     api.get<StrategyConfig>('/api/strategy/config', { params: { symbol } })
-      .then((res) => { if (loadedSymbolRef.current !== symbol) applyConfig(res.data); })
+      .then((res) => {
+        setConfig(res.data);
+        if (loadedSymbolRef.current !== symbol) applyConfig(res.data);
+      })
       .catch(() => {});
-  }, [symbol]); // eslint-disable-line
+  }, [symbol, strategyId]); // eslint-disable-line
 
   useEffect(() => {
+    // zone/is_running/entry-preview เป็นสถานะ live ของ SMC จริง — มีความหมายเฉพาะตอน instance นี้
+    // รัน engine=smc อยู่จริงเท่านั้น ดู config SMC จาก instance ที่รัน Sniper ใช้แค่ endpoint config ด้านบนพอ
+    if (strategyId !== 'smc' || engine !== 'smc') return;
     let cancelled = false;
 
     const fetchZone = async () => {
@@ -391,9 +413,10 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [symbol]); // eslint-disable-line
+  }, [symbol, strategyId, engine]); // eslint-disable-line
 
   useEffect(() => {
+    if (strategyId !== 'smc') return;
     const fetchPositions = async () => {
       try {
         const res = await api.get<Position[]>('/api/positions', { params: { symbol } });
@@ -405,7 +428,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
     fetchPositions();
     const interval = setInterval(fetchPositions, 3000);
     return () => clearInterval(interval);
-  }, [symbol]);
+  }, [symbol, strategyId]);
 
   const handleClosePosition = async (ticket: number) => {
     try {
@@ -474,6 +497,8 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
 
   const strategyTitle = STRATEGIES.find((s) => s.id === strategyId)?.title ?? STRATEGIES[0].title;
   const activeGroup = CONFIG_GROUPS.find((g) => g.id === activeTab)!;
+
+  if (strategyId === 'sniper') return <SniperConfigPanel symbol={symbol} />;
 
   return (
     <div className="ios-fade-in flex flex-col gap-3 h-full overflow-hidden">

@@ -71,6 +71,28 @@ export interface StrategyConfig {
 // Partial config sent to POST /api/strategy/config (รวม zone_timeframe/entry_timeframe ที่ปรับได้แล้ว)
 export type StrategyConfigUpdate = Partial<StrategyConfig>;
 
+// Mirrors SniperStrategy.CONFIG_FIELDS (SniperStrategy.py) — N-bar breakout strategy,
+// ไม่มี zone/OB/FVG concept แบบ SMC จึงมี field น้อยกว่ามาก
+export interface SniperConfig {
+  entry_timeframe: string;
+  breakout_lookback_bars: number;
+  buffer_atr: number;
+  buffer_points: number;
+  min_sl_atr: number;
+  risk_percent: number;
+  max_trades_per_day: number;
+  max_daily_loss_percent: number;
+  max_portfolio_drawdown_pct: number;
+  max_spread_points: number;
+  use_trend_filter: number;
+  trend_filter_mode: number;
+  swing_lookback: number;
+  news_filter_minutes: number;
+  trade_sessions: string;
+}
+
+export type SniperConfigUpdate = Partial<SniperConfig>;
+
 // ไม้ล่าสุดของ symbol นี้จาก trade_history (SMCStrategy + AIStrategy บันทึกผ่าน save_trade() ร่วมกัน)
 // source: ZONE/FVG = SMC Strategy, AI = AI Strategy, MANUAL = เปิดเองจากปุ่ม, UNKNOWN = ไม้เก่าก่อนมีคอลัมน์นี้
 export interface LastEntry {
@@ -292,4 +314,5 @@ export interface StructureResponse {
   equal_levels: EqualLevel[];
   premium_discount: PremiumDiscountZone | null;
   breaker_blocks: OrderBlock[];
+  atr: number | null;
 }

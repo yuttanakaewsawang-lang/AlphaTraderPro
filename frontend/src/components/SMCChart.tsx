@@ -72,7 +72,13 @@ const FVG_BEAR_BORDER = 'rgba(245, 158, 11, 0.80)';
 
 // Order Block ที่ยังไม่ mitigate ทั้งหมด + mitigated ล่าสุดอีกไม่กี่โซน (กันกราฟรก)
 const MAX_MITIGATED_ORDER_BLOCKS = 2;
-const OB_MAX_DISTANCE = 0.02;  // ซ่อน OB ที่ห่างราคาปัจจุบันเกิน 2%
+// ระยะที่ยอมให้ OB/FVG แสดงผล อิง ATR ของ TF ที่กำลังดูแทน % ตายตัว (เดิม 2% ของ XAUUSD ~4150
+// เท่ากับ ~83 จุด ทั้งที่ ATR M5 จริงมีแค่ ~1.5-2.5 จุด และ entry guard จริง (max_ob_zone_atr)
+// อนุญาตแค่ ~5×ATR — ทำให้กราฟโชว์ OB ไกลเกินกว่าที่บอทจะเข้าไม้จริงได้หลายสิบเท่า ดูแล้วเข้าใจผิดว่า
+// "โซนไกล" — ใช้ 8×ATR (กว้างกว่า guard จริงพอดู near-miss ได้ แต่ไม่ไกลเวอร์) fallback เป็น 0.5%
+// ของราคาถ้า ATR ยังไม่พร้อม (เช่น mt5 เพิ่งต่อ)
+const OB_MAX_DISTANCE_ATR = 8;
+const OB_MAX_DISTANCE_FALLBACK_PCT = 0.005;
 
 // คืนรายการโซนที่ยัง unmitigated ทั้งหมด + mitigated ล่าสุดไม่เกิน maxMitigated โซน (กันกราฟรก)
 function pickZones(zones: OrderBlock[], maxMitigated: number): OrderBlock[] {
@@ -262,13 +268,16 @@ const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, can
         });
         if (cancelled) return;
         const price = lastCandleRef.current?.close ?? 0;
+        const maxDistance = res.data.atr && res.data.atr > 0
+          ? res.data.atr * OB_MAX_DISTANCE_ATR
+          : price * OB_MAX_DISTANCE_FALLBACK_PCT;
 
         // Order Blocks
         const blocks: OrderBlockData[] = pickZones(res.data.order_blocks, MAX_MITIGATED_ORDER_BLOCKS)
           .filter((ob) => {
             if (!price) return true;
             const mid = (ob.top + ob.bottom) / 2;
-            return Math.abs(mid - price) / price <= OB_MAX_DISTANCE;
+            return Math.abs(mid - price) <= maxDistance;
           })
           .map((ob) => {
             const bull = ob.direction === 'bullish';
@@ -289,7 +298,7 @@ const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, can
             if (fvg.mitigated) return false;
             if (!price) return true;
             const mid = (fvg.top + fvg.bottom) / 2;
-            return Math.abs(mid - price) / price <= OB_MAX_DISTANCE;
+            return Math.abs(mid - price) <= maxDistance;
           })
           .map((fvg) => {
             const bull = fvg.direction === 'bullish';

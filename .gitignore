@@ -44,6 +44,8 @@ run_app.py
 run_app.spec
 start.bat
 version.py
+SniperStrategy.py
+sniper_backtest.py
 
 # Patch update temp files
 update/
