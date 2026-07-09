@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import api from '../api';
 import SMCChart, { type EntryMarker } from './SMCChart';
 import type { ActiveZone, EntryPreview, ZoneResponse, StrategyConfig } from '../types/strategy';
 
-const TIMEFRAMES = ['M1', 'M5', 'M15', 'H1'];
+const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1'];
 
 // สร้าง STEPS แบบ dynamic ตาม config จริง
 function buildSteps(cfg: StrategyConfig | null) {
@@ -40,6 +40,8 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
   const [showOverlays, setShowOverlays] = useState(true);
   const [timeframe, setTimeframe] = useState('M5');
   const [config, setConfig] = useState<StrategyConfig | null>(null);
+  // ผู้ใช้กดเลือก TF เองแล้วหรือยัง — ถ้ายัง ให้ TF ตามค่า zone_timeframe ใน config ที่เซฟไว้
+  const tfManualRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,7 +52,11 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
         setZone(res.data.zone);
         setIsRunning(res.data.is_running);
         setLastMessage(res.data.last_message || '');
-        if (res.data.config) setConfig(res.data.config);
+        if (res.data.config) {
+          setConfig(res.data.config);
+          const cfgTf = res.data.config.zone_timeframe;
+          if (!tfManualRef.current && cfgTf && TIMEFRAMES.includes(cfgTf)) setTimeframe(cfgTf);
+        }
         if (typeof (res.data as any).broker_offset === 'number') setBrokerOffset((res.data as any).broker_offset);
       } catch (err) {
         console.error('Failed to load zone', err);
@@ -128,7 +134,7 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol }) => {
           {TIMEFRAMES.map((tf) => (
             <button
               key={tf}
-              onClick={() => setTimeframe(tf)}
+              onClick={() => { tfManualRef.current = true; setTimeframe(tf); }}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                 timeframe === tf ? 'lux-btn-primary' : 'lux-btn-ghost text-ink-muted'
               }`}
