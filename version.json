@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.105",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.105/ApolloAutoTrade.exe",
-    "sha256":  "0E14B9265D9E3B2BBEFC03865FC17004B4F3F2FF963B30E22FABD3A9966B5B83",
-    "notes":  "Fix: start_balance in Backtest Replay never reached the engine (USD/DD figures were based on connected MT5 account balance instead of the entered capital; partial-TP feasibility now simulated from real starting capital)"
+    "version":  "1.0.106",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.106/ApolloAutoTrade.exe",
+    "sha256":  "ED28B7BD5391F5140B0980B77D529C465475D4156C7E8C2B0140397CAA5076D3",
+    "notes":  "Live Chart: default TF sync with saved zone_timeframe config (manual TF pick still overrides) + add missing M30 to chart TF buttons/seconds map"
 }
