@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.104",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.104/ApolloAutoTrade.exe",
-    "sha256":  "8133B21064E62FB3B3F48A21D03BEE1898FBB612C712E3E1CEB6E87F195E851C",
-    "notes":  "Sync backtest retest semantics with live v1.0.103: the zone-break bar no longer counts as its own retest in Backtest Replay (must be a new bar after the break) - restores live/backtest parity; 12-month tick-mode validation showed ~0.7%R difference (noise)"
+    "version":  "1.0.105",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.105/ApolloAutoTrade.exe",
+    "sha256":  "0E14B9265D9E3B2BBEFC03865FC17004B4F3F2FF963B30E22FABD3A9966B5B83",
+    "notes":  "Fix: start_balance in Backtest Replay never reached the engine (USD/DD figures were based on connected MT5 account balance instead of the entered capital; partial-TP feasibility now simulated from real starting capital)"
 }
