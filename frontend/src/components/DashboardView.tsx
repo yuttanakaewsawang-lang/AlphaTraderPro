@@ -57,6 +57,7 @@ const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> =
   DAILY_LIMIT:    { label: 'ลิมิตรายวัน', bg: 'bg-red-500/15',     text: 'text-red-400' },
   PORTFOLIO_KILL: { label: 'หยุดพอร์ต',   bg: 'bg-red-500/15',     text: 'text-red-400' },
   ZONE_GUARD:     { label: 'Zone Guard',   bg: 'bg-amber-500/15',   text: 'text-amber-400' },
+  RISK_GUARD:     { label: 'Risk Guard',   bg: 'bg-red-500/15',     text: 'text-red-400' },
   POSITION_OPEN:  { label: 'มีไม้เปิด',    bg: 'bg-sky-500/15',     text: 'text-sky-400' },
   SEARCHING:      { label: 'กำลังหา',     bg: 'bg-white/5',        text: 'text-ink-muted' },
 };
@@ -234,7 +235,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   const cRejected = todayCounts.AI_REJECT ?? 0;
   const cBlocked  = (todayCounts.NEWS ?? 0) + (todayCounts.SESSION ?? 0)
     + (todayCounts.DAILY_LIMIT ?? 0) + (todayCounts.PORTFOLIO_KILL ?? 0)
-    + (todayCounts.ZONE_GUARD ?? 0);
+    + (todayCounts.ZONE_GUARD ?? 0) + (todayCounts.RISK_GUARD ?? 0);
 
   const pipeActive = (a: boolean, b: boolean) => a && b;
 
