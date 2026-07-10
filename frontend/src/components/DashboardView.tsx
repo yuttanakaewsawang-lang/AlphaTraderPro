@@ -9,7 +9,7 @@ import type {
 
 interface ContextFactor { key: string; label: string; score: number; weight: number }
 interface MarketCtx { direction: 'BULLISH' | 'BEARISH' | 'SIDEWAYS'; confidence: number; factors: ContextFactor[] }
-interface MarketContextResponse { tf: string; context: MarketCtx | null; h1: MarketCtx | null }
+interface MarketContextResponse { tf: string; context: MarketCtx | null; ref_tf: string; ref: MarketCtx | null }
 
 const DIRECTION_GLOW: Record<'BULLISH' | 'BEARISH' | 'SIDEWAYS', string> = {
   BULLISH: '#30D158',
@@ -211,7 +211,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   const events        = structure?.events ?? [];
   const latestEvent   = events[events.length - 1] ?? null;
   const ctx           = mctx?.context ?? null;
-  const ctxH1         = mctx?.h1 ?? null;
+  const ctxRef        = mctx?.ref ?? null;
+  const ctxRefTf      = mctx?.ref_tf ?? 'H1';
   const floatPL       = positions.reduce((s, p) => s + p.profit, 0);
   const smcRunning    = !!zone?.is_running;
   const dailyLoss     = zone?.daily_loss;
@@ -365,7 +366,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
           <PipeNode
             color="#BF5AF2" title={`Market Context (${mctx?.tf ?? '-'})`}
             value={ctx ? `${ctx.direction} ${ctx.confidence}%` : 'รอข้อมูล'}
-            sub={ctxH1 ? `H1: ${ctxH1.direction} ${ctxH1.confidence}%` : '—'}
+            sub={ctxRef ? `${ctxRefTf}: ${ctxRef.direction} ${ctxRef.confidence}%` : '—'}
             state={ctx ? (ctx.direction === 'BEARISH' ? 'warn' : ctx.direction === 'BULLISH' ? 'active' : 'idle') : 'idle'}
             flash={flash.review}
           />
@@ -405,9 +406,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
                   : ctx.direction === 'BEARISH' ? 'text-red-400' : 'text-ink-muted'}`}>
                   {ctx.direction === 'BULLISH' ? '▲ BULLISH' : ctx.direction === 'BEARISH' ? '▼ BEARISH' : '◆ SIDEWAYS'} {ctx.confidence}%
                 </span>
-                {ctxH1 && (
+                {ctxRef && (
                   <span className="text-[11px] text-ink-faint">
-                    ภาพใหญ่ H1: {ctxH1.direction} {ctxH1.confidence}%
+                    ภาพใหญ่ {ctxRefTf}: {ctxRef.direction} {ctxRef.confidence}%
                   </span>
                 )}
               </div>

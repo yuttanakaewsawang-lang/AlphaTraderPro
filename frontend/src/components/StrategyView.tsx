@@ -90,7 +90,7 @@ const CONFIG_FIELDS: {
 
   // ── ตัวกรองสัญญาณ ──
   { key: 'use_trend_filter', label: 'Trend Filter', desc: 'กรองทิศตาม Trend Filter ที่เลือก', group: 'filter', toggle: true },
-  { key: 'trend_filter_mode', label: 'Filter Mode', desc: '0 = EMA50 (H1) · 1 = HH/HL Structure (H1)', step: '1', group: 'filter', hideWhen: (f) => !Number(f.use_trend_filter) },
+  { key: 'trend_filter_mode', label: 'Filter Mode', desc: '0 = EMA50 · 1 = HH/HL Structure — คำนวณบน TF คู่ที่สูงกว่า Zone TF หนึ่งขั้น (M1→M5, M5→M15, M15/M30→H1)', step: '1', group: 'filter', hideWhen: (f) => !Number(f.use_trend_filter) },
   { key: 'require_retest', label: 'Retest Zone', desc: 'รอให้ราคากลับมาแตะโซนก่อนถึงจะเข้า', group: 'filter', toggle: true },
   { key: 'enable_ob_entry', label: 'Order Block Entry', desc: 'เปิด signal จาก Order Block (แนะนำ)', group: 'filter', toggle: true },
   { key: 'enable_fvg_entry', label: 'FVG Entry', desc: 'เปิด signal จาก Fair Value Gap (ผล backtest อ่อนกว่า OB)', group: 'filter', toggle: true },
