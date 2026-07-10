@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.106",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.106/ApolloAutoTrade.exe",
-    "sha256":  "ED28B7BD5391F5140B0980B77D529C465475D4156C7E8C2B0140397CAA5076D3",
-    "notes":  "Live Chart: default TF sync with saved zone_timeframe config (manual TF pick still overrides) + add missing M30 to chart TF buttons/seconds map"
+    "version":  "1.0.107",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.107/ApolloAutoTrade.exe",
+    "sha256":  "26EB2E086FB127A252E8D1F6E46584BE3380C4BDBF63C2A3A0C4815549C4C424",
+    "notes":  "Trend Filter + Market Context จับคู่ TF อ้างอิงตาม TF ที่เล่น (M1→M5, M5→M15, M15/M30→H1) แทน hardcode H1 — Dashboard โชว์ label TF อ้างอิงจริง"
 }
