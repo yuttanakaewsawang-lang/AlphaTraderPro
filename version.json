@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.1",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.1/ApolloAutoTrade.exe",
-    "sha256":  "E098061183A663BAA251846B76BB74AF8D5ED329A66B189173B38FA9E04A3633",
-    "notes":  "v1.2.1 — ปิดแจ้งเตือน Discord อัตโนมัติวันเสาร์-อาทิตย์ (เวลาไทย) — ประวัติแจ้งเตือนในแอปยังบันทึกครบ ปุ่มทดสอบ webhook ใช้ได้ปกติ"
+    "version":  "1.2.2",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.2/ApolloAutoTrade.exe",
+    "sha256":  "B758B65E12DE07B07798139E7CEB0E2B89D1487137F621B9A325BC38839A5861",
+    "notes":  "v1.2.2 — เปิดโปรแกรมแล้วบอทไม่สตาร์ทเอง ต้องกด START AUTO TRADE เองทุกครั้ง (รีสตาร์ท/อัปเดตบน VPS แล้วต้องเข้าไปกด Start ด้วย) | รวมของ v1.2.0-1.2.1: 5 กลยุทธ์ + หน้าเลือกกลยุทธ์ + ปิดแจ้งเตือน Discord เสาร์-อาทิตย์"
 }
