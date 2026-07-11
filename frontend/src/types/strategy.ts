@@ -93,13 +93,189 @@ export interface SniperConfig {
 
 export type SniperConfigUpdate = Partial<SniperConfig>;
 
+// Mirrors SwingStrategy.CONFIG_FIELDS (SwingStrategy.py) — trend pullback strategy (EA3)
+export interface SwingConfig {
+  entry_timeframe: string;
+  pullback_ema: number;
+  sl_lookback_bars: number;
+  buffer_atr: number;
+  buffer_points: number;
+  min_sl_atr: number;
+  rr: number;
+  risk_percent: number;
+  max_trades_per_day: number;
+  max_daily_loss_percent: number;
+  max_portfolio_drawdown_pct: number;
+  max_spread_points: number;
+  use_trend_filter: number;
+  trend_filter_mode: number;
+  swing_lookback: number;
+  news_filter_minutes: number;
+  trade_sessions: string;
+}
+
+// Mirrors ReversalStrategy.CONFIG_FIELDS (ReversalStrategy.py) — RSI extreme reversal (EA4)
+export interface ReversalConfig {
+  entry_timeframe: string;
+  rsi_period: number;
+  rsi_buy_level: number;
+  rsi_sell_level: number;
+  extreme_lookback_bars: number;
+  require_engulfing: number;
+  buffer_atr: number;
+  buffer_points: number;
+  min_sl_atr: number;
+  rr: number;
+  risk_percent: number;
+  max_trades_per_day: number;
+  max_daily_loss_percent: number;
+  max_portfolio_drawdown_pct: number;
+  max_spread_points: number;
+  use_trend_filter: number;
+  trend_filter_mode: number;
+  swing_lookback: number;
+  news_filter_minutes: number;
+  trade_sessions: string;
+}
+
+// Mirrors GridStrategy.CONFIG_FIELDS (GridStrategy.py) — grid martingale (EA5)
+export interface GridConfig {
+  entry_timeframe: string;
+  base_lot: number;
+  lot_multiplier: number;
+  grid_step_atr: number;
+  grid_step_points: number;
+  max_grid_levels: number;
+  basket_tp_atr: number;
+  basket_tp_points: number;
+  basket_sl_percent: number;
+  direction_mode: number;
+  cooldown_bars: number;
+  max_baskets_per_day: number;
+  max_daily_loss_percent: number;
+  max_portfolio_drawdown_pct: number;
+  max_spread_points: number;
+  news_filter_minutes: number;
+  trade_sessions: string;
+}
+
 // ไม้ล่าสุดของ symbol นี้จาก trade_history (SMCStrategy + AIStrategy บันทึกผ่าน save_trade() ร่วมกัน)
-// source: ZONE/FVG = SMC Strategy, AI = AI Strategy, MANUAL = เปิดเองจากปุ่ม, UNKNOWN = ไม้เก่าก่อนมีคอลัมน์นี้
+// source: ZONE/FVG = SMC Strategy, AI = AI Strategy, SNIPER = Sniper Strategy,
+// MANUAL = เปิดเองจากปุ่ม, UNKNOWN = ไม้เก่าก่อนมีคอลัมน์นี้
 export interface LastEntry {
   time: string;
   type: 'BUY' | 'SELL';
   price: number;
-  source: 'ZONE' | 'FVG' | 'OB' | 'AI' | 'MANUAL' | 'UNKNOWN';
+  source: 'ZONE' | 'FVG' | 'OB' | 'AI' | 'MANUAL' | 'SNIPER' | 'SWING' | 'REVERSAL' | 'GRID' | 'UNKNOWN';
+}
+
+// สถานะ live ของ Sniper จาก GET /api/sniper/status — breakout window คำนวณสูตรเดียวกับ
+// SniperStrategy.execute_logic (window = N แท่งก่อน row1, ตัดแท่ง forming)
+export interface SniperBreakout {
+  lookback: number;
+  range_high: number;
+  range_low: number;
+  range_height: number;
+  last_close: number;
+  price: number | null;
+  bias: -1 | 0 | 1;
+  atr: number | null;
+  tp_buy: number;
+  tp_sell: number;
+}
+
+export interface SniperStatusResponse {
+  is_running: boolean;
+  last_message: string;
+  entry_timeframe: string;
+  config: SniperConfig;
+  last_entry: LastEntry | null;
+  daily_loss?: DailyLossStatus;
+  broker_offset?: number | null;
+  breakout: SniperBreakout | null;
+}
+
+// สถานะ live ของ Swing จาก GET /api/swing/status
+export interface SwingSetup {
+  bias: -1 | 0 | 1;
+  ema: number;
+  pullback_ema: number;
+  atr: number | null;
+  last_close: number;
+  price: number | null;
+  touched: boolean;
+}
+
+export interface SwingStatusResponse {
+  is_running: boolean;
+  last_message: string;
+  entry_timeframe: string;
+  config: SwingConfig;
+  last_entry: LastEntry | null;
+  daily_loss?: DailyLossStatus;
+  broker_offset?: number | null;
+  setup: SwingSetup | null;
+}
+
+// สถานะ live ของ Reversal จาก GET /api/reversal/status
+export interface ReversalSetup {
+  rsi: number;
+  rsi_prev: number;
+  rsi_buy_level: number;
+  rsi_sell_level: number;
+  extreme_low: number;
+  extreme_high: number;
+  lookback: number;
+  bias: -1 | 0 | 1;
+  atr: number | null;
+  last_close: number;
+  price: number | null;
+}
+
+export interface ReversalStatusResponse {
+  is_running: boolean;
+  last_message: string;
+  entry_timeframe: string;
+  config: ReversalConfig;
+  last_entry: LastEntry | null;
+  daily_loss?: DailyLossStatus;
+  broker_offset?: number | null;
+  setup: ReversalSetup | null;
+}
+
+// สถานะ live ของ Grid จาก GET /api/grid/status
+export interface GridBasketLeg {
+  ticket: number;
+  price: number;
+  lot: number;
+  profit: number;
+}
+
+export interface GridBasket {
+  direction: 'BUY' | 'SELL' | null;
+  legs: GridBasketLeg[];
+  levels: number;
+  max_levels: number;
+  avg: number | null;
+  tp: number | null;
+  floating: number;
+  step: number | null;
+  next_level: number | null;
+  price: number | null;
+  ema50?: number;
+  atr?: number | null;
+  cooldown?: boolean;
+}
+
+export interface GridStatusResponse {
+  is_running: boolean;
+  last_message: string;
+  entry_timeframe: string;
+  config: GridConfig;
+  last_entry: LastEntry | null;
+  daily_loss?: DailyLossStatus;
+  broker_offset?: number | null;
+  basket: GridBasket | null;
 }
 
 export interface DailyLossStatus {

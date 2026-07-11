@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, Layers } from 'lucide-react';
 import api from '../api';
 import LineContact from './LineContact';
 
 interface SettingsViewProps {
   onLogout: () => void;
+  onChangeStrategy: () => void;
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
+const ENGINE_LABELS: Record<string, string> = {
+  smc: 'SMC — Smart Money Concept',
+  sniper: 'SNIPER — N-bar Breakout',
+};
+
+const SettingsView: React.FC<SettingsViewProps> = ({ onLogout, onChangeStrategy }) => {
   const [discordWebhook, setDiscordWebhook] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [engine, setEngine] = useState('');
+  const [engineLocked, setEngineLocked] = useState(false);
 
   useEffect(() => {
     api.get('/api/settings')
@@ -18,6 +26,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
         if (res.data.discord_webhook_url) setDiscordWebhook(res.data.discord_webhook_url);
       })
       .catch((err) => console.error('Failed to load settings', err));
+    api.get('/api/engine')
+      .then((res) => {
+        setEngine(res.data.engine);
+        setEngineLocked(!!res.data.locked);
+      })
+      .catch(() => {});
   }, []);
 
   const handleSave = async () => {
@@ -68,6 +82,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
           <button type="button" onClick={handleTest} className="h-10 px-6 lux-btn-ghost text-sm">TEST</button>
           {message && <span className="self-center text-sm" style={{ color: 'rgba(235,235,245,0.55)' }}>{message}</span>}
         </div>
+      </div>
+
+      <div className="lux-card p-6 max-w-[560px] space-y-3">
+        <div>
+          <h2 className="lux-title">Strategy</h2>
+          <p className="text-xs mt-1" style={{ color: 'rgba(235,235,245,0.38)' }}>
+            กลยุทธ์ที่ใช้อยู่: <span style={{ color: '#0A84FF', fontWeight: 600 }}>{ENGINE_LABELS[engine] || engine || '—'}</span>
+            {engineLocked && ' (ล็อกโดย instance นี้ — สลับไม่ได้)'}
+          </p>
+        </div>
+        {!engineLocked && (
+          <button
+            type="button"
+            onClick={onChangeStrategy}
+            className="ios-pressable h-10 px-6 lux-btn-ghost text-sm flex items-center gap-2"
+            style={{ color: '#0A84FF' }}
+          >
+            <Layers size={14} strokeWidth={2.2} />
+            เปลี่ยนกลยุทธ์
+          </button>
+        )}
       </div>
 
       <div className="max-w-[560px]">

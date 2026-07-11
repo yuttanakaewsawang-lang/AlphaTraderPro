@@ -33,6 +33,13 @@ export interface EntryMarker {
   raw_time?: string;
 }
 
+// เส้นราคาแนวนอน generic — สำหรับกลยุทธ์ที่ไม่มี zone concept (เช่น Sniper วาดขอบกรอบ breakout)
+export interface PriceLevel {
+  price: number;
+  color: string;
+  title: string;
+}
+
 interface SMCChartProps {
   symbol: string;
   timeframe?: string;
@@ -41,6 +48,7 @@ interface SMCChartProps {
   preview?: EntryPreview | null;
   markers?: EntryMarker[];
   retestLevel?: number | null;
+  levels?: PriceLevel[];     // เส้นราคาเพิ่มเติม (เช่น ขอบบน/ล่างกรอบ breakout ของ Sniper)
   shiftHours?: number;       // เลื่อนเวลาแสดงผลบนแกน X (เช่น เป็นเวลาไทย)
   showOverlays?: boolean;    // false = ซ่อน Order Block เหลือแค่โซน + retest
 }
@@ -103,13 +111,14 @@ interface LiveCandle {
   close: number;
 }
 
-const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, candleCount = 700, preview = null, markers, retestLevel = null, shiftHours = 0, showOverlays = true }) => {
+const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, candleCount = 700, preview = null, markers, retestLevel = null, levels, shiftHours = 0, showOverlays = true }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const priceLinesRef = useRef<IPriceLine[]>([]);
   const retestLineRef = useRef<IPriceLine | null>(null);
+  const levelLinesRef = useRef<IPriceLine[]>([]);
   const positionBoxRef = useRef<OrderBlockPrimitive | null>(null);
   const markersDataRef = useRef<EntryMarker[]>([]);
   const shiftRef = useRef(0);
@@ -468,6 +477,18 @@ const SMCChart: React.FC<SMCChartProps> = ({ symbol, timeframe = 'M5', zone, can
       });
     }
   }, [retestLevel]);
+
+  // เส้นราคา generic จาก prop levels (เช่น ขอบกรอบ breakout ของ Sniper) — วาดใหม่ทุกครั้งที่ค่าเปลี่ยน
+  useEffect(() => {
+    const series = candleSeriesRef.current;
+    if (!series) return;
+    levelLinesRef.current.forEach((l) => series.removePriceLine(l));
+    levelLinesRef.current = (levels ?? []).map((lv) =>
+      series.createPriceLine({
+        price: lv.price, color: lv.color, lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: lv.title,
+      })
+    );
+  }, [levels]);
 
   return (
     <div className="relative w-full h-full">

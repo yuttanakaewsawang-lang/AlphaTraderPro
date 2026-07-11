@@ -43,9 +43,16 @@ calendar_feed.py
 run_app.py
 run_app.spec
 start.bat
+dev.ps1
 version.py
 SniperStrategy.py
 sniper_backtest.py
+SwingStrategy.py
+swing_backtest.py
+ReversalStrategy.py
+reversal_backtest.py
+GridStrategy.py
+grid_backtest.py
 
 # Patch update temp files
 update/

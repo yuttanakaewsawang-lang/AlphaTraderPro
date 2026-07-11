@@ -3,6 +3,7 @@ import { RotateCcw, CheckCircle2, AlertTriangle } from 'lucide-react';
 import api from '../api';
 import type { StrategyConfig, ZoneResponse } from '../types/strategy';
 import SniperConfigPanel from './SniperConfigPanel';
+import EngineConfigPanel from './EngineConfigPanel';
 
 // TF ที่เลือกได้สำหรับ zone/entry ใน Strategy Configuration (ต้องตรงกับ TIMEFRAME_LABELS ฝั่ง backend)
 const CONFIG_TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1'];
@@ -37,6 +38,9 @@ const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
 const STRATEGIES: { id: string; name: string; title: string }[] = [
   { id: 'smc', name: 'SMC', title: 'SMC (Smart Money Concepts) Monitor' },
   { id: 'sniper', name: 'Sniper', title: 'Sniper (N-bar Breakout) Monitor' },
+  { id: 'swing', name: 'Swing Trade', title: 'Swing Trade (Trend Pullback) Monitor' },
+  { id: 'reversal', name: 'Reversal', title: 'Reversal (RSI Extreme) Monitor' },
+  { id: 'grid', name: 'Grid Martingale', title: 'Grid Martingale Monitor' },
 ];
 
 interface Position {
@@ -499,6 +503,9 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const activeGroup = CONFIG_GROUPS.find((g) => g.id === activeTab)!;
 
   if (strategyId === 'sniper') return <SniperConfigPanel symbol={symbol} />;
+  if (strategyId === 'swing' || strategyId === 'reversal' || strategyId === 'grid') {
+    return <EngineConfigPanel engine={strategyId} symbol={symbol} />;
+  }
 
   return (
     <div className="ios-fade-in flex flex-col gap-3 h-full overflow-hidden">

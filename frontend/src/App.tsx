@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import api from './api';
 import ActivateView from './components/ActivateView';
 import Login from './components/Login';
+import StrategySelectView from './components/StrategySelectView';
 import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
+import SniperDashboardView from './components/SniperDashboardView';
+import SwingDashboardView from './components/SwingDashboardView';
+import ReversalDashboardView from './components/ReversalDashboardView';
+import GridDashboardView from './components/GridDashboardView';
 import StrategyView from './components/StrategyView';
 import HistoryView from './components/HistoryView';
 import LedgerView from './components/LedgerView';
@@ -16,6 +21,9 @@ import BacktestReplayView from './components/BacktestReplayView';
 const App: React.FC = () => {
   const [licensed, setLicensed] = useState<boolean | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [strategyChosen, setStrategyChosen] = useState(false);
+  // engine ที่ผู้ใช้เลือกจากหน้าเลือกกลยุทธ์ — ใช้เลือกหน้า Dashboard (SMC/Sniper คนละ component)
+  const [engine, setEngine] = useState('smc');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [account, setAccount] = useState<any>(null);
   const [symbol, setSymbol] = useState('XAUUSD.');
@@ -47,6 +55,7 @@ const App: React.FC = () => {
         const res = await api.get('/api/license');
         if (!res.data.valid && licensedRef.current === true) {
           setLoggedIn(false);
+          setStrategyChosen(false);
           setLicensed(false);
         }
       } catch {}
@@ -84,6 +93,7 @@ const App: React.FC = () => {
   if (licensed === null) return null;
   if (!licensed) return <ActivateView onActivated={() => setLicensed(true)} />;
   if (!loggedIn) return <Login onLoginSuccess={() => setLoggedIn(true)} />;
+  if (!strategyChosen) return <StrategySelectView onSelected={(eng) => { setEngine(eng); setStrategyChosen(true); }} />;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -95,18 +105,29 @@ const App: React.FC = () => {
           symbol={symbol}
           symbols={symbols}
           setSymbol={setSymbol}
-          onLicenseExpired={() => { setLoggedIn(false); setLicensed(false); }}
+          onLicenseExpired={() => { setLoggedIn(false); setStrategyChosen(false); setLicensed(false); }}
         />
         <div key={activeTab} className="ios-fade-in flex-1 overflow-auto p-4">
-          {activeTab === 'dashboard' && <DashboardView symbol={symbol} />}
+          {activeTab === 'dashboard' && (
+            engine === 'sniper' ? <SniperDashboardView symbol={symbol} />
+            : engine === 'swing' ? <SwingDashboardView symbol={symbol} />
+            : engine === 'reversal' ? <ReversalDashboardView symbol={symbol} />
+            : engine === 'grid' ? <GridDashboardView symbol={symbol} />
+            : <DashboardView symbol={symbol} />
+          )}
           {activeTab === 'strategy' && <StrategyView symbol={symbol} />}
-          {activeTab === 'livechart' && <LiveChartView symbol={symbol} />}
+          {activeTab === 'livechart' && <LiveChartView symbol={symbol} engine={engine} />}
           {activeTab === 'replay' && <BacktestReplayView symbol={symbol} />}
           {activeTab === 'calendar' && <CalendarView />}
           {activeTab === 'history' && <HistoryView />}
           {activeTab === 'ledger' && <LedgerView symbol={symbol} />}
           {activeTab === 'stats' && <StatsView />}
-          {activeTab === 'settings' && <SettingsView onLogout={() => setLoggedIn(false)} />}
+          {activeTab === 'settings' && (
+            <SettingsView
+              onLogout={() => { setLoggedIn(false); setStrategyChosen(false); }}
+              onChangeStrategy={() => { setStrategyChosen(false); setActiveTab('dashboard'); }}
+            />
+          )}
         </div>
       </div>
     </div>

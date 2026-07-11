@@ -1,25 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Wallet, LineChart, TrendingUp, TrendingDown, Zap, Target, Circle, ScanSearch } from 'lucide-react';
+import { Wallet, LineChart, TrendingUp, TrendingDown, Zap, Target, Crosshair } from 'lucide-react';
 import api from '../api';
-import type {
-  LiveDecision,
-  StructureResponse,
-  ZoneResponse,
-} from '../types/strategy';
+import type { LiveDecision, SniperStatusResponse } from '../types/strategy';
 
-// สีประจำกลยุทธ์ SMC (ตรงการ์ดหน้าเลือกกลยุทธ์) — ใช้เป็นโทนหลักของ accent ทั้งหน้า
-// สี semantic (กำไรเขียว/ขาดทุนแดง/เตือนเหลือง) คงเดิมไม่เปลี่ยนตามกลยุทธ์
-const SMC_BLUE = '#0A84FF';
+// Dashboard เฉพาะกลยุทธ์ Sniper (N-bar breakout) — แยกไฟล์จาก DashboardView (SMC) โดยเจตนา:
+// Sniper ไม่มี zone/OB/FVG/retest/trailing เลย pipeline กับ panel จึงเป็นคนละเรื่องกัน
+// App.tsx เลือก render หน้านี้เมื่อ engine ที่ผู้ใช้เลือกจากหน้าเลือกกลยุทธ์เป็น 'sniper'
 
-interface ContextFactor { key: string; label: string; score: number; weight: number }
-interface MarketCtx { direction: 'BULLISH' | 'BEARISH' | 'SIDEWAYS'; confidence: number; factors: ContextFactor[] }
-interface MarketContextResponse { tf: string; context: MarketCtx | null; ref_tf: string; ref: MarketCtx | null }
-
-const DIRECTION_GLOW: Record<'BULLISH' | 'BEARISH' | 'SIDEWAYS', string> = {
-  BULLISH: '#30D158',
-  BEARISH: '#FF453A',
-  SIDEWAYS: '#8E8E93',
-};
+const SNIPER_GREEN = '#30D158';
 
 interface AccountInfo {
   success: boolean;
@@ -28,8 +16,6 @@ interface AccountInfo {
   margin?: number;
   profit_total?: number;
   trades_total?: number;
-  broker?: string;
-  account?: number;
 }
 
 interface Position {
@@ -42,29 +28,25 @@ interface Position {
   profit: number;
 }
 
-interface DashboardViewProps { symbol: string }
+interface SniperDashboardViewProps { symbol: string }
 
-const zoneLabel = (zoneType: -1 | 0 | 1) => {
-  if (zoneType === 1) return 'RBS · Buy Zone';
-  if (zoneType === 0) return 'SBR · Sell Zone';
-  return 'No Zone';
-};
-
-const biasLabel = (dir?: 'bullish' | 'bearish' | null) =>
-  dir === 'bullish' ? 'Bullish' : dir === 'bearish' ? 'Bearish' : 'Neutral';
-
+// stage ที่ SniperStrategy._decision บันทึกจริง (SEARCHING ไม่ log ลง DB แต่กันไว้เผื่อ)
 const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> = {
   EXECUTED:       { label: 'เปิดไม้',      bg: 'bg-emerald-500/15', text: 'text-emerald-400' },
-  AI_REJECT:      { label: 'AI ปฏิเสธ',    bg: 'bg-red-500/15',     text: 'text-red-400' },
   NEWS:           { label: 'ข่าวแรง',      bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   SESSION:        { label: 'นอก session',  bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   DAILY_LIMIT:    { label: 'ลิมิตรายวัน', bg: 'bg-red-500/15',     text: 'text-red-400' },
   PORTFOLIO_KILL: { label: 'หยุดพอร์ต',   bg: 'bg-red-500/15',     text: 'text-red-400' },
-  ZONE_GUARD:     { label: 'Zone Guard',   bg: 'bg-amber-500/15',   text: 'text-amber-400' },
-  RISK_GUARD:     { label: 'Risk Guard',   bg: 'bg-red-500/15',     text: 'text-red-400' },
+  SPREAD:         { label: 'สเปรดกว้าง',  bg: 'bg-amber-500/15',   text: 'text-amber-400' },
+  ERROR:          { label: 'ผิดพลาด',     bg: 'bg-red-500/15',     text: 'text-red-400' },
   POSITION_OPEN:  { label: 'มีไม้เปิด',    bg: 'bg-sky-500/15',     text: 'text-sky-400' },
   SEARCHING:      { label: 'กำลังหา',     bg: 'bg-white/5',        text: 'text-ink-muted' },
 };
+
+const biasText = (bias: -1 | 0 | 1) =>
+  bias === 1 ? 'BULLISH' : bias === -1 ? 'BEARISH' : 'NEUTRAL';
+const biasColor = (bias: -1 | 0 | 1) =>
+  bias === 1 ? '#30D158' : bias === -1 ? '#FF453A' : 'rgba(235,235,245,0.45)';
 
 /* ── Pill badge ─────────────────────────────────── */
 const Pill: React.FC<{ label: string; bg: string; text: string }> = ({ label, bg, text }) => (
@@ -75,7 +57,7 @@ const Pill: React.FC<{ label: string; bg: string; text: string }> = ({ label, bg
 const KPI: React.FC<{
   label: string; value: React.ReactNode; sub?: React.ReactNode;
   icon?: React.ElementType; iconColor?: string; iconBg?: string;
-}> = ({ label, value, sub, icon: Icon, iconColor = '#0A84FF', iconBg = 'rgba(10,132,255,0.15)' }) => (
+}> = ({ label, value, sub, icon: Icon, iconColor = SNIPER_GREEN, iconBg = 'rgba(48,209,88,0.15)' }) => (
   <div className="lux-card px-4 py-3">
     {Icon && (
       <div className="ios-icon-tile w-8 h-8 mb-2" style={{ background: iconBg }}>
@@ -98,9 +80,7 @@ const PipeNode: React.FC<{
   return (
     <div className={`flex-1 min-w-0 rounded-2xl border p-3.5 ${flash ? 'agent-card-flash' : ''}`}
       style={{
-        background: state !== 'idle'
-          ? `rgba(255,255,255,0.07)`
-          : 'rgba(255,255,255,0.04)',
+        background: state !== 'idle' ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderColor: state !== 'idle' ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.08)',
@@ -119,45 +99,32 @@ const PipeNode: React.FC<{
 };
 
 /* ── Animated flow connector ─────────────────────── */
-const Arrow: React.FC<{ active: boolean; color?: string }> = ({ active, color = '#0A84FF' }) => (
+const Arrow: React.FC<{ active: boolean; color?: string }> = ({ active, color = SNIPER_GREEN }) => (
   <div className="hidden lg:flex items-center justify-center w-14 shrink-0">
     <svg width="56" height="16" viewBox="0 0 56 16">
-      {/* glow track */}
-      {active && (
-        <line x1="0" y1="8" x2="50" y2="8"
-          stroke={color} strokeWidth="4" opacity="0.08" />
-      )}
-      {/* main track */}
-      <line x1="0" y1="8" x2="50" y2="8"
-        stroke={active ? color : '#1F2937'} strokeWidth="1.5"
-        opacity={active ? 0.4 : 1} />
-      {/* animated dot 1 */}
+      {active && <line x1="0" y1="8" x2="50" y2="8" stroke={color} strokeWidth="4" opacity="0.08" />}
+      <line x1="0" y1="8" x2="50" y2="8" stroke={active ? color : '#1F2937'} strokeWidth="1.5" opacity={active ? 0.4 : 1} />
       {active && (
         <circle r="2.5" cy="8" fill={color} opacity="0.95">
           <animateMotion dur="1.2s" repeatCount="indefinite" begin="0s" path="M0,0 L50,0" />
         </circle>
       )}
-      {/* animated dot 2 (offset) */}
       {active && (
         <circle r="1.5" cy="8" fill={color} opacity="0.5">
           <animateMotion dur="1.2s" repeatCount="indefinite" begin="-0.6s" path="M0,0 L50,0" />
         </circle>
       )}
-      {/* arrowhead */}
       <polyline points="44,4 50,8 44,12" fill="none"
-        stroke={active ? color : '#1F2937'}
-        strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        stroke={active ? color : '#1F2937'} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   </div>
 );
 
-const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
+const SniperDashboardView: React.FC<SniperDashboardViewProps> = ({ symbol }) => {
   const [online, setOnline] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [zone, setZone] = useState<ZoneResponse | null>(null);
-  const [mctx, setMctx] = useState<MarketContextResponse | null>(null);
+  const [status, setStatus] = useState<SniperStatusResponse | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [structure, setStructure] = useState<StructureResponse | null>(null);
   const [decisions, setDecisions] = useState<LiveDecision[]>([]);
   const [todayCounts, setTodayCounts] = useState<Record<string, number>>({});
   const [flash, setFlash] = useState<Record<string, boolean>>({});
@@ -177,30 +144,24 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
 
     const fetchAll = async () => {
       try {
-        const [accRes, zoneRes, ctxRes, posRes, structRes, decRes] = await Promise.all([
+        const [accRes, stRes, posRes, decRes] = await Promise.all([
           api.get<AccountInfo>('/api/account'),
-          api.get<ZoneResponse>('/api/strategy/zone', { params: { symbol } }),
-          api.get<MarketContextResponse>('/api/market-context', { params: { symbol } }),
+          api.get<SniperStatusResponse>('/api/sniper/status', { params: { symbol } }),
           api.get<Position[]>('/api/positions', { params: { symbol } }),
-          api.get<StructureResponse>('/api/structure', { params: { symbol } }),
           api.get<{ decisions: LiveDecision[]; today_counts: Record<string, number> }>(
             '/api/strategy/decisions', { params: { symbol, limit: 15 } }),
         ]);
         if (cancelled) return;
         setOnline(!!accRes.data.success);
         setAccount(accRes.data);
-        setZone(zoneRes.data);
-        setMctx(ctxRes.data);
+        setStatus(stRes.data);
         setPositions(posRes.data);
-        setStructure(structRes.data);
         setDecisions(decRes.data.decisions);
         setTodayCounts(decRes.data.today_counts ?? {});
 
-        const events = structRes.data.events ?? [];
-        const latestEvent = events[events.length - 1];
-        triggerFlash('structure', latestEvent ? `${latestEvent.break_time}-${latestEvent.direction}` : '');
-        triggerFlash('smc', zoneRes.data.last_message ?? '');
-        triggerFlash('review', ctxRes.data.context ? `${ctxRes.data.context.direction}` : '');
+        triggerFlash('scan', stRes.data.last_message ?? '');
+        triggerFlash('range', stRes.data.breakout
+          ? `${stRes.data.breakout.range_high}-${stRes.data.breakout.range_low}` : '');
         triggerFlash('portfolio', `${posRes.data.length}-${accRes.data.equity}`);
       } catch {
         if (!cancelled) setOnline(false);
@@ -213,35 +174,30 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   }, [symbol]);
 
   /* ── derived values ─────────────────────────────── */
-  const events        = structure?.events ?? [];
-  const latestEvent   = events[events.length - 1] ?? null;
-  const ctx           = mctx?.context ?? null;
-  const ctxRef        = mctx?.ref ?? null;
-  const ctxRefTf      = mctx?.ref_tf ?? 'H1';
-  const floatPL       = positions.reduce((s, p) => s + p.profit, 0);
-  const smcRunning    = !!zone?.is_running;
-  const dailyLoss     = zone?.daily_loss;
-  const halted        = !!dailyLoss?.halted;
-  const cfg           = zone?.config;
-  const obCount       = (structure?.order_blocks ?? []).filter((o) => !o.mitigated).length;
-  const fvgCount      = (structure?.fvgs ?? []).filter((f) => !f.mitigated).length;
-  const az            = zone?.zone;
-  const azActive      = !!(az && az.zone_type !== -1);
-  const azBuy         = az?.zone_type === 1;
-  const lastEntry     = zone?.last_entry;
-  const mgmtTags      = cfg
-    ? [cfg.use_breakeven ? 'BE' : '', cfg.enable_trailing ? 'Trail' : '',
-       (cfg.use_partial_tp && cfg.partial_tp_close_pct > 0) ? 'Partial' : '']
-        .filter(Boolean).join(' · ') || 'ปิดทั้งหมด'
-    : '-';
+  const running   = !!status?.is_running;
+  const cfg       = status?.config;
+  const bo        = status?.breakout ?? null;
+  const dailyLoss = status?.daily_loss;
+  const halted    = !!dailyLoss?.halted;
+  const lastEntry = status?.last_entry;
+  const floatPL   = positions.reduce((s, p) => s + p.profit, 0);
+  const tf        = status?.entry_timeframe ?? cfg?.entry_timeframe ?? '—';
 
-  const cOpened   = todayCounts.EXECUTED ?? 0;
-  const cRejected = todayCounts.AI_REJECT ?? 0;
-  const cBlocked  = (todayCounts.NEWS ?? 0) + (todayCounts.SESSION ?? 0)
+  // แท่งปิดล่าสุดทะลุกรอบหรือยัง — เงื่อนไขเดียวกับสัญญาณเข้าจริงใน execute_logic
+  const brokeUp   = !!bo && bo.last_close > bo.range_high;
+  const brokeDown = !!bo && bo.last_close < bo.range_low;
+  const trendOn   = !!cfg && !!cfg.use_trend_filter;
+  const bias      = bo?.bias ?? 0;
+
+  // ตำแหน่งราคาปัจจุบันในกรอบ (0% = ขอบล่าง, 100% = ขอบบน) — clamp ให้ marker ไม่หลุดแถบ
+  const pricePct = bo && bo.price != null && bo.range_height > 0
+    ? Math.min(108, Math.max(-8, ((bo.price - bo.range_low) / bo.range_height) * 100))
+    : null;
+
+  const cOpened  = todayCounts.EXECUTED ?? 0;
+  const cBlocked = (todayCounts.NEWS ?? 0) + (todayCounts.SESSION ?? 0)
     + (todayCounts.DAILY_LIMIT ?? 0) + (todayCounts.PORTFOLIO_KILL ?? 0)
-    + (todayCounts.ZONE_GUARD ?? 0) + (todayCounts.RISK_GUARD ?? 0);
-
-  const pipeActive = (a: boolean, b: boolean) => a && b;
+    + (todayCounts.SPREAD ?? 0);
 
   return (
     <div className="ios-fade-in flex flex-col gap-3 h-full">
@@ -250,9 +206,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
       <div className="flex items-center gap-2 shrink-0">
         <h1 className="lux-h1">Dashboard</h1>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-          style={{ color: SMC_BLUE, background: 'rgba(10,132,255,0.12)', border: '1px solid rgba(10,132,255,0.30)' }}>
-          <ScanSearch size={11} strokeWidth={2.5} />
-          SMC
+          style={{ color: SNIPER_GREEN, background: 'rgba(48,209,88,0.12)', border: '1px solid rgba(48,209,88,0.30)' }}>
+          <Crosshair size={11} strokeWidth={2.5} />
+          SNIPER
         </span>
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
           online ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
@@ -260,9 +216,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
           <span className={`w-1.5 h-1.5 rounded-full ${online ? 'bg-emerald-400 agent-pulse' : 'bg-red-500'}`} />
           {online ? 'MT5 ONLINE' : 'OFFLINE'}
         </span>
-        {smcRunning && (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--accent-blue)]/15 text-[var(--accent-blue)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-blue)] agent-pulse" />
+        {running && (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 agent-pulse" />
             AUTO TRADE · {symbol}
           </span>
         )}
@@ -276,7 +232,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
       {/* ── KPI row ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         <KPI label="Balance"
-          icon={Wallet} iconColor="#0A84FF" iconBg="rgba(10,132,255,0.15)"
+          icon={Wallet}
           value={<span style={{ color: '#FFFFFF' }}>${account?.balance?.toLocaleString('en', { minimumFractionDigits: 2 }) ?? '—'}</span>} />
         <KPI label="Equity"
           icon={LineChart}
@@ -294,27 +250,25 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
         <KPI label="Total Trades"
           icon={Zap}
           value={<span style={{ color: '#FFFFFF' }}>{account?.trades_total ?? 0}</span>} />
-        <KPI label="Today — เปิด / ปฏิเสธ / บล็อก"
-          icon={Target} iconColor="#0A84FF" iconBg="rgba(10,132,255,0.12)"
+        <KPI label="Today — เปิด / บล็อก"
+          icon={Target}
           value={
             <span className="flex gap-2">
               <span style={{ color: '#30D158' }}>{cOpened}</span>
               <span style={{ color: 'rgba(235,235,245,0.25)' }}>/</span>
-              <span style={{ color: '#FF453A' }}>{cRejected}</span>
-              <span style={{ color: 'rgba(235,235,245,0.25)' }}>/</span>
               <span style={{ color: '#FFD60A' }}>{cBlocked}</span>
             </span>
           } />
-        <KPI label="Active Zone"
-          icon={Circle}
-          iconColor={azActive ? (azBuy ? '#30D158' : '#FF453A') : 'rgba(235,235,245,0.3)'}
-          iconBg={azActive ? (azBuy ? 'rgba(48,209,88,0.12)' : 'rgba(255,69,58,0.12)') : 'rgba(255,255,255,0.06)'}
+        <KPI label="Breakout Range"
+          icon={Crosshair}
+          iconColor={bo ? SNIPER_GREEN : 'rgba(235,235,245,0.3)'}
+          iconBg={bo ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.06)'}
           value={
-            <span style={{ color: azActive ? (azBuy ? '#30D158' : '#FF453A') : 'rgba(235,235,245,0.40)' }}>
-              {az ? zoneLabel(az.zone_type) : 'None'}
+            <span style={{ color: bo ? '#FFFFFF' : 'rgba(235,235,245,0.40)' }}>
+              {bo ? `${bo.range_low.toFixed(2)} – ${bo.range_high.toFixed(2)}` : 'รอข้อมูล'}
             </span>
           }
-          sub={az && azActive ? `${az.low_limit.toFixed(2)} – ${az.high_limit.toFixed(2)}` : undefined} />
+          sub={bo ? `${bo.lookback} แท่ง · ${tf}` : undefined} />
       </div>
 
       {/* ── Open Positions ─────────────────────────────────── */}
@@ -353,103 +307,132 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
         </div>
       )}
 
-      {/* ── Agent Pipeline ─────────────────────────────────── */}
+      {/* ── Sniper Pipeline ────────────────────────────────── */}
       <div className="lux-card px-4 py-3 shrink-0">
-        <p className="lux-title mb-2.5">Live Pipeline</p>
+        <p className="lux-title mb-2.5">Live Pipeline — Sniper Breakout</p>
         <div className="flex items-stretch gap-1">
           <PipeNode
-            color={SMC_BLUE} title="Market Structure"
-            value={`${biasLabel(latestEvent?.direction)}${latestEvent ? ` · ${latestEvent.type}` : ''}`}
-            sub={`OB ${obCount} · FVG ${fvgCount} active`}
-            state={latestEvent ? (latestEvent.direction === 'bearish' ? 'warn' : 'active') : 'idle'}
-            flash={flash.structure}
+            color={SNIPER_GREEN} title="Range Scan"
+            value={running ? `RUNNING · ${tf}` : 'STOPPED'}
+            sub={bo ? `กรอบ ${bo.lookback} แท่ง: ${bo.range_low.toFixed(2)} – ${bo.range_high.toFixed(2)}` : 'รอข้อมูลแท่งเทียน'}
+            state={running && bo ? 'active' : 'idle'}
+            flash={flash.range}
           />
-          <Arrow active={pipeActive(!!latestEvent, smcRunning && !!az)} />
+          <Arrow active={running && !!bo} />
           <PipeNode
-            color={SMC_BLUE} title="SMC Strategy"
-            value={smcRunning ? `RUNNING · ${zone?.zone_timeframe ?? 'M5'}` : 'STOPPED'}
-            sub={az ? zoneLabel(az.zone_type) : 'กำลังหาโซน'}
-            state={smcRunning && az ? 'active' : 'idle'}
-            flash={flash.smc}
+            color={SNIPER_GREEN} title="Trend Filter"
+            value={trendOn ? biasText(bias) : 'OFF'}
+            sub={trendOn ? `H1 · ${cfg?.trend_filter_mode === 1 ? 'HH/HL structure' : 'EMA50'}` : 'เข้าได้ทั้งสองทิศ'}
+            state={!trendOn ? 'idle' : bias === -1 ? 'warn' : bias === 1 ? 'active' : 'idle'}
           />
-          <Arrow active={pipeActive(smcRunning && !!az, !!ctx)} />
+          <Arrow active={running && (brokeUp || brokeDown)} />
           <PipeNode
-            color={SMC_BLUE} title={`Market Context (${mctx?.tf ?? '-'})`}
-            value={ctx ? `${ctx.direction} ${ctx.confidence}%` : 'รอข้อมูล'}
-            sub={ctxRef ? `${ctxRefTf}: ${ctxRef.direction} ${ctxRef.confidence}%` : '—'}
-            state={ctx ? (ctx.direction === 'BEARISH' ? 'warn' : ctx.direction === 'BULLISH' ? 'active' : 'idle') : 'idle'}
-            flash={flash.review}
+            color={SNIPER_GREEN} title="Breakout Signal"
+            value={brokeUp ? 'ปิดเหนือกรอบ → BUY' : brokeDown ? 'ปิดใต้กรอบ → SELL' : 'รอแท่งปิดทะลุกรอบ'}
+            sub={status?.last_message ?? '—'}
+            state={brokeUp || brokeDown ? (brokeDown ? 'warn' : 'active') : 'idle'}
+            flash={flash.scan}
           />
-          <Arrow active={pipeActive(!!ctx, positions.length > 0)} />
+          <Arrow active={positions.length > 0} />
           <PipeNode
-            color={SMC_BLUE} title="Execution"
+            color={SNIPER_GREEN} title="Execution"
             value={`Risk ${cfg?.risk_percent ?? '-'}% / ไม้`}
             sub={lastEntry ? `${lastEntry.type} @ ${lastEntry.price} · ${lastEntry.source}` : 'ยังไม่มีไม้'}
             state={positions.length > 0 ? 'active' : 'idle'}
           />
-          <Arrow active={pipeActive(positions.length > 0, positions.length > 0)} />
+          <Arrow active={positions.length > 0} />
           <PipeNode
-            color={SMC_BLUE} title="Trade Mgmt"
-            value={mgmtTags}
-            sub={`ดูแลอยู่ ${positions.length} ไม้`}
+            color={SNIPER_GREEN} title="SL/TP @ Order"
+            value="Measured-move TP"
+            sub={positions.length > 0 ? `โบรกเกอร์ดูแล ${positions.length} ไม้ (ไม่มี trailing)` : 'SL/TP ตั้งที่ออเดอร์ตั้งแต่เปิดไม้'}
             state={positions.length > 0 ? 'active' : 'idle'}
             flash={flash.portfolio}
           />
         </div>
       </div>
 
-      {/* ── Activity logs ──────────────────────────────────── */}
+      {/* ── Breakout panel + Live log ──────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 flex-1 min-h-0">
 
-        {/* Market Context breakdown */}
+        {/* กรอบ Breakout ปัจจุบัน */}
         <div className="lux-card p-4 min-h-0 flex flex-col">
-          <p className="lux-title mb-2 shrink-0">Market Context — อ่านจากแท่งเทียน ({mctx?.tf ?? '-'})</p>
-          {!ctx ? (
-            <p className="text-ink-muted text-sm">รอข้อมูลแท่งเทียน...</p>
+          <p className="lux-title mb-2 shrink-0">กรอบ Breakout — {bo ? `${bo.lookback} แท่งล่าสุด (${tf})` : 'รอข้อมูล'}</p>
+          {!bo ? (
+            <p className="text-ink-muted text-sm">รอข้อมูลแท่งเทียนจาก MT5...</p>
           ) : (
-            <div className="flex-1 overflow-y-auto min-h-0 space-y-3">
-              <div className="flex items-center gap-3">
-                <span
-                  style={{ textShadow: `0 0 10px ${DIRECTION_GLOW[ctx.direction]}55` }}
-                  className={`text-xl font-bold tabular-nums ${
-                  ctx.direction === 'BULLISH' ? 'text-emerald-400'
-                  : ctx.direction === 'BEARISH' ? 'text-red-400' : 'text-ink-muted'}`}>
-                  {ctx.direction === 'BULLISH' ? '▲ BULLISH' : ctx.direction === 'BEARISH' ? '▼ BEARISH' : '◆ SIDEWAYS'} {ctx.confidence}%
-                </span>
-                {ctxRef && (
-                  <span className="text-[11px] text-ink-faint">
-                    ภาพใหญ่ {ctxRefTf}: {ctxRef.direction} {ctxRef.confidence}%
-                  </span>
-                )}
+            <div className="flex-1 overflow-y-auto min-h-0 space-y-4">
+              {/* แถบ range แนวนอน: ขอบล่าง → ขอบบน + จุดราคาปัจจุบัน */}
+              <div className="pt-5 pb-1">
+                <div className="relative h-2.5 rounded-full"
+                  style={{ background: 'linear-gradient(90deg, rgba(255,69,58,0.35), rgba(255,255,255,0.10), rgba(48,209,88,0.35))' }}>
+                  {pricePct != null && (
+                    <div className="absolute -top-[7px] w-1 h-6 rounded-full"
+                      style={{
+                        left: `calc(${Math.min(100, Math.max(0, pricePct))}% - 2px)`,
+                        background: '#FFFFFF',
+                        boxShadow: `0 0 8px ${pricePct > 100 || pricePct < 0 ? '#FF9F0A' : SNIPER_GREEN}`,
+                      }} />
+                  )}
+                </div>
+                <div className="flex justify-between mt-2 text-xs tabular-nums">
+                  <span className="text-red-400">ขอบล่าง {bo.range_low.toFixed(2)}</span>
+                  {bo.price != null && (
+                    <span className="text-ink font-semibold">ราคา {bo.price.toFixed(2)}</span>
+                  )}
+                  <span className="text-emerald-400">ขอบบน {bo.range_high.toFixed(2)}</span>
+                </div>
               </div>
-              <ul className="space-y-2">
-                {ctx.factors.map((f) => {
-                  const pct = Math.round(Math.abs(f.score) * 100);
-                  const pos = f.score >= 0;
-                  return (
-                    <li key={f.key} className="text-xs">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-ink-muted">{f.label} <span className="text-ink-faint">({f.weight}%)</span></span>
-                        <span className={`tabular-nums font-semibold ${
-                          f.score > 0.1 ? 'text-emerald-400' : f.score < -0.1 ? 'text-red-400' : 'text-ink-faint'}`}>
-                          {f.score > 0 ? '+' : ''}{f.score.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden flex">
-                        <div className="h-full w-1/2 flex justify-end">
-                          {!pos && <div className="h-full rounded-l-full bg-red-400/70" style={{ width: `${pct}%` }} />}
-                        </div>
-                        <div className="h-full w-1/2">
-                          {pos && <div className="h-full rounded-r-full bg-emerald-400/70" style={{ width: `${pct}%` }} />}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+
+              {/* ตัวเลขประกอบ */}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs tabular-nums">
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">แท่งปิดล่าสุด</span>
+                  <span className={`font-semibold ${brokeUp ? 'text-emerald-400' : brokeDown ? 'text-red-400' : 'text-ink'}`}>
+                    {bo.last_close.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">ความสูงกรอบ</span>
+                  <span className="text-ink">{bo.range_height.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">TP ฝั่ง BUY (measured move)</span>
+                  <span className="text-emerald-400">{bo.tp_buy.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">TP ฝั่ง SELL (measured move)</span>
+                  <span className="text-red-400">{bo.tp_sell.toFixed(2)}</span>
+                </div>
+                {bo.price != null && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-ink-muted">ห่างขอบบน</span>
+                      <span className="text-ink">{(bo.range_high - bo.price).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-ink-muted">ห่างขอบล่าง</span>
+                      <span className="text-ink">{(bo.price - bo.range_low).toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+                {bo.atr != null && (
+                  <div className="flex justify-between">
+                    <span className="text-ink-muted">ATR(14)</span>
+                    <span className="text-ink">{bo.atr.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-ink-muted">เทรนด์ H1</span>
+                  <span className="font-semibold" style={{ color: biasColor(bias) }}>
+                    {trendOn ? biasText(bias) : 'ปิด filter'}
+                  </span>
+                </div>
+              </div>
+
               <p className="text-[10px] text-ink-faint leading-relaxed">
-                คะแนนความชัดของ trend จาก price action ล้วน (swing structure · body · ตำแหน่ง range · ATR)
-                — ใช้ประกอบการตัดสินใจ ไม่มีผลต่อ entry ของบอท
+                สัญญาณเข้า = แท่งปิดทะลุกรอบ {bo.lookback} แท่ง (BUY เมื่อปิดเหนือขอบบน / SELL เมื่อปิดใต้ขอบล่าง
+                — ถ้าเปิด trend filter ต้องไม่สวนเทรนด์ H1) · TP = ความสูงกรอบต่อจากจุดเบรก · SL หลังแท่งสัญญาณ +
+                buffer — คำนวณกรอบด้วยสูตรเดียวกับที่บอทใช้ตัดสินใจจริง
               </p>
             </div>
           )}
@@ -461,7 +444,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
             <p className="lux-title">บันทึก Live — ทำไมเข้า/ไม่เข้าไม้</p>
             <div className="flex gap-3 text-[10px] tabular-nums">
               <span className="text-emerald-400 font-semibold">เปิด {cOpened}</span>
-              <span className="text-red-400 font-semibold">ปฏิเสธ {cRejected}</span>
               <span className="text-amber-400 font-semibold">บล็อก {cBlocked}</span>
             </div>
           </div>
@@ -490,4 +472,4 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   );
 };
 
-export default DashboardView;
+export default SniperDashboardView;
