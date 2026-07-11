@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.2",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.2/ApolloAutoTrade.exe",
-    "sha256":  "B758B65E12DE07B07798139E7CEB0E2B89D1487137F621B9A325BC38839A5861",
-    "notes":  "v1.2.2 — เปิดโปรแกรมแล้วบอทไม่สตาร์ทเอง ต้องกด START AUTO TRADE เองทุกครั้ง (รีสตาร์ท/อัปเดตบน VPS แล้วต้องเข้าไปกด Start ด้วย) | รวมของ v1.2.0-1.2.1: 5 กลยุทธ์ + หน้าเลือกกลยุทธ์ + ปิดแจ้งเตือน Discord เสาร์-อาทิตย์"
+    "version":  "1.2.3",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.3/ApolloAutoTrade.exe",
+    "sha256":  "22A60538E3CEC2ED1EEBC0129651DE8E0F445D0750594299E883EAA62A973B90",
+    "notes":  "Backtest Replay รองรับครบ 5 กลยุทธ์ + หน้า Strategy ตามกลยุทธ์ที่เลือก (ถอด dropdown) + คำเตือน Reversal ยังไม่ผ่าน out-of-sample + Sniper backtest หักต้นทุนจริง (spread + lot จริง + min-lot guard)"
 }
