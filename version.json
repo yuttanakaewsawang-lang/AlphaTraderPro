@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.108",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.0.108/ApolloAutoTrade.exe",
-    "sha256":  "F21F51EF760BD60D81B2372706ECC3E7311071A64170DFB78CA213DEF2893685",
-    "notes":  "Min-lot Risk Guard: ข้ามไม้ที่ lot ต่ำสุด 0.01 ทำให้ความเสี่ยงจริงเกิน 2 เท่าของ risk% ที่ตั้ง (พอร์ตเล็ก + SL กว้างช่วงตลาดผันผวน) — แจ้งเตือน Discord + badge Risk Guard ใน Dashboard เมื่อข้าม, backtest/replay จำลอง gate เดียวกัน"
+    "version":  "1.2.0",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.0/ApolloAutoTrade.exe",
+    "sha256":  "DC363889073C624E60A07815CEC15459697F33DCE49958745B915234CB43D91C",
+    "notes":  "v1.2.0 — ครบ 5 กลยุทธ์: หน้าเลือกกลยุทธ์หลัง login (SMC/Sniper/Swing/Reversal/Grid สลับได้จากในแอป), กลยุทธ์ใหม่ 3 ตัวเทรดได้จริง + Dashboard/Config/Live Chart แยกธีมสีต่อกลยุทธ์, config ผ่าน backtest sweep 6 เดือน + Min-lot Risk Guard ทุกตัว | คำแนะนำ: Sniper/Swing เหมาะทุน $1,000+ หรือบัญชี cent, Grid ใช้ demo เท่านั้น (backtest ติดลบ), บัญชีสเปรดกว้างต้องปรับ Max Spread ในหน้า config"
 }
