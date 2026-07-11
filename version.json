@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.0",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.0/ApolloAutoTrade.exe",
-    "sha256":  "DC363889073C624E60A07815CEC15459697F33DCE49958745B915234CB43D91C",
-    "notes":  "v1.2.0 — ครบ 5 กลยุทธ์: หน้าเลือกกลยุทธ์หลัง login (SMC/Sniper/Swing/Reversal/Grid สลับได้จากในแอป), กลยุทธ์ใหม่ 3 ตัวเทรดได้จริง + Dashboard/Config/Live Chart แยกธีมสีต่อกลยุทธ์, config ผ่าน backtest sweep 6 เดือน + Min-lot Risk Guard ทุกตัว | คำแนะนำ: Sniper/Swing เหมาะทุน $1,000+ หรือบัญชี cent, Grid ใช้ demo เท่านั้น (backtest ติดลบ), บัญชีสเปรดกว้างต้องปรับ Max Spread ในหน้า config"
+    "version":  "1.2.1",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.1/ApolloAutoTrade.exe",
+    "sha256":  "E098061183A663BAA251846B76BB74AF8D5ED329A66B189173B38FA9E04A3633",
+    "notes":  "v1.2.1 — ปิดแจ้งเตือน Discord อัตโนมัติวันเสาร์-อาทิตย์ (เวลาไทย) — ประวัติแจ้งเตือนในแอปยังบันทึกครบ ปุ่มทดสอบ webhook ใช้ได้ปกติ"
 }
