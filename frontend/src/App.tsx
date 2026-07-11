@@ -117,7 +117,7 @@ const App: React.FC = () => {
           )}
           {activeTab === 'strategy' && <StrategyView symbol={symbol} />}
           {activeTab === 'livechart' && <LiveChartView symbol={symbol} engine={engine} />}
-          {activeTab === 'replay' && <BacktestReplayView symbol={symbol} />}
+          {activeTab === 'replay' && <BacktestReplayView symbol={symbol} engine={engine} />}
           {activeTab === 'calendar' && <CalendarView />}
           {activeTab === 'history' && <HistoryView />}
           {activeTab === 'ledger' && <LedgerView symbol={symbol} />}

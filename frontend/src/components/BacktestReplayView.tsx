@@ -19,8 +19,10 @@ interface ReplayCandle { time: number; open: number; high: number; low: number; 
 interface ReplayTrade {
   time: number; exit_time: number; type: 'BUY' | 'SELL';
   entry: number; sl: number; tp: number; result: 'TP' | 'SL' | 'TRAIL';
-  r: number; pattern: string;
+  r: number; pattern?: string;
   zone_top?: number; zone_bottom?: number;
+  // engine อื่น (sniper/swing/reversal/grid) จำลอง lot จริง — มี profit $ ต่อไม้มาให้เลย
+  profit?: number; lot?: number; legs?: number;
 }
 type IPriceLine = ReturnType<ISeriesApi<'Candlestick', Time>['createPriceLine']>;
 interface ZoneState { t: number; h: number | null; b: number | null; tp: number; rt: boolean; }
@@ -67,9 +69,26 @@ const ZONE_DIM = {
 };
 
 interface CacheMonth { month: string; status: 'none' | 'saved' | 'active'; zone_type: number | null; high: number | null; low: number | null; }
-interface Props { symbol: string; }
+interface Props { symbol: string; engine?: string; }
 
-const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
+// ข้อมูลประจำ engine — สี/ชื่อ ตรงกับการ์ดหน้าเลือกกลยุทธ์และ badge ใน Live Chart
+const ENGINE_META: Record<string, { label: string; color: string; title: string }> = {
+  smc:      { label: 'SMC',      color: '#0A84FF', title: 'SMC Strategy Setup' },
+  sniper:   { label: 'SNIPER',   color: '#30D158', title: 'Sniper Strategy Setup' },
+  swing:    { label: 'SWING',    color: '#40C8E0', title: 'Swing Trade Setup' },
+  reversal: { label: 'REVERSAL', color: '#FF9F0A', title: 'Reversal Setup' },
+  grid:     { label: 'GRID',     color: '#BF5AF2', title: 'Grid Martingale Setup' },
+};
+
+const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
+  const eng = ENGINE_META[engine] ? engine : 'smc';
+  const isSmc = eng === 'smc';
+  const meta = ENGINE_META[eng];
+  // ฟิลด์ override ที่ backtest ของแต่ละ engine รองรับจริง (key ไม่รองรับ backend กรองทิ้งอยู่แล้ว
+  // แต่ซ่อนจาก UI ด้วย — กติกา dead-knob: ไม่โชว์ปุ่มที่หมุนแล้วไม่มีผล)
+  const hasRR = isSmc || eng === 'swing' || eng === 'reversal';
+  const hasTrendFilter = eng !== 'grid';
+  const hasRisk = eng !== 'grid';
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick', Time> | null>(null);
@@ -148,25 +167,41 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
   // precomputed map: candle index → active OB state at that bar
   const obMapRef = useRef<Map<number, { top: number; bot: number; dir: 'bullish' | 'bearish' } | null>>(new Map());
 
-  // ── load live config ──────────────────────────────────────────────────────
+  // ── load live config (ตาม engine ที่เลือก — คนละ endpoint คนละ shape) ─────
   useEffect(() => {
-    api.get<StrategyConfig>('/api/strategy/config', { params: { symbol } })
-      .then((res) => {
-        const c = res.data;
-        setRr(String(c.tp_ratio_rr));
-        setEntryTf(c.entry_timeframe);
-        setZoneTf(c.zone_timeframe);
-        setTrendFilter(!!c.use_trend_filter);
-        setObEntry(!!c.enable_ob_entry);
-        setEngulfing(!!c.require_engulfing);
-        setRetest(!!c.require_retest);
-        setSpread(String(c.spread_points ?? 0));
-        setCommission(String(c.commission_per_lot ?? 0));
-        if (c.risk_percent) setRiskPct(String(c.risk_percent));
-        setConfigLoaded(true);
-      })
-      .catch(() => setConfigLoaded(true));
-  }, [symbol]);
+    if (isSmc) {
+      api.get<StrategyConfig>('/api/strategy/config', { params: { symbol } })
+        .then((res) => {
+          const c = res.data;
+          setRr(String(c.tp_ratio_rr));
+          setEntryTf(c.entry_timeframe);
+          setZoneTf(c.zone_timeframe);
+          setTrendFilter(!!c.use_trend_filter);
+          setObEntry(!!c.enable_ob_entry);
+          setEngulfing(!!c.require_engulfing);
+          setRetest(!!c.require_retest);
+          setSpread(String(c.spread_points ?? 0));
+          setCommission(String(c.commission_per_lot ?? 0));
+          if (c.risk_percent) setRiskPct(String(c.risk_percent));
+          setConfigLoaded(true);
+        })
+        .catch(() => setConfigLoaded(true));
+    } else {
+      api.get<Record<string, any>>(`/api/${eng}/config`, { params: { symbol } })
+        .then((res) => {
+          const c = res.data ?? {};
+          if (c.rr != null) setRr(String(c.rr));
+          if (c.entry_timeframe) setEntryTf(c.entry_timeframe);
+          if (c.use_trend_filter != null) setTrendFilter(!!c.use_trend_filter);
+          // config live ของ engine อื่นไม่มี spread_points (มีเฉพาะใน backtest) — default 11
+          // ให้ตรงกับ DEFAULT_CONFIG ของ <engine>_backtest ทุกตัว ไม่งั้น UI โชว์ 0 แต่ engine ใช้ 11
+          setSpread(String(c.spread_points ?? 11));
+          if (c.risk_percent != null) setRiskPct(String(c.risk_percent));
+          setConfigLoaded(true);
+        })
+        .catch(() => setConfigLoaded(true));
+    }
+  }, [symbol, eng, isSmc]);
 
   // ── init chart ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -210,7 +245,8 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     } catch { /* ignore */ }
   }, [symbol]);
 
-  useEffect(() => { fetchCacheStatus(); }, [fetchCacheStatus]);
+  // zone cache = concept ของ SMC เท่านั้น — engine อื่นไม่ต้องดึง
+  useEffect(() => { if (isSmc) fetchCacheStatus(); }, [fetchCacheStatus, isSmc]);
 
   // ── fetch & run backtest (single or multi-month) ─────────────────────────
   const fetchData = async () => {
@@ -228,21 +264,25 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
     candleSeriesRef.current?.setData([]);
 
     const months = [...selectedMonths].sort();
-    const commonParams = {
+    // ส่งเฉพาะ override ที่ engine นั้นรองรับ — engine อื่นเป็น bar-mode เสมอ (ไม่มี tick sim)
+    const commonParams: Record<string, string | number | boolean> = {
       symbol,
-      use_real_ticks: useRealTicks,
-      tp_ratio_rr: Number(rr),
+      engine: eng,
       entry_timeframe: entryTf,
-      zone_timeframe: zoneTf,
-      use_trend_filter: trendFilter ? 1 : 0,
-      enable_ob_entry: obEntry ? 1 : 0,
-      require_engulfing: engulfing ? 1 : 0,
-      require_retest: retest ? 1 : 0,
-      spread_points: Number(spread),
-      commission_per_lot: Number(commission),
       show_warmup: showWarmup,
       start_balance: Number(startBalance) || 200,
       risk_percent: Number(riskPct) || 1.0,
+      spread_points: Number(spread),
+      ...(hasRR ? { tp_ratio_rr: Number(rr) } : {}),
+      ...(hasTrendFilter ? { use_trend_filter: trendFilter ? 1 : 0 } : {}),
+      ...(isSmc ? {
+        use_real_ticks: useRealTicks,
+        zone_timeframe: zoneTf,
+        enable_ob_entry: obEntry ? 1 : 0,
+        require_engulfing: engulfing ? 1 : 0,
+        require_retest: retest ? 1 : 0,
+        commission_per_lot: Number(commission),
+      } : {}),
     };
 
     try {
@@ -469,13 +509,14 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         if (next > peakRRef.current) peakRRef.current = next;
         return next;
       });
-      // คำนวณ USD แบบ compound
+      // คำนวณ USD แบบ compound — engine อื่นจำลอง lot จริงมาแล้ว ใช้ profit $ ต่อไม้ตรงๆ
+      // (แม่นกว่า recompute จาก R เพราะรวม min-lot guard/ปัด volume_step แล้ว) ส่วน SMC ใช้สูตรเดิม
       const bal0 = (dataRef.current?.start_balance ?? 0) || 200;
       const riskPctNum = (dataRef.current?.risk_percent ?? 0) || 1.0;
       setStatProfitUsd((prevUsd) => {
         const curBalance = bal0 + prevUsd;
         const riskAmt = curBalance * riskPctNum / 100;
-        const profitThisTrade = t.r * riskAmt;
+        const profitThisTrade = !isSmc && t.profit != null ? t.profit : t.r * riskAmt;
         const nextUsd = +(prevUsd + profitThisTrade).toFixed(2);
         const nextBalance = bal0 + nextUsd;
         if (nextBalance > peakBalanceRef.current) peakBalanceRef.current = nextBalance;
@@ -604,7 +645,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
       const half = range ? Math.round((range.to - range.from) / 2) : 20;
       ts.scrollToPosition(half, false);
     }
-  }, []);
+  }, [isSmc]); // eslint-disable-line
 
   const stopReplay = useCallback(() => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -651,13 +692,34 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
 
   return (
     <div className="ios-fade-in flex flex-col gap-4">
-      <h1 className="lux-h1">Backtest Replay</h1>
+      <div className="flex items-center gap-3">
+        <h1 className="lux-h1">Backtest Replay</h1>
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+          style={{ color: meta.color, background: `${meta.color}1f`, border: `1px solid ${meta.color}4d` }}>
+          {meta.label}
+        </span>
+      </div>
 
-      {/* ── SMC Strategy Setup ────────────────────────────────────────────── */}
+      {eng === 'grid' && (
+        <div className="lux-card p-3 border border-red-500/40 bg-red-500/5 text-red-400 text-xs">
+          ⚠ Grid Martingale: จากการ backtest ทุก config ที่ทดสอบให้ผลติดลบ — ใช้เพื่อศึกษาพฤติกรรมเท่านั้น ไม่แนะนำเงินจริง
+        </div>
+      )}
+      {eng === 'reversal' && (
+        <div className="lux-card p-3 border border-amber-500/40 bg-amber-500/5 text-amber-400 text-xs">
+          ⚠ Reversal: ยังไม่ผ่าน out-of-sample (backtest ปี 2025 ติดลบ, เดือนบวก 4/11) — ผลบวกปี 2026 อาจเป็น overfit · ใช้เพื่อศึกษา/demo เท่านั้น
+        </div>
+      )}
+
+      {/* ── Strategy Setup (ตาม engine ที่เลือก) ─────────────────────────── */}
       <div className="lux-card p-4 space-y-3">
         <div className="flex items-baseline gap-2">
-          <p className="lux-title">SMC Strategy Setup</p>
-          {configLoaded && <span className="text-[10px] text-ink-faint">โหลดจาก live config แล้ว — ค่าอื่นๆ (Zone Guard, Liquidity Sweep ฯลฯ) ใช้ตาม Strategy config อัตโนมัติ</span>}
+          <p className="lux-title">{meta.title}</p>
+          {configLoaded && <span className="text-[10px] text-ink-faint">
+            {isSmc
+              ? 'โหลดจาก live config แล้ว — ค่าอื่นๆ (Zone Guard, Liquidity Sweep ฯลฯ) ใช้ตาม Strategy config อัตโนมัติ'
+              : `โหลดจาก config ของ ${meta.label} แล้ว — ค่าอื่นๆ ใช้ตาม config ที่เซฟไว้ในหน้า Strategy อัตโนมัติ`}
+          </span>}
         </div>
 
         <div className="flex flex-wrap gap-x-6 gap-y-3 items-end">
@@ -682,13 +744,15 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             )}
           </div>
 
-          {/* RR */}
-          <div className="flex flex-col gap-1">
-            <span className="lux-label">RR</span>
-            <input type="number" step="0.5" min="1" max="10" value={rr}
-              onChange={(e) => setRr(e.target.value)}
-              className="lux-input px-3 h-9 w-20 text-sm" />
-          </div>
+          {/* RR — SMC/Swing/Reversal (Sniper ใช้ measured-move TP, Grid ใช้ basket TP) */}
+          {hasRR && (
+            <div className="flex flex-col gap-1">
+              <span className="lux-label">RR</span>
+              <input type="number" step="0.5" min="1" max="10" value={rr}
+                onChange={(e) => setRr(e.target.value)}
+                className="lux-input px-3 h-9 w-20 text-sm" />
+            </div>
+          )}
 
           {/* Entry TF */}
           <div className="flex flex-col gap-1">
@@ -699,14 +763,16 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             </select>
           </div>
 
-          {/* Zone TF */}
-          <div className="flex flex-col gap-1">
-            <span className="lux-label">Zone TF</span>
-            <select value={zoneTf} onChange={(e) => setZoneTf(e.target.value)}
-              className="lux-input px-3 h-9 text-sm">
-              {TF_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
+          {/* Zone TF — concept ของ SMC เท่านั้น */}
+          {isSmc && (
+            <div className="flex flex-col gap-1">
+              <span className="lux-label">Zone TF</span>
+              <select value={zoneTf} onChange={(e) => setZoneTf(e.target.value)}
+                className="lux-input px-3 h-9 text-sm">
+                {TF_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          )}
 
           {/* Start Balance */}
           <div className="flex flex-col gap-1">
@@ -715,41 +781,54 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
               className="lux-input px-3 h-9 w-28 text-sm" />
           </div>
 
-          {/* Risk % */}
-          <div className="flex flex-col gap-1">
-            <span className="lux-label">Risk %/ไม้</span>
-            <input type="number" min="0.1" max="100" step="0.5" value={riskPct} onChange={(e) => setRiskPct(e.target.value)}
-              className="lux-input px-3 h-9 w-20 text-sm" />
-          </div>
+          {/* Risk % — Grid ใช้ base lot + martingale multiplier ไม่ใช่ risk ต่อไม้ */}
+          {hasRisk && (
+            <div className="flex flex-col gap-1">
+              <span className="lux-label">Risk %/ไม้</span>
+              <input type="number" min="0.1" max="100" step="0.5" value={riskPct} onChange={(e) => setRiskPct(e.target.value)}
+                className="lux-input px-3 h-9 w-20 text-sm" />
+            </div>
+          )}
 
-          {/* Spread */}
+          {/* Spread — ทุก engine มี spread model แล้ว (sniper เพิ่มพร้อม lot จริง 2026-07-11) */}
           <div className="flex flex-col gap-1">
             <span className="lux-label">Spread (pts)</span>
             <input type="number" min="0" value={spread} onChange={(e) => setSpread(e.target.value)}
               className="lux-input px-3 h-9 w-24 text-sm" />
           </div>
 
-          {/* Commission */}
-          <div className="flex flex-col gap-1">
-            <span className="lux-label">Commission/Lot</span>
-            <input type="number" step="0.1" min="0" value={commission} onChange={(e) => setCommission(e.target.value)}
-              className="lux-input px-3 h-9 w-28 text-sm" />
-          </div>
+          {/* Commission — มีเฉพาะ SMC backtest */}
+          {isSmc && (
+            <div className="flex flex-col gap-1">
+              <span className="lux-label">Commission/Lot</span>
+              <input type="number" step="0.1" min="0" value={commission} onChange={(e) => setCommission(e.target.value)}
+                className="lux-input px-3 h-9 w-28 text-sm" />
+            </div>
+          )}
         </div>
 
         {/* Toggles row */}
         <div className="flex flex-wrap items-center gap-5 pt-1">
-          <Toggle label="OB Entry" value={obEntry} onChange={setObEntry} />
-          <Toggle label="Engulfing" value={engulfing} onChange={setEngulfing} />
-          <Toggle label="Retest Zone" value={retest} onChange={setRetest} />
-          <Toggle label="Trend Filter" value={trendFilter} onChange={setTrendFilter} />
+          {isSmc && <Toggle label="OB Entry" value={obEntry} onChange={setObEntry} />}
+          {isSmc && <Toggle label="Engulfing" value={engulfing} onChange={setEngulfing} />}
+          {isSmc && <Toggle label="Retest Zone" value={retest} onChange={setRetest} />}
+          {hasTrendFilter && <Toggle label="Trend Filter" value={trendFilter} onChange={setTrendFilter} />}
           <Toggle label="แสดง Warmup (เทาหรี่)" value={showWarmup} onChange={setShowWarmup} />
-          <span
-            title="จำลอง fill/cost จาก tick จริงเสมอ (แม่นสุด) — ปิดไม่ได้"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-            Every Tick (Real Ticks)
-          </span>
+          {isSmc ? (
+            <span
+              title="จำลอง fill/cost จาก tick จริงเสมอ (แม่นสุด) — ปิดไม่ได้"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              Every Tick (Real Ticks)
+            </span>
+          ) : (
+            <span
+              title="backtest ของกลยุทธ์นี้จำลองจากแท่งปิด (bar-mode) — ไม่มี tick simulation"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-ink-muted border border-[var(--hairline)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-ink-faint" style={{ background: meta.color }} />
+              Bar Mode (แท่งปิด)
+            </span>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-3 mt-1 items-start">
@@ -843,7 +922,8 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
             ))}
           </div>
 
-          {/* Zone / OB overlay toggles */}
+          {/* Zone / OB overlay toggles — overlay เหล่านี้มีเฉพาะ SMC backtest */}
+          {isSmc && (
           <div className="flex gap-1 ml-auto">
             <button
               onClick={() => setShowZoneOverlay((v) => !v)}
@@ -866,6 +946,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
               OB
             </button>
           </div>
+          )}
 
           {/* Progress */}
           <div className="flex-1 flex items-center gap-2 min-w-[160px]">
@@ -931,7 +1012,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         <div className={`lux-card p-2.5 flex items-center gap-4 border ${
           openTrade.type === 'BUY' ? 'border-green-500/40 bg-green-500/5' : 'border-red-500/40 bg-red-500/5'}`}>
           <span className={`text-sm font-bold ${openTrade.type === 'BUY' ? 'text-green-400' : 'text-red-400'}`}>
-            {openTrade.type} [{openTrade.pattern}]
+            {openTrade.type}{openTrade.pattern ? ` [${openTrade.pattern}]` : ''}{openTrade.legs != null ? ` (${openTrade.legs} ชั้น)` : ''}
           </span>
           <span className="text-ink-muted text-xs">Entry <span className="text-ink tabular-nums">{openTrade.entry}</span></span>
           <span className="text-ink-muted text-xs">SL <span className="text-red-400 tabular-nums">{openTrade.sl}</span></span>
@@ -965,7 +1046,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
         let peakBal = bal0, runBal = bal0, maxDDPctFinal = 0;
         data.trades.forEach((t) => {
           const riskAmt = runBal * riskPctNum / 100;
-          runBal = +(runBal + t.r * riskAmt).toFixed(2);
+          // engine อื่นมี profit $ จริงต่อไม้ (lot จริง) — ใช้ตรงๆ ให้ตรง animation
+          const p = !isSmc && t.profit != null ? t.profit : t.r * riskAmt;
+          runBal = +(runBal + p).toFixed(2);
           if (runBal > peakBal) peakBal = runBal;
           if (peakBal > 0) {
             const ddPct = +((peakBal - runBal) / peakBal * 100).toFixed(2);
@@ -980,7 +1063,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol }) => {
           const gross_loss = Math.abs(data.trades.filter(t => t.r <= 0).reduce((s, t) => s + t.r, 0));
           return gross_loss > 0 ? (gross_win / gross_loss).toFixed(2) : '∞';
         })();
-        const configStr = `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`;
+        const configStr = isSmc
+          ? `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`
+          : `Engine=${meta.label} | Entry=${entryTf}${hasRR ? ` | RR=${rr}` : ''}${hasTrendFilter ? ` | Trend=${trendFilter?'ON':'OFF'}` : ''} | Spread=${spread}${hasRisk ? ` | Risk=${riskPct}%` : ''} | Bar Mode`;
 
         const exportHTML = async () => {
           setExporting(true);

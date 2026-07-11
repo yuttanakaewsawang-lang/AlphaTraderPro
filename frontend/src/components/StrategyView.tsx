@@ -334,12 +334,16 @@ const GROUP_DOT: Record<string, string> = {
 };
 
 const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
-  // instance นี้รัน engine ไหน (SMC หรือ Sniper) — อ่านจาก /api/version ครั้งเดียว
-  // default 'smc' ไว้ก่อนจนกว่าจะรู้จริง เพื่อไม่เปลี่ยนพฤติกรรมของ instance SMC ที่มีอยู่แล้ว
-  const [engine, setEngine] = useState<'smc' | 'sniper'>('smc');
+  // instance นี้รัน engine ไหน — อ่านจาก /api/version ครั้งเดียว (ค่า dynamic ตาม engine ที่เลือก)
+  // default 'smc' ไว้ก่อนจนกว่าจะรู้จริง — ต้องรับครบทั้ง 5 engine ไม่ใช่แค่ sniper
+  // (เดิมเช็คแค่ 'sniper' → รัน swing/reversal/grid แล้วหน้านี้เปิดมาเป็น config SMC)
+  const [engine, setEngine] = useState<string>('smc');
   useEffect(() => {
     api.get<{ strategy_engine?: string }>('/api/version')
-      .then((res) => { if (res.data.strategy_engine === 'sniper') setEngine('sniper'); })
+      .then((res) => {
+        const e = res.data.strategy_engine;
+        if (e && STRATEGIES.some((s) => s.id === e)) setEngine(e);
+      })
       .catch(() => {});
   }, []);
 
@@ -350,8 +354,9 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const [saveError, setSaveError] = useState('');
   const [resetting, setResetting] = useState(false);
   const [strategyId, setStrategyId] = useState(STRATEGIES[0].id);
-  // เปิดหน้าด้วย logic ที่ instance นี้รันอยู่จริงเป็นค่าเริ่มต้น — ผู้ใช้ยังสลับ dropdown ดู/แก้
-  // config ของอีก logic ได้เสมอ ไม่ผูกกับ engine ที่รันจริง (แค่ engine เดียวที่แก้แล้วมีผลทันที)
+  // หน้านี้ตามกลยุทธ์ที่ผู้ใช้เลือกจากหน้าเลือกกลยุทธ์เสมอ — dropdown สลับดู config
+  // ข้าม engine ถูกถอดออกแล้ว (2026-07-11 ตามคำขอ user) อยากแก้ engine อื่นให้กด
+  // "เปลี่ยนกลยุทธ์" ใน Settings แล้วเข้าหน้านี้ใหม่
   useEffect(() => { setStrategyId(engine); }, [engine]);
   const [positions, setPositions] = useState<Position[]>([]);
   // TF ของ zone/entry ที่ปรับได้
@@ -513,15 +518,6 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
       {/* ── Header row ── */}
       <div className="flex items-center gap-3 flex-wrap shrink-0">
         <h1 className="lux-h1">{strategyTitle}</h1>
-        <select
-          value={strategyId}
-          onChange={(e) => setStrategyId(e.target.value)}
-          className="h-8 lux-input px-2 text-sm"
-        >
-          {STRATEGIES.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
-          ))}
-        </select>
       </div>
 
       {/* ── Open positions ── */}

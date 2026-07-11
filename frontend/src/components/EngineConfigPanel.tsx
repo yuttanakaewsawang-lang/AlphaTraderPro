@@ -76,6 +76,7 @@ const ENGINE_DEFS: Record<string, EngineDef> = {
     title: 'Reversal (RSI Extreme) Monitor',
     color: '#FF9F0A',
     endpoint: '/api/reversal/config',
+    warning: 'ยังไม่ผ่าน out-of-sample: backtest ปี 2025 เต็มปีติดลบ (เดือนบวกแค่ 4/11) — ผลบวกปี 2026 อาจเป็น overfit กับ regime ปีเดียว · แนะนำบัญชี demo เท่านั้นจนกว่าจะจูนใหม่ผ่าน OOS',
     recommended: {
       entry_timeframe: 'M5', rsi_period: 14, rsi_buy_level: 30, rsi_sell_level: 70,
       extreme_lookback_bars: 20, require_engulfing: 0, buffer_atr: 0.15, buffer_points: 15,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Wallet, LineChart, TrendingUp, TrendingDown, Zap, Target, ArrowDownUp } from 'lucide-react';
+import { Wallet, LineChart, TrendingUp, TrendingDown, Zap, Target, ArrowDownUp, AlertTriangle } from 'lucide-react';
 import api from '../api';
 import type { LiveDecision, ReversalStatusResponse } from '../types/strategy';
 
@@ -205,6 +205,16 @@ const ReversalDashboardView: React.FC<{ symbol: string }> = ({ symbol }) => {
             ⚠ DAILY LOSS LIMIT — บอทหยุดเปิดไม้
           </span>
         )}
+      </div>
+
+      {/* คำเตือนถาวร — ตก out-of-sample 2025 (pattern เดียวกับ banner ของ Grid) */}
+      <div className="flex items-start gap-2 px-3 py-2 rounded-xl text-[11px] leading-relaxed shrink-0"
+        style={{ color: '#FF9F0A', background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.25)' }}>
+        <AlertTriangle size={14} strokeWidth={2.3} className="shrink-0 mt-0.5" />
+        <span>
+          <b>ยังไม่ผ่าน out-of-sample:</b> backtest ปี 2025 เต็มปีติดลบ (เดือนบวกแค่ 4/11) —
+          ผลบวกปี 2026 อาจเป็น overfit กับ regime ปีเดียว · แนะนำใช้บัญชี demo เท่านั้นจนกว่าจะจูนใหม่ผ่าน OOS
+        </span>
       </div>
 
       {/* KPI row */}
