@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.4",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.4/ApolloAutoTrade.exe",
-    "sha256":  "80F496763969D9A82E8C0825C0785FB381AEA23514B13C4B09C24DAA934FC91F",
-    "notes":  "Reversal re-tune: London,NY session + rr2.5 + wider SL flips 2025 OOS from -13R to +0.5R (breakeven, not proven profit) - still demo-only"
+    "version":  "1.2.5",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.5/ApolloAutoTrade.exe",
+    "sha256":  "9BBC54A635C0BA3F0185150C0146734241082C24113F37E616E97FB318E693AB",
+    "notes":  "SMC: รวม Zone TF + Entry TF เป็นฟิลด์เดียว, แก้บั๊ก Zone Entry Guard reset ทำให้ OB/FVG หลุด distance guard, เพิ่ม daily-loss simulation ใน backtest"
 }
