@@ -18,8 +18,7 @@ export interface ActiveZone {
 }
 
 export interface StrategyConfig {
-  zone_timeframe: string;
-  entry_timeframe: string;
+  zone_timeframe: string; // TF เดียวใช้ทั้ง zone detection + entry confirmation (entry_timeframe รวมเข้ามาแล้ว)
   risk_percent: number;
   min_candle_points: number;
   max_candle_points: number;
@@ -68,7 +67,7 @@ export interface StrategyConfig {
   sweep_lookback_bars: number;
 }
 
-// Partial config sent to POST /api/strategy/config (รวม zone_timeframe/entry_timeframe ที่ปรับได้แล้ว)
+// Partial config sent to POST /api/strategy/config
 export type StrategyConfigUpdate = Partial<StrategyConfig>;
 
 // Mirrors SniperStrategy.CONFIG_FIELDS (SniperStrategy.py) — N-bar breakout strategy,

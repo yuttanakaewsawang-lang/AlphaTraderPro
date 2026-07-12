@@ -178,8 +178,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
         .then((res) => {
           const c = res.data;
           setRr(String(c.tp_ratio_rr));
-          setEntryTf(c.entry_timeframe);
-          setZoneTf(c.zone_timeframe);
+          setZoneTf(c.zone_timeframe); // TF เดียวใช้ทั้ง zone+entry (entry_timeframe รวมเข้ามาแล้ว)
           setTrendFilter(!!c.use_trend_filter);
           setObEntry(!!c.enable_ob_entry);
           setEngulfing(!!c.require_engulfing);
@@ -272,7 +271,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
     const commonParams: Record<string, string | number | boolean> = {
       symbol,
       engine: eng,
-      entry_timeframe: entryTf,
+      // SMC ใช้ TF เดียว (zone_timeframe, ส่งในบล็อก isSmc ด้านล่าง) — entry_timeframe เป็น field
+      // ของ Sniper/Swing/Reversal/Grid เท่านั้น (แต่ละ engine มี TF เดียวของตัวเองอยู่แล้ว)
+      ...(isSmc ? {} : { entry_timeframe: entryTf }),
       show_warmup: showWarmup,
       start_balance: Number(startBalance) || 200,
       risk_percent: Number(riskPct) || 1.0,
@@ -764,19 +765,21 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
             </div>
           )}
 
-          {/* Entry TF */}
-          <div className="flex flex-col gap-1">
-            <span className="lux-label">Entry TF</span>
-            <select value={entryTf} onChange={(e) => setEntryTf(e.target.value)}
-              className="lux-input px-3 h-9 text-sm">
-              {TF_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
+          {/* Entry TF — Sniper/Swing/Reversal/Grid เท่านั้น (แต่ละ engine มี TF เดียวของตัวเอง) */}
+          {!isSmc && (
+            <div className="flex flex-col gap-1">
+              <span className="lux-label">Entry TF</span>
+              <select value={entryTf} onChange={(e) => setEntryTf(e.target.value)}
+                className="lux-input px-3 h-9 text-sm">
+                {TF_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          )}
 
-          {/* Zone TF — concept ของ SMC เท่านั้น */}
+          {/* Timeframe — SMC เท่านั้น (TF เดียวใช้ทั้ง zone+entry, entry_timeframe รวมเข้ามาแล้ว) */}
           {isSmc && (
             <div className="flex flex-col gap-1">
-              <span className="lux-label">Zone TF</span>
+              <span className="lux-label">Timeframe</span>
               <select value={zoneTf} onChange={(e) => setZoneTf(e.target.value)}
                 className="lux-input px-3 h-9 text-sm">
                 {TF_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -1103,7 +1106,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
           return gross_loss > 0 ? (gross_win / gross_loss).toFixed(2) : '∞';
         })();
         const configStr = isSmc
-          ? `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`
+          ? `RR=${rr} | TF=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`
           : `Engine=${meta.label} | Entry=${entryTf}${hasRR ? ` | RR=${rr}` : ''}${hasTrendFilter ? ` | Trend=${trendFilter?'ON':'OFF'}` : ''} | Spread=${spread}${hasRisk ? ` | Risk=${riskPct}%` : ''} | ${hasTicks ? 'Every Tick' : 'Bar Mode'}`;
 
         const exportHTML = async () => {

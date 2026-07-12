@@ -30,7 +30,7 @@ const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
   trail_candle_offset_pips: 30, min_sl_atr: 0.5, max_ob_zone_atr: 5.0, use_swing_sl: 1,
   entry_mode: 1, max_entry_zone_atr: 0.3,
   enable_liquidity_sweep: 1, sweep_tolerance_atr: 0.3, sweep_lookback_bars: 40,
-  zone_timeframe: 'M5', entry_timeframe: 'M5', trade_sessions: '',
+  zone_timeframe: 'M5', trade_sessions: '',
 };
 
 // รายการกลยุทธ์ที่เลือกได้บนหน้านี้ — ดู/แก้ config ของ logic ไหนก็ได้จากทุก instance
@@ -359,9 +359,8 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   // "เปลี่ยนกลยุทธ์" ใน Settings แล้วเข้าหน้านี้ใหม่
   useEffect(() => { setStrategyId(engine); }, [engine]);
   const [positions, setPositions] = useState<Position[]>([]);
-  // TF ของ zone/entry ที่ปรับได้
+  // TF เดียวใช้ทั้ง zone detection + entry confirmation (entry_timeframe รวมเข้ามาแล้ว)
   const [zoneTf, setZoneTf] = useState('M5');
-  const [entryTf, setEntryTf] = useState('M1');
   // session ที่เลือกเทรด (เก็บเป็น set ของชื่อ) — ว่าง = ทุกเวลา
   const [sessions, setSessions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState(CONFIG_GROUPS[0].id);
@@ -372,7 +371,6 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const applyConfig = (c: StrategyConfig) => {
     setForm(Object.fromEntries(CONFIG_FIELDS.map((f) => [f.key, String(c[f.key])])));
     setZoneTf(c.zone_timeframe);
-    setEntryTf(c.entry_timeframe);
     setSessions(
       (c.trade_sessions || '')
         .split(',')
@@ -456,7 +454,6 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
         CONFIG_FIELDS.map((f) => [f.key, Number(form[f.key])])
       );
       payload.zone_timeframe = zoneTf;
-      payload.entry_timeframe = entryTf;
       payload.trade_sessions = sessions.join(',');
       const res = await api.post('/api/strategy/config', payload, {
         params: { symbol },
@@ -480,19 +477,17 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
     try {
       const newForm = { ...form };
       for (const [k, v] of Object.entries(RECOMMENDED_DEFAULTS)) {
-        if (k !== 'zone_timeframe' && k !== 'entry_timeframe' && k !== 'trade_sessions') {
+        if (k !== 'zone_timeframe' && k !== 'trade_sessions') {
           newForm[k] = String(v);
         }
       }
       setForm(newForm);
       setZoneTf(String(RECOMMENDED_DEFAULTS.zone_timeframe ?? 'M5'));
-      setEntryTf(String(RECOMMENDED_DEFAULTS.entry_timeframe ?? 'M5'));
       setSessions([]);
       const payload: Record<string, number | string> = Object.fromEntries(
         CONFIG_FIELDS.map((f) => [f.key, Number(newForm[f.key])])
       );
       payload.zone_timeframe = String(RECOMMENDED_DEFAULTS.zone_timeframe ?? 'M5');
-      payload.entry_timeframe = String(RECOMMENDED_DEFAULTS.entry_timeframe ?? 'M5');
       payload.trade_sessions = '';
       const res = await api.post('/api/strategy/config', payload, { params: { symbol } });
       setConfig(res.data.config);
@@ -574,14 +569,8 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
             <p className="lux-title">Strategy Configuration</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <label className="lux-label">Zone TF</label>
+                <label className="lux-label">Timeframe</label>
                 <select value={zoneTf} onChange={(e) => { setSaved(false); setZoneTf(e.target.value); }} className="h-7 lux-input px-2 text-sm">
-                  {CONFIG_TIMEFRAMES.map((tf) => <option key={tf} value={tf}>{tf}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="lux-label">Entry TF</label>
-                <select value={entryTf} onChange={(e) => { setSaved(false); setEntryTf(e.target.value); }} className="h-7 lux-input px-2 text-sm">
                   {CONFIG_TIMEFRAMES.map((tf) => <option key={tf} value={tf}>{tf}</option>)}
                 </select>
               </div>
