@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.3",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.3/ApolloAutoTrade.exe",
-    "sha256":  "22A60538E3CEC2ED1EEBC0129651DE8E0F445D0750594299E883EAA62A973B90",
-    "notes":  "Backtest Replay รองรับครบ 5 กลยุทธ์ + หน้า Strategy ตามกลยุทธ์ที่เลือก (ถอด dropdown) + คำเตือน Reversal ยังไม่ผ่าน out-of-sample + Sniper backtest หักต้นทุนจริง (spread + lot จริง + min-lot guard)"
+    "version":  "1.2.4",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.4/ApolloAutoTrade.exe",
+    "sha256":  "80F496763969D9A82E8C0825C0785FB381AEA23514B13C4B09C24DAA934FC91F",
+    "notes":  "Reversal re-tune: London,NY session + rr2.5 + wider SL flips 2025 OOS from -13R to +0.5R (breakeven, not proven profit) - still demo-only"
 }
