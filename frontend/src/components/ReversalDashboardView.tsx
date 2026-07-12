@@ -212,8 +212,8 @@ const ReversalDashboardView: React.FC<{ symbol: string }> = ({ symbol }) => {
         style={{ color: '#FF9F0A', background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.25)' }}>
         <AlertTriangle size={14} strokeWidth={2.3} className="shrink-0 mt-0.5" />
         <span>
-          <b>ยังไม่ผ่าน out-of-sample:</b> backtest ปี 2025 เต็มปีติดลบ (เดือนบวกแค่ 4/11) —
-          ผลบวกปี 2026 อาจเป็น overfit กับ regime ปีเดียว · แนะนำใช้บัญชี demo เท่านั้นจนกว่าจะจูนใหม่ผ่าน OOS
+          <b>Re-tune 2026-07-12:</b> ตัด session Sydney/Tokyo เหลือ London,NY + rr2.5 + SL กว้างขึ้น
+          พลิก OOS 2025 จาก -13R เป็น +0.5R — เสมอทุน ไม่ใช่กำไรจริง · แนะนำใช้บัญชี demo เท่านั้น
         </span>
       </div>
 

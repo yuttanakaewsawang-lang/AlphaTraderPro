@@ -76,14 +76,14 @@ const ENGINE_DEFS: Record<string, EngineDef> = {
     title: 'Reversal (RSI Extreme) Monitor',
     color: '#FF9F0A',
     endpoint: '/api/reversal/config',
-    warning: 'ยังไม่ผ่าน out-of-sample: backtest ปี 2025 เต็มปีติดลบ (เดือนบวกแค่ 4/11) — ผลบวกปี 2026 อาจเป็น overfit กับ regime ปีเดียว · แนะนำบัญชี demo เท่านั้นจนกว่าจะจูนใหม่ผ่าน OOS',
+    warning: 'Re-tune 2026-07-12 (ตัด session Sydney/Tokyo + rr2.5 + SL กว้างขึ้น) พลิก OOS 2025 จาก -13R เป็น +0.5R — เสมอทุน ไม่ใช่กำไรจริง ยังไม่ผ่านเกณฑ์ "กำไรสม่ำเสมอ" เต็มรูปแบบ · แนะนำบัญชี demo เท่านั้น',
     recommended: {
       entry_timeframe: 'M5', rsi_period: 14, rsi_buy_level: 30, rsi_sell_level: 70,
       extreme_lookback_bars: 20, require_engulfing: 0, buffer_atr: 0.15, buffer_points: 15,
-      min_sl_atr: 0.5, rr: 2.0, risk_percent: 1.0, max_trades_per_day: 5,
+      min_sl_atr: 0.8, rr: 2.5, risk_percent: 1.0, max_trades_per_day: 5,
       max_daily_loss_percent: 15.0, max_portfolio_drawdown_pct: 20.0, max_spread_points: 15,
       use_trend_filter: 1, trend_filter_mode: 1, swing_lookback: 2, news_filter_minutes: 30,
-      trade_sessions: '',
+      trade_sessions: 'London,NY',
     },
     fields: [
       ...RISK_FIELDS_COMMON,

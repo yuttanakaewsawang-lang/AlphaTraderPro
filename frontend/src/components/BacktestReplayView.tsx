@@ -36,6 +36,8 @@ interface ReplayData {
   total_trades: number; wins: number; losses: number; total_r: number; expectancy_r: number;
   total_profit: number; max_drawdown: number; max_drawdown_pct: number;
   start_balance: number; risk_percent: number;
+  // grid tick-mode: จำนวนตะกร้าที่จำลองด้วย tick จริง / fallback bar-mode (ไม่มี tick history)
+  use_real_ticks?: boolean; tick_sim_baskets?: number | null; bar_fallback_baskets?: number | null;
 }
 
 const MONTH_OPTIONS = (() => {
@@ -89,6 +91,8 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
   const hasRR = isSmc || eng === 'swing' || eng === 'reversal';
   const hasTrendFilter = eng !== 'grid';
   const hasRisk = eng !== 'grid';
+  // engine ที่ backtest จำลองด้วย tick จริงได้ (Every Tick) — smc + grid (2026-07-11)
+  const hasTicks = isSmc || eng === 'grid';
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick', Time> | null>(null);
@@ -264,7 +268,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
     candleSeriesRef.current?.setData([]);
 
     const months = [...selectedMonths].sort();
-    // ส่งเฉพาะ override ที่ engine นั้นรองรับ — engine อื่นเป็น bar-mode เสมอ (ไม่มี tick sim)
+    // ส่งเฉพาะ override ที่ engine นั้นรองรับ — sniper/swing/reversal เป็น bar-mode เสมอ
     const commonParams: Record<string, string | number | boolean> = {
       symbol,
       engine: eng,
@@ -275,8 +279,9 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
       spread_points: Number(spread),
       ...(hasRR ? { tp_ratio_rr: Number(rr) } : {}),
       ...(hasTrendFilter ? { use_trend_filter: trendFilter ? 1 : 0 } : {}),
+      // SMC + Grid จำลองด้วย tick จริง (grid: ตะกร้าที่ไม่มี tick history จะ fallback bar-mode)
+      ...(hasTicks ? { use_real_ticks: useRealTicks } : {}),
       ...(isSmc ? {
-        use_real_ticks: useRealTicks,
         zone_timeframe: zoneTf,
         enable_ob_entry: obEntry ? 1 : 0,
         require_engulfing: engulfing ? 1 : 0,
@@ -292,6 +297,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
       let allObZones: OBZone[] = [];
       let lastData: ReplayData | null = null;
       let monthStartMarkers: SeriesMarker<Time>[] = [];
+      let sumTickSim = 0, sumBarFB = 0;   // grid tick-mode: รวมข้ามเดือน
 
       for (const m of months) {
         const res = await api.get<ReplayData>('/api/backtest/replay-data', {
@@ -306,6 +312,8 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
         allTrades.push(...res.data.trades);
         allZoneData.push(...(res.data.zone_data ?? []));
         allObZones.push(...(res.data.ob_zones ?? []));
+        sumTickSim += res.data.tick_sim_baskets ?? 0;
+        sumBarFB += res.data.bar_fallback_baskets ?? 0;
         lastData = res.data;
 
         if (showWarmup && res.data.month_start_ts) {
@@ -340,6 +348,8 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
         losses: combinedLosses,
         total_r: Math.round(combinedTotalR * 100) / 100,
         expectancy_r: combinedTotal ? Math.round((combinedTotalR / combinedTotal) * 1000) / 1000 : 0,
+        tick_sim_baskets: sumTickSim,
+        bar_fallback_baskets: sumBarFB,
       };
 
       setReplayData(combined);
@@ -707,7 +717,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
       )}
       {eng === 'reversal' && (
         <div className="lux-card p-3 border border-amber-500/40 bg-amber-500/5 text-amber-400 text-xs">
-          ⚠ Reversal: ยังไม่ผ่าน out-of-sample (backtest ปี 2025 ติดลบ, เดือนบวก 4/11) — ผลบวกปี 2026 อาจเป็น overfit · ใช้เพื่อศึกษา/demo เท่านั้น
+          ⚠ Reversal: Re-tune 2026-07-12 พลิก OOS 2025 จาก -13R เป็น +0.5R (เสมอทุน ไม่ใช่กำไรจริง) — ใช้เพื่อศึกษา/demo เท่านั้น
         </div>
       )}
 
@@ -814,9 +824,11 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
           {isSmc && <Toggle label="Retest Zone" value={retest} onChange={setRetest} />}
           {hasTrendFilter && <Toggle label="Trend Filter" value={trendFilter} onChange={setTrendFilter} />}
           <Toggle label="แสดง Warmup (เทาหรี่)" value={showWarmup} onChange={setShowWarmup} />
-          {isSmc ? (
+          {hasTicks ? (
             <span
-              title="จำลอง fill/cost จาก tick จริงเสมอ (แม่นสุด) — ปิดไม่ได้"
+              title={isSmc
+                ? 'จำลอง fill/cost จาก tick จริงเสมอ (แม่นสุด) — ปิดไม่ได้'
+                : 'จำลองตะกร้า (เติมชั้น/basket stop/TP) จาก tick จริงตามลำดับราคาจริง — เดือน/ตะกร้าที่ไม่มี tick history จะ fallback เป็น bar-mode อัตโนมัติ'}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/30">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
               Every Tick (Real Ticks)
@@ -837,6 +849,33 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
             {loading ? 'กำลังโหลด — รัน backtest อยู่…' : 'โหลดข้อมูล & เริ่ม Replay'}
           </button>
         </div>
+
+        {/* ── Month multi-select grid (engine อื่นที่ไม่มี Zone Cache grid ของ SMC) ──
+            ให้เลือกหลายเดือนย้อนหลัง 12 เดือนต่อกันได้แบบเดียวกับ SMC */}
+        {!isSmc && (
+          <div className="pt-1">
+            <p className="lux-label mb-1">เลือกเดือนย้อนหลัง</p>
+            <p className="text-[10px] text-ink-faint mb-1">คลิกเพื่อเลือก/ยกเลิกเดือน (เลือกได้หลายเดือน — replay ต่อกันตามลำดับ)</p>
+            <div className="grid grid-cols-6 gap-1.5">
+              {[...MONTH_OPTIONS].reverse().map((o) => {
+                const isSelected = selectedMonths.includes(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    onClick={() => toggleMonth(o.value)}
+                    title={o.label}
+                    className={`relative rounded-md px-1.5 py-2 text-center transition-all border ios-pressable ${
+                      isSelected
+                        ? 'border-[var(--accent-blue)] ring-1 ring-[var(--accent-blue)]/40 bg-white/[0.06]'
+                        : 'border-[var(--hairline)] hover:border-white/20 bg-white/[0.03]'
+                    }`}>
+                    <span className="text-[11px] font-medium block">{o.value}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── Zone Cache Status grid ──────────────────────────────────────── */}
         {cacheMonths.length > 0 && (
@@ -1065,7 +1104,7 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
         })();
         const configStr = isSmc
           ? `RR=${rr} | Entry=${entryTf} | Zone=${zoneTf} | OB=${obEntry?'ON':'OFF'} | Eng=${engulfing?'ON':'OFF'} | Retest=${retest?'ON':'OFF'} | Trend=${trendFilter?'ON':'OFF'} | Spread=${spread} | Comm=${commission}${useRealTicks?' | Every Tick':''}`
-          : `Engine=${meta.label} | Entry=${entryTf}${hasRR ? ` | RR=${rr}` : ''}${hasTrendFilter ? ` | Trend=${trendFilter?'ON':'OFF'}` : ''} | Spread=${spread}${hasRisk ? ` | Risk=${riskPct}%` : ''} | Bar Mode`;
+          : `Engine=${meta.label} | Entry=${entryTf}${hasRR ? ` | RR=${rr}` : ''}${hasTrendFilter ? ` | Trend=${trendFilter?'ON':'OFF'}` : ''} | Spread=${spread}${hasRisk ? ` | Risk=${riskPct}%` : ''} | ${hasTicks ? 'Every Tick' : 'Bar Mode'}`;
 
         const exportHTML = async () => {
           setExporting(true);
@@ -1118,6 +1157,12 @@ const BacktestReplayView: React.FC<Props> = ({ symbol, engine = 'smc' }) => {
             ))}
           </div>
           <div className="text-xs text-ink-faint pt-1">{configStr}</div>
+          {eng === 'grid' && (data.bar_fallback_baskets ?? 0) > 0 && (
+            <p className="text-xs text-amber-400">
+              ⚠ {data.bar_fallback_baskets} ตะกร้าไม่มี tick history ช่วงนั้น — จำลองแบบ bar-mode แทน
+              (tick จริง {data.tick_sim_baskets ?? 0} ตะกร้า)
+            </p>
+          )}
 
           {/* Export button */}
           <button

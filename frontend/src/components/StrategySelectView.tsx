@@ -59,8 +59,8 @@ const CARDS = [
     icon: ArrowDownUp,
     color: '#FF9F0A',
     tagline: 'Trend Change Dynamics — Pivot Point Identification',
-    features: ['จุดสุดขั้ว N แท่ง (pivot) + RSI 30/70', 'แท่งยืนยันกลับตัว + Trend Filter', '⚠ ตก out-of-sample 2025 — demo เท่านั้น'],
-    note: 'ยังไม่ผ่าน OOS (ปี 2025 ติดลบ) — ใช้บัญชี demo เท่านั้น',
+    features: ['จุดสุดขั้ว N แท่ง (pivot) + RSI 30/70', 'แท่งยืนยันกลับตัว + Trend Filter', '⚠ OOS 2025 เสมอทุน ไม่ใช่กำไร — demo เท่านั้น'],
+    note: 'Re-tune แล้ว OOS 2025 พลิกจาก -13R เป็น +0.5R (เสมอทุน) — ใช้บัญชี demo เท่านั้น',
     available: true,
   },
   {
