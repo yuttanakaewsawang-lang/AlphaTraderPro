@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.7",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.7/ApolloAutoTrade.exe",
-    "sha256":  "D86503D7065BA0AC2B0B17AA7A430C29B260E26357A0BFDC2BE259D073C1CBDE",
-    "notes":  "แยกข้อมูล today trade/Discord webhook/running_state/notification ตามเลขบัญชี MT5 อัตโนมัติ กันปนกันเมื่อเปิดหลาย exe คนละบัญชีบน DB เดียวกัน"
+    "version":  "1.2.8",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.8/ApolloAutoTrade.exe",
+    "sha256":  "FA7F14E97E2FDAF9F3379353337B108BDA5D78424DE33381FB5891FE72606AF7",
+    "notes":  "Backtest Replay: แก้ order กองรวมกันอ่านไม่ออกบนกราฟ (ตัดข้อความราคา/R ออกจาก marker เหลือแค่ BUY/SELL, WIN/LOSS) + เพิ่มข้อความแจ้งเตือนใน Sidebar ตอนบอทยังไม่ทำงาน"
 }
