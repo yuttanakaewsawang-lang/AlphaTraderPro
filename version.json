@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.5",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.5/ApolloAutoTrade.exe",
-    "sha256":  "9BBC54A635C0BA3F0185150C0146734241082C24113F37E616E97FB318E693AB",
-    "notes":  "SMC: รวม Zone TF + Entry TF เป็นฟิลด์เดียว, แก้บั๊ก Zone Entry Guard reset ทำให้ OB/FVG หลุด distance guard, เพิ่ม daily-loss simulation ใน backtest"
+    "version":  "1.2.6",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.6/ApolloAutoTrade.exe",
+    "sha256":  "121B07DFE76C6D7FFED6D261EB7D52B95DFDD5B9606B4557C845E3DA1069A1F6",
+    "notes":  "Sidebar: เพิ่มแบนเนอร์เตือนกด START AUTO TRADE เมื่อบอทยังไม่ทำงาน"
 }
