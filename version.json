@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.8",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.8/ApolloAutoTrade.exe",
-    "sha256":  "FA7F14E97E2FDAF9F3379353337B108BDA5D78424DE33381FB5891FE72606AF7",
-    "notes":  "Backtest Replay: แก้ order กองรวมกันอ่านไม่ออกบนกราฟ (ตัดข้อความราคา/R ออกจาก marker เหลือแค่ BUY/SELL, WIN/LOSS) + เพิ่มข้อความแจ้งเตือนใน Sidebar ตอนบอทยังไม่ทำงาน"
+    "version":  "1.2.9",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.9/ApolloAutoTrade.exe",
+    "sha256":  "BB2B7AB1903704A62142E97E60C1AB51D9D886EC3E025C322FF9400EAD304AD1",
+    "notes":  "Backtest OB/FVG lookback parity fix (100-bar cap, matching live) + SPREAD block logging/notification (Discord + live_decision_log)"
 }
