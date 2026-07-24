@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.11",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.11/ApolloAutoTrade.exe",
-    "sha256":  "7D84008AF39C8C89AAEA3DE83C3B57BA3FA4716E08EC9AAF4194CCF092D6E371",
-    "notes":  "แก้ปัญหา live ขาดทุนหนักทั้งที่ backtest replay กำไรงาม: วินิจฉัยพบว่า Partial TP + Breakeven + Trailing ตัดไม้ชนะก่อนถึง TP (avg win 0.75R จาก TP 2.5R ที่ตั้งไว้) ทำให้ live ติดลบทั้งที่ edge จริงเป็นบวก — ปิด Partial/BE/Trailing เป็นดีฟอลต์ + เปลี่ยน RR เป็น 2.0 (validate WR สูงสุดข้าม 3 เดือน) migration บังคับ XAUUSD อัตโนมัติ + เพิ่มคำเตือนในหน้า Backtest Replay เมื่อ config เปิด management (ผลจะดูดีเกินจริง)"
+    "version":  "1.2.12",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.12/ApolloAutoTrade.exe",
+    "sha256":  "A759E5B600175164B1B4EFDF1B6D1E3C786D06169D02A522F5334381CC5BFD86",
+    "notes":  "v1.2.12: แจ้ง Discord online ตอน login (แยกตามบัญชี ไม่ยิงตอนเปิดโปรแกรมอีก) + UI: หน้า Login การ์ดเลือกบัญชี, badge บัญชี/engine บน title bar, ขัดเงา Settings/Dashboard/หน้าเลือกกลยุทธ์ (skeleton + count-up)"
 }
