@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.13",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.13/ApolloAutoTrade.exe",
-    "sha256":  "5DA195E55C4A6B452769B423AAB20031BD2B9F5D1317709705D8DD39701951B8",
-    "notes":  "รวมงานที่กักไว้ตั้งแต่หลัง v1.2.12 เป็นก้อนเดียว (build จาก source ปัจจุบันทั้งหมด) - Backtest Replay: เลือกช่วงวันที่อิสระ (1 วัน ถึง 1 ปี) ทุก engine, ตำแหน่ง entry/SL/TP/exit บนกราฟตรงราคาจริงแบบ TradingView, โหมดเรียลไทม์ (แท่งก่อตัวทีละนิด), ปุ่มไปแท่งล่าสุด, ปุ่มบันทึกเป็น Live Config, อธิบายเหตุผล entry ต่อไม้, แถบสีโซนแบบ Live Chart, คำเตือน trailing/BE/partial ทำให้ backtest โม้เกินจริง - History: ปฏิทินเทรดแบบ broker terminal ใหม่ทั้งหน้าพร้อมสถิติรายเดือน - Login: การ์ดเลือกบัญชี one-tap, ปุ่มลบบัญชี, hover glow สีประจำบัญชี - Settings/Dashboard/StrategySelect: ปรับ UI, skeleton loading, ตัวเลข count-up, badge บัญชี/engine ที่ TitleBar - ย้ายแจ้งเตือน Discord online จากตอนเปิดโปรแกรมไปเป็นตอน login สำเร็จ (scope ตามบัญชี) - deploy: ปิด exe เดิมบน VPS ให้หมดก่อน copy ทับ แล้ว Start-MpScan ก่อนเปิดครั้งแรก"
+    "version":  "1.2.14",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.14/ApolloAutoTrade.exe",
+    "sha256":  "A791CDBDF78D17A7593938283DC14ED4326613B0F3A27B88F23E35780E7A631E",
+    "notes":  "Sniper: Breakout+Retest Confirmation เป็น default ใหม่ (confirm_pullback=1) - รอราคาย่อกลับมายืนยันก่อนเข้าแทนเข้าทันทีที่ทะลุกรอบ N-bar, กรอง false breakout ได้จริง (validate 12 เดือน tick-mode: +142.7R/$793 บวก 11/12 เดือน เทียบ baseline +62.9R/$357 บวก 10/12 เดือน). รวมงาน UI/backend ที่กักไว้ก่อนหน้า (Backtest Replay overhaul, History calendar redesign, Login/TitleBar polish, Combo mode SMC+Sniper, multi-account config scoping, EA3-5 strategies)."
 }
