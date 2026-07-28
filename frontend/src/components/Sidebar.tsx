@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  History, Settings, TrendingUp, BarChart2, Receipt, LayoutDashboard,
+  History, Settings, TrendingUp, LayoutDashboard,
   CalendarDays, CandlestickChart, Play, Zap, Wallet, LineChart, Activity,
   AlertTriangle, RefreshCw, ChevronRight, CheckCircle2,
 } from 'lucide-react';
@@ -64,8 +64,6 @@ const menuItems = [
   { id: 'replay',     label: 'Backtest Replay', icon: Play },
   { id: 'calendar',   label: 'Calendar',        icon: CalendarDays },
   { id: 'history',    label: 'History',         icon: History },
-  { id: 'ledger',     label: 'Trade Ledger',    icon: Receipt },
-  { id: 'stats',      label: 'Statistics',      icon: BarChart2 },
   { id: 'settings',   label: 'Settings',        icon: Settings },
 ];
 
@@ -113,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setUpdating(true);
     try {
       await api.post('/api/update/apply');
-      alert('กำลังติดตั้ง — แอปจะปิดและเปิดใหม่เองอัตโนมัติ');
+      alert('กำลังติดตั้ง — แอปจะปิดตัวเอง แล้วจะมีป๊อบอัพแจ้งเมื่อเสร็จ กรุณาเปิดโปรแกรมใหม่เองอีกครั้ง');
     } catch (err: any) {
       if (!err.response) return;
       alert(err.response?.data?.detail || 'อัปเดตไม่สำเร็จ');
@@ -328,6 +326,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {!isRunning && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(10,132,255,0.12)', border: '1px solid rgba(10,132,255,0.28)' }}>
+            <Play size={13} color="#0A84FF" strokeWidth={2.3} className="shrink-0" />
+            <span className="text-[11px] font-medium" style={{ color: '#0A84FF' }}>บอทยังไม่ทำงาน — กด START AUTO TRADE เพื่อเริ่มเทรด</span>
           </div>
         )}
 

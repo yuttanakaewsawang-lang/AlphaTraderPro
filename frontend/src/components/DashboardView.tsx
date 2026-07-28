@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Wallet, LineChart, TrendingUp, TrendingDown, Zap, Target, Circle, ScanSearch } from 'lucide-react';
 import api from '../api';
+import { AnimatedNum } from '../lib/anim';
 import type {
   LiveDecision,
   StructureResponse,
@@ -42,7 +43,7 @@ interface Position {
   profit: number;
 }
 
-interface DashboardViewProps { symbol: string }
+interface DashboardViewProps { symbol: string; comboMode?: boolean }
 
 const zoneLabel = (zoneType: -1 | 0 | 1) => {
   if (zoneType === 1) return 'RBS · Buy Zone';
@@ -62,6 +63,7 @@ const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> =
   PORTFOLIO_KILL: { label: 'หยุดพอร์ต',   bg: 'bg-red-500/15',     text: 'text-red-400' },
   ZONE_GUARD:     { label: 'Zone Guard',   bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   RISK_GUARD:     { label: 'Risk Guard',   bg: 'bg-red-500/15',     text: 'text-red-400' },
+  SPREAD:         { label: 'สเปรดกว้าง',  bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   POSITION_OPEN:  { label: 'มีไม้เปิด',    bg: 'bg-sky-500/15',     text: 'text-sky-400' },
   SEARCHING:      { label: 'กำลังหา',     bg: 'bg-white/5',        text: 'text-ink-muted' },
 };
@@ -69,6 +71,15 @@ const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> =
 /* ── Pill badge ─────────────────────────────────── */
 const Pill: React.FC<{ label: string; bg: string; text: string }> = ({ label, bg, text }) => (
   <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${bg} ${text}`}>{label}</span>
+);
+
+/* ── Skeleton KPI (โหลดรอบแรก) ──────────────────── */
+const KPISkeleton: React.FC = () => (
+  <div className="lux-card px-4 py-3">
+    <div className="skeleton w-8 h-8 mb-2 rounded-[11px]" />
+    <div className="skeleton h-2.5 w-16 mb-2.5 rounded" />
+    <div className="skeleton h-5 w-24 rounded" />
+  </div>
 );
 
 /* ── KPI card ───────────────────────────────────── */
@@ -151,7 +162,7 @@ const Arrow: React.FC<{ active: boolean; color?: string }> = ({ active, color = 
   </div>
 );
 
-const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
+const DashboardView: React.FC<DashboardViewProps> = ({ symbol, comboMode }) => {
   const [online, setOnline] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [zone, setZone] = useState<ZoneResponse | null>(null);
@@ -161,6 +172,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   const [decisions, setDecisions] = useState<LiveDecision[]>([]);
   const [todayCounts, setTodayCounts] = useState<Record<string, number>>({});
   const [flash, setFlash] = useState<Record<string, boolean>>({});
+  const [loaded, setLoaded] = useState(false);   // false = โหลดข้อมูลรอบแรกยังไม่เสร็จ → โชว์ skeleton
   const lastSigs = useRef<Record<string, string>>({});
 
   useEffect(() => {
@@ -204,6 +216,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
         triggerFlash('portfolio', `${posRes.data.length}-${accRes.data.equity}`);
       } catch {
         if (!cancelled) setOnline(false);
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
     };
 
@@ -239,7 +253,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
   const cRejected = todayCounts.AI_REJECT ?? 0;
   const cBlocked  = (todayCounts.NEWS ?? 0) + (todayCounts.SESSION ?? 0)
     + (todayCounts.DAILY_LIMIT ?? 0) + (todayCounts.PORTFOLIO_KILL ?? 0)
-    + (todayCounts.ZONE_GUARD ?? 0) + (todayCounts.RISK_GUARD ?? 0);
+    + (todayCounts.ZONE_GUARD ?? 0) + (todayCounts.RISK_GUARD ?? 0) + (todayCounts.SPREAD ?? 0);
 
   const pipeActive = (a: boolean, b: boolean) => a && b;
 
@@ -247,7 +261,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
     <div className="ios-fade-in flex flex-col gap-3 h-full">
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className={`flex items-center gap-2 flex-wrap shrink-0 ${comboMode ? 'pr-36' : ''}`}>
         <h1 className="lux-h1">Dashboard</h1>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
           style={{ color: SMC_BLUE, background: 'rgba(10,132,255,0.12)', border: '1px solid rgba(10,132,255,0.30)' }}>
@@ -275,25 +289,28 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
 
       {/* ── KPI row ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
+        {!loaded ? (
+          Array.from({ length: 6 }).map((_, i) => <KPISkeleton key={i} />)
+        ) : (
+        <>
         <KPI label="Balance"
           icon={Wallet} iconColor="#0A84FF" iconBg="rgba(10,132,255,0.15)"
-          value={<span style={{ color: '#FFFFFF' }}>${account?.balance?.toLocaleString('en', { minimumFractionDigits: 2 }) ?? '—'}</span>} />
+          value={<AnimatedNum value={account?.balance ?? 0} prefix="$" className="text-white" />} />
         <KPI label="Equity"
           icon={LineChart}
-          value={<span style={{ color: '#FFFFFF' }}>${account?.equity?.toLocaleString('en', { minimumFractionDigits: 2 }) ?? '—'}</span>} />
+          value={<AnimatedNum value={account?.equity ?? 0} prefix="$" className="text-white" />} />
         <KPI label="Floating P/L"
           icon={floatPL >= 0 ? TrendingUp : TrendingDown}
           iconColor={floatPL >= 0 ? '#30D158' : '#FF453A'}
           iconBg={floatPL >= 0 ? 'rgba(48,209,88,0.15)' : 'rgba(255,69,58,0.15)'}
           value={
-            <span style={{ color: floatPL >= 0 ? '#30D158' : '#FF453A' }}>
-              {floatPL >= 0 ? '+' : ''}{floatPL.toFixed(2)}
-            </span>
+            <AnimatedNum value={floatPL} signed
+              className={floatPL >= 0 ? 'text-emerald-400' : 'text-red-400'} />
           }
           sub={`${positions.length} ไม้เปิด`} />
         <KPI label="Total Trades"
           icon={Zap}
-          value={<span style={{ color: '#FFFFFF' }}>{account?.trades_total ?? 0}</span>} />
+          value={<AnimatedNum value={account?.trades_total ?? 0} decimals={0} className="text-white" />} />
         <KPI label="Today — เปิด / ปฏิเสธ / บล็อก"
           icon={Target} iconColor="#0A84FF" iconBg="rgba(10,132,255,0.12)"
           value={
@@ -315,6 +332,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ symbol }) => {
             </span>
           }
           sub={az && azActive ? `${az.low_limit.toFixed(2)} – ${az.high_limit.toFixed(2)}` : undefined} />
+        </>
+        )}
       </div>
 
       {/* ── Open Positions ─────────────────────────────────── */}

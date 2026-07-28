@@ -28,7 +28,7 @@ interface Position {
   profit: number;
 }
 
-interface SniperDashboardViewProps { symbol: string }
+interface SniperDashboardViewProps { symbol: string; comboMode?: boolean }
 
 // stage ที่ SniperStrategy._decision บันทึกจริง (SEARCHING ไม่ log ลง DB แต่กันไว้เผื่อ)
 const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> = {
@@ -40,6 +40,8 @@ const STAGE_STYLE: Record<string, { label: string; bg: string; text: string }> =
   SPREAD:         { label: 'สเปรดกว้าง',  bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   ERROR:          { label: 'ผิดพลาด',     bg: 'bg-red-500/15',     text: 'text-red-400' },
   POSITION_OPEN:  { label: 'มีไม้เปิด',    bg: 'bg-sky-500/15',     text: 'text-sky-400' },
+  PULLBACK_WAIT:  { label: 'รอย่อยืนยัน',  bg: 'bg-violet-500/15',  text: 'text-violet-400' },
+  RISK_GUARD:     { label: 'Risk Guard',   bg: 'bg-red-500/15',     text: 'text-red-400' },
   SEARCHING:      { label: 'กำลังหา',     bg: 'bg-white/5',        text: 'text-ink-muted' },
 };
 
@@ -120,7 +122,7 @@ const Arrow: React.FC<{ active: boolean; color?: string }> = ({ active, color = 
   </div>
 );
 
-const SniperDashboardView: React.FC<SniperDashboardViewProps> = ({ symbol }) => {
+const SniperDashboardView: React.FC<SniperDashboardViewProps> = ({ symbol, comboMode }) => {
   const [online, setOnline] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [status, setStatus] = useState<SniperStatusResponse | null>(null);
@@ -203,7 +205,7 @@ const SniperDashboardView: React.FC<SniperDashboardViewProps> = ({ symbol }) => 
     <div className="ios-fade-in flex flex-col gap-3 h-full">
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className={`flex items-center gap-2 flex-wrap shrink-0 ${comboMode ? 'pr-36' : ''}`}>
         <h1 className="lux-h1">Dashboard</h1>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
           style={{ color: SNIPER_GREEN, background: 'rgba(48,209,88,0.12)', border: '1px solid rgba(48,209,88,0.30)' }}>

@@ -88,6 +88,9 @@ export interface SniperConfig {
   swing_lookback: number;
   news_filter_minutes: number;
   trade_sessions: string;
+  confirm_pullback: number;
+  confirm_max_bars: number;
+  retest_buffer_atr: number;
 }
 
 export type SniperConfigUpdate = Partial<SniperConfig>;
@@ -183,6 +186,13 @@ export interface SniperBreakout {
   tp_sell: number;
 }
 
+export interface SniperPending {
+  direction: 'BUY' | 'SELL';
+  level: number;
+  bars_elapsed: number;
+  confirm_max_bars: number;
+}
+
 export interface SniperStatusResponse {
   is_running: boolean;
   last_message: string;
@@ -192,6 +202,7 @@ export interface SniperStatusResponse {
   daily_loss?: DailyLossStatus;
   broker_offset?: number | null;
   breakout: SniperBreakout | null;
+  pending?: SniperPending | null;
 }
 
 // สถานะ live ของ Swing จาก GET /api/swing/status

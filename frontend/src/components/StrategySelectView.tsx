@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Crosshair, ScanSearch, AlertTriangle, ChevronRight, Waves, ArrowDownUp, LayoutGrid } from 'lucide-react';
+import { Crosshair, ScanSearch, AlertTriangle, ChevronRight, Waves, ArrowDownUp, LayoutGrid, Loader2, Layers } from 'lucide-react';
 import api from '../api';
 
 interface StrategySelectViewProps {
@@ -122,8 +122,76 @@ const StrategySelectView: React.FC<StrategySelectViewProps> = ({ onSelected }) =
         </div>
       </div>
 
+      {/* Combo (SMC + Sniper) — การ์ดแนะนำแนวนอนเหนือแถวหลัก แยกออกมาเพราะเป็นการรัน 2 logic
+          พร้อมกัน ไม่ใช่กลยุทธ์เดี่ยว (และเก็บ layout แถวเดียวของ 5 การ์ดเดิมไว้เหมือนเดิม) */}
+      {(() => {
+        const isCurrent = status.engine === 'combo';
+        const isRunning = isCurrent && status.running.length > 0;
+        const busy = submitting === 'combo';
+        const isHovered = hovered === 'combo';
+        const A = '#0A84FF', B = '#30D158';
+        return (
+          <div className="ios-fade-in w-full max-w-[1360px] px-2 mb-4">
+            <button
+              type="button"
+              onClick={() => choose('combo')}
+              onMouseEnter={() => setHovered('combo')}
+              onMouseLeave={() => setHovered(null)}
+              disabled={!!submitting}
+              className={`ios-pressable lux-card relative flex items-center gap-4 w-full p-4 text-left ${submitting ? 'opacity-60' : ''}`}
+              style={{
+                borderColor: isHovered ? B : isCurrent ? `${B}66` : undefined,
+                boxShadow: isHovered
+                  ? `0 0 34px -6px ${B}88, 0 8px 24px -10px rgba(0,0,0,0.6)`
+                  : isCurrent ? `0 0 24px -8px ${B}55` : undefined,
+                transform: isHovered ? 'translateY(-3px)' : undefined,
+              }}
+            >
+              <div className="ios-icon-tile w-14 h-14 shrink-0"
+                style={{ background: `linear-gradient(135deg, ${A}26 0%, ${B}26 100%)`, border: `1px solid ${B}45` }}>
+                <Layers size={26} strokeWidth={2} style={{ color: B }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-base font-extrabold tracking-wide" style={{ color: '#FFFFFF' }}>SMC + SNIPER</span>
+                  <span className="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded-md"
+                    style={{ color: B, background: `${B}1a`, border: `1px solid ${B}40` }}>COMBO</span>
+                  {isRunning ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                      style={{ color: '#30D158', background: 'rgba(48,209,88,0.12)' }}>● กำลังรัน</span>
+                  ) : isCurrent ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                      style={{ color: 'rgba(235,235,245,0.55)', background: 'rgba(255,255,255,0.06)' }}>ใช้ล่าสุด</span>
+                  ) : null}
+                </div>
+                <div className="text-[11px] mt-1" style={{ color: 'rgba(235,235,245,0.62)' }}>
+                  รัน 2 logic พร้อมกันในบัญชีเดียว — ตรง logic ไหนเข้าเงื่อนไข ก็ออกออเดอร์ของ logic นั้น
+                  (คนละ magic · ตั้งคนละ TF ได้ · ประวัติแยกกัน)
+                </div>
+                <div className="text-[11px] mt-1.5" style={{ color: 'rgba(235,235,245,0.45)' }}>
+                  backtest 11 เดือน XAUUSD: SMC +$463 (8/11) + Sniper +$641 (9/11) = <span style={{ color: B }}>+$1,104 บวก 9/11 เดือน</span>
+                  {' '}· correlation รายเดือน +0.15 · ~16 ไม้/สัปดาห์
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] mt-1.5" style={{ color: '#FFD60A' }}>
+                  <AlertTriangle size={12} strokeWidth={2.3} className="shrink-0" />
+                  ถือไม้พร้อมกันได้ทั้งสอง logic — ตั้ง Risk % ต่อกลยุทธ์ให้ต่ำกว่าตอนรันเดี่ยว (แนะนำ 0.5–0.75%)
+                </div>
+              </div>
+              <div className="h-10 px-5 shrink-0 flex items-center justify-center text-xs login-btn-primary"
+                style={{
+                  background: `linear-gradient(135deg, ${A} 0%, ${B} 100%)`,
+                  borderColor: `${B}59`,
+                  boxShadow: `0 6px 18px -6px ${B}73`,
+                }}>
+                {busy ? <Loader2 size={15} strokeWidth={2.6} className="animate-spin" /> : isRunning ? 'เข้าใช้งานต่อ' : 'เลือกโหมดนี้'}
+              </div>
+            </button>
+          </div>
+        );
+      })()}
+
       <div className="grid grid-cols-5 gap-4 w-full max-w-[1360px] px-2">
-        {CARDS.map((card) => {
+        {CARDS.map((card, idx) => {
           const Icon = card.icon;
           const isCurrent = status.engine === card.id;
           const isRunning = isCurrent && status.running.length > 0;
@@ -131,14 +199,15 @@ const StrategySelectView: React.FC<StrategySelectViewProps> = ({ onSelected }) =
           const isHovered = hovered === card.id;
           const disabled = !card.available || !!submitting;
           return (
+            /* wrapper รับ entrance animation (translateY) แยกจากปุ่ม — กันชนกับ transform ตอน hover ของปุ่ม */
+            <div key={card.id} className="ios-fade-in flex" style={{ animationDelay: `${idx * 60}ms` }}>
             <button
-              key={card.id}
               type="button"
               onClick={() => card.available && choose(card.id)}
               onMouseEnter={() => setHovered(card.id)}
               onMouseLeave={() => setHovered(null)}
               disabled={disabled}
-              className={`ios-pressable lux-card relative flex flex-col p-4 min-h-[440px] ${card.available ? '' : 'cursor-not-allowed'} ${submitting && card.available ? 'opacity-60' : ''}`}
+              className={`ios-pressable lux-card relative flex flex-col w-full p-4 min-h-[440px] ${card.available ? '' : 'cursor-not-allowed'} ${submitting && card.available ? 'opacity-60' : ''}`}
               style={{
                 borderColor: isHovered ? card.color : isCurrent ? `${card.color}66` : undefined,
                 boxShadow: isHovered
@@ -206,7 +275,7 @@ const StrategySelectView: React.FC<StrategySelectViewProps> = ({ onSelected }) =
                     borderColor: `${card.color}59`,
                     boxShadow: `0 6px 18px -6px ${card.color}73`,
                   } : undefined}>
-                  {busy ? '...' : isRunning ? 'เข้าใช้งานต่อ' : 'เลือกกลยุทธ์นี้'}
+                  {busy ? <Loader2 size={15} strokeWidth={2.6} className="animate-spin" /> : isRunning ? 'เข้าใช้งานต่อ' : 'เลือกกลยุทธ์นี้'}
                 </div>
               ) : (
                 <div className="mt-3 h-9 flex items-center justify-center text-xs rounded-[14px] font-bold"
@@ -215,6 +284,7 @@ const StrategySelectView: React.FC<StrategySelectViewProps> = ({ onSelected }) =
                 </div>
               )}
             </button>
+            </div>
           );
         })}
       </div>

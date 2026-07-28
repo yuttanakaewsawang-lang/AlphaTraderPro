@@ -17,20 +17,24 @@ const SESSION_OPTIONS: { id: string; th: string }[] = [
   { id: 'Sydney', th: '04:00–13:00' },
 ];
 
-// Default config จาก backtest 12 เดือน (XAUUSD) ให้ผลดีที่สุด: +$1661, win 57.5%, maxDD -10.9%, หัก spread 11
-// ปิด engulfing/trend/rule/trailing, RR 3.5, OB on, zone 0.3, buffer 0.05, partial+BE on
+// Default config (อัปเดต 2026-07-26) — วัดบนเอนจิน live-parity ด้วย tick จริง แล้วคัดกรอง 5 เดือน +
+// validate 6 เดือนที่ไม่เคยเห็นตอนเลือก: XAUUSD M15 / RR 2.5 / retest on / OB on / FVG off /
+// Zone Guard 0.3 ATR / Liquidity Sweep ปิด / ไม่มี partial-BE-trailing / risk 1%
+// ผล: validate +$335.56 บวก 5/6 เดือน · 11 เดือนรวม +$470.49 บวก 8/11 · DD สูงสุด 12.3% (ทุน $1,000)
+// ⚠ เดือน ก.ค. 2026 ซึ่งเป็น holdout จริง ยังติดลบ (−$39) — ยังไม่ผ่าน forward test
+// ⚠ ตัวเลขชุดก่อน (+$1661, RR 3.5, partial+BE on) มาจากเอนจินก่อนแก้ parity ใช้เทียบกันไม่ได้
 const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
-  risk_percent: 1, tp_ratio_rr: 3.5, max_trades_per_day: 10, max_daily_loss_percent: 15,
+  risk_percent: 1, tp_ratio_rr: 2.5, max_trades_per_day: 10, max_daily_loss_percent: 15,
   max_portfolio_drawdown_pct: 20, max_spread_points: 15, news_filter_minutes: 30,
   retrain_interval_days: 30, zone_expiry_bars: 50, zone_atr_mult: 0.3,
   min_candle_atr: 0.3, max_candle_atr: 2.5, buffer_atr: 0.15,
   use_trend_filter: 0, trend_filter_mode: 1, require_retest: 1, enable_ob_entry: 1, enable_fvg_entry: 0,
-  require_engulfing: 0, use_partial_tp: 1, use_breakeven: 1, enable_trailing: 0,
+  require_engulfing: 0, use_partial_tp: 0, use_breakeven: 0, enable_trailing: 0,
   be_trigger_pct: 40, be_offset_pips: 20, trail_trigger_pct: 50, trail_mode: 1,
   trail_candle_offset_pips: 30, min_sl_atr: 0.5, max_ob_zone_atr: 5.0, use_swing_sl: 1,
   entry_mode: 1, max_entry_zone_atr: 0.3,
-  enable_liquidity_sweep: 1, sweep_tolerance_atr: 0.3, sweep_lookback_bars: 40,
-  zone_timeframe: 'M5', trade_sessions: '',
+  enable_liquidity_sweep: 0, sweep_tolerance_atr: 0.3, sweep_lookback_bars: 40,
+  zone_timeframe: 'M15', trade_sessions: '',
 };
 
 // รายการกลยุทธ์ที่เลือกได้บนหน้านี้ — ดู/แก้ config ของ logic ไหนก็ได้จากทุก instance
@@ -88,7 +92,7 @@ const CONFIG_FIELDS: {
   { key: 'entry_mode', label: 'Zone Entry Guard', desc: 'เข้าเฉพาะไม้ที่ราคายังใกล้ขอบโซน — ข้ามไม้ที่ราคาวิ่งหนีไปไกลแล้ว (backtest +59%)', group: 'zone', toggle: true },
   { key: 'max_entry_zone_atr', label: 'Max Entry-Zone ATR×', desc: 'ระยะห่างจากขอบโซนสูงสุดที่ยอมเข้า = ATR × ค่านี้', step: '0.1', group: 'zone', hideWhen: (f) => !Number(f.entry_mode) },
   { key: 'max_ob_zone_atr', label: 'Max OB-Zone ATR×', desc: 'OB/FVG ต้องห่างจาก active zone ไม่เกิน ATR × ค่านี้ (0 = ปิด)', step: '0.5', group: 'zone' },
-  { key: 'enable_liquidity_sweep', label: 'Liquidity Sweep Filter', desc: 'ต้องเห็น double-top/bottom (equal-high/low) sweep ก่อนยอมรับ zone break (backtest 12mo: +9.3% กำไร)', group: 'zone', toggle: true },
+  { key: 'enable_liquidity_sweep', label: 'Liquidity Sweep Filter', desc: 'ต้องเห็น double-top/bottom (equal-high/low) sweep ก่อนยอมรับ zone break — ค่าแนะนำคือ "ปิด": วัดบนเอนจิน live-parity (M15/RR2.5, 11 เดือน) ปิดได้ +$470 vs เปิด +$306 (ตัวเลข +9.3% เดิมมาจากเอนจินก่อนแก้ parity)', group: 'zone', toggle: true },
   { key: 'sweep_tolerance_atr', label: 'Sweep Tolerance ATR×', desc: 'สอง swing ถือว่า "เท่ากัน" (liquidity pool) ถ้าห่างกันไม่เกิน ATR × ค่านี้', step: '0.1', group: 'zone', hideWhen: (f) => !Number(f.enable_liquidity_sweep) },
   { key: 'sweep_lookback_bars', label: 'Sweep Lookback (bars)', desc: 'ค้นหา swing ย้อนหลังกี่แท่งก่อนจุด break', group: 'zone', hideWhen: (f) => !Number(f.enable_liquidity_sweep) },
 
@@ -200,13 +204,13 @@ function TradeManagementDiagram({ form }: { form: Record<string, string> }) {
   const conflict = useBE && Math.abs(beTrig - partialTrig) < 10;
 
   return (
-    <div className="mt-2 rounded-xl border border-[var(--hairline)] bg-[var(--color-surface-2)] p-4 space-y-3">
+    <div className="mt-1 rounded-xl border border-[var(--hairline)] bg-[var(--color-surface-2)] p-3 space-y-2">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-gold/80">
         แผนภาพการจัดการไม้ (ต่อ 1 ไม้)
       </p>
 
       {/* Bar */}
-      <div className="relative h-6 mt-6">
+      <div className="relative h-5 mt-5">
         {/* track */}
         <div className="absolute inset-y-[10px] left-0 right-0 rounded-full bg-white/8" />
         {/* SL zone */}
@@ -249,7 +253,7 @@ function TradeManagementDiagram({ form }: { form: Record<string, string> }) {
       </div>
 
       {/* Legend rows */}
-      <div className="space-y-1.5 pt-1">
+      <div className="space-y-1 pt-0.5">
         {/* Entry label below bar */}
         <div className="flex items-start gap-2 text-xs">
           <span className="w-2 h-2 mt-0.5 rounded-full bg-white/60 shrink-0" />
@@ -322,6 +326,9 @@ const CONFIG_GROUPS: { id: string; label: string; color: string; accent: string;
 
 interface StrategyViewProps {
   symbol: string;
+  /** โหมด combo: logic ที่กำลังดูอยู่ (เลือกจากแถบด้านบนของ App) — บังคับหน้านี้ให้โชว์ config
+      ของ engine นั้น แทนการเดาจาก /api/version (ซึ่งคืน "combo" ที่ไม่ใช่ชื่อ config panel ใดๆ) */
+  viewEngine?: string;
 }
 
 // dot color per group for numeric field labels
@@ -333,7 +340,7 @@ const GROUP_DOT: Record<string, string> = {
   ai: 'bg-emerald-400',
 };
 
-const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
+const StrategyView: React.FC<StrategyViewProps> = ({ symbol, viewEngine }) => {
   // instance นี้รัน engine ไหน — อ่านจาก /api/version ครั้งเดียว (ค่า dynamic ตาม engine ที่เลือก)
   // default 'smc' ไว้ก่อนจนกว่าจะรู้จริง — ต้องรับครบทั้ง 5 engine ไม่ใช่แค่ sniper
   // (เดิมเช็คแค่ 'sniper' → รัน swing/reversal/grid แล้วหน้านี้เปิดมาเป็น config SMC)
@@ -341,7 +348,9 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   useEffect(() => {
     api.get<{ strategy_engine?: string }>('/api/version')
       .then((res) => {
-        const e = res.data.strategy_engine;
+        // combo = รัน SMC + Sniper พร้อมกัน → ถือว่า SMC live อยู่จริง (zone poll ใช้ได้)
+        // ส่วน config ของ Sniper เลือกดูจาก dropdown ด้านบนได้ตามปกติ
+        const e = res.data.strategy_engine === 'combo' ? 'smc' : res.data.strategy_engine;
         if (e && STRATEGIES.some((s) => s.id === e)) setEngine(e);
       })
       .catch(() => {});
@@ -353,7 +362,12 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [resetting, setResetting] = useState(false);
-  const [strategyId, setStrategyId] = useState(STRATEGIES[0].id);
+  const [strategyId, setStrategyId] = useState(
+    viewEngine && STRATEGIES.some((s) => s.id === viewEngine) ? viewEngine : STRATEGIES[0].id);
+  // โหมด combo: สลับ logic จากแถบด้านบน → หน้านี้ต้องตามไปด้วย (SMC ⇄ Sniper)
+  useEffect(() => {
+    if (viewEngine && STRATEGIES.some((s) => s.id === viewEngine)) setStrategyId(viewEngine);
+  }, [viewEngine]);
   // หน้านี้ตามกลยุทธ์ที่ผู้ใช้เลือกจากหน้าเลือกกลยุทธ์เสมอ — dropdown สลับดู config
   // ข้าม engine ถูกถอดออกแล้ว (2026-07-11 ตามคำขอ user) อยากแก้ engine อื่นให้กด
   // "เปลี่ยนกลยุทธ์" ใน Settings แล้วเข้าหน้านี้ใหม่
@@ -508,7 +522,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
   }
 
   return (
-    <div className="ios-fade-in flex flex-col gap-3 h-full overflow-hidden">
+    <div className="ios-fade-in flex flex-col gap-2 h-full overflow-hidden">
 
       {/* ── Header row ── */}
       <div className="flex items-center gap-3 flex-wrap shrink-0">
@@ -517,7 +531,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
 
       {/* ── Open positions ── */}
       {positions.length > 0 && (
-        <div className="lux-card px-4 py-3 shrink-0">
+        <div className="lux-card px-4 py-2 shrink-0">
           <table className="lux-table text-xs">
             <thead>
               <tr>
@@ -565,7 +579,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
         <div className="lux-card flex flex-col min-h-0 flex-1">
 
           {/* Top bar: title + TF pickers */}
-          <div className="flex items-center justify-between flex-wrap gap-2 px-4 pt-4 pb-3 border-b border-[var(--hairline)] shrink-0">
+          <div className="flex items-center justify-between flex-wrap gap-2 px-4 pt-2.5 pb-2 border-b border-[var(--hairline)] shrink-0">
             <p className="lux-title">Strategy Configuration</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -578,7 +592,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
           </div>
 
           {/* Tab bar — iOS segmented control */}
-          <div className="flex gap-1 mx-4 mt-3 mb-1 p-1 rounded-xl shrink-0" style={{ background: 'var(--color-surface-3)' }}>
+          <div className="flex gap-1 mx-4 mt-2 mb-1 p-1 rounded-xl shrink-0" style={{ background: 'var(--color-surface-3)' }}>
             {CONFIG_GROUPS.map((g) => (
               <button
                 key={g.id}
@@ -594,18 +608,18 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
           </div>
 
           {/* Tab content */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+          <div className="flex-1 overflow-y-auto px-4 py-2.5 space-y-3">
 
             {/* Numeric fields */}
             {(() => {
               const numerics = CONFIG_FIELDS.filter((f) => f.group === activeTab && !f.toggle && !f.hideWhen?.(form));
               if (numerics.length === 0) return null;
               return (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5">
                   {numerics.map((f) => {
                     const disabled = f.disabledWhen?.(form) ?? false;
                     return (
-                      <div key={f.key} className={`flex flex-col gap-1 transition-opacity ${disabled ? 'opacity-35 pointer-events-none' : ''}`}>
+                      <div key={f.key} className={`flex flex-col gap-0.5 transition-opacity ${disabled ? 'opacity-35 pointer-events-none' : ''}`}>
                         <label className="flex items-center gap-1.5 lux-label">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${GROUP_DOT[activeTab]}`} />
                           {f.label}
@@ -616,9 +630,9 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
                           value={form[f.key] ?? ''}
                           disabled={disabled}
                           onChange={(e) => { setSaved(false); setForm((prev) => ({ ...prev, [f.key]: e.target.value })); }}
-                          className={`lux-input px-2 py-1.5 text-sm ${disabled ? 'cursor-not-allowed' : ''}`}
+                          className={`lux-input px-2 py-1 text-sm ${disabled ? 'cursor-not-allowed' : ''}`}
                         />
-                        {f.desc && <p className="text-[11px] text-ink-faint leading-tight">{f.desc}</p>}
+                        {f.desc && <p className="text-[11px] text-ink-faint leading-tight line-clamp-2">{f.desc}</p>}
                       </div>
                     );
                   })}
@@ -635,7 +649,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
                   {toggles.map((f) => {
                     const on = Number(form[f.key]) > 0;
                     return (
-                      <div key={f.key} className={`flex flex-col gap-1 rounded-xl border px-3 py-2.5 transition-colors ${
+                      <div key={f.key} className={`flex flex-col gap-1 rounded-xl border px-3 py-1.5 transition-colors ${
                         on ? `${activeGroup.accent} ${activeGroup.border}` : 'bg-[var(--color-surface-2)] border-[var(--hairline)]'
                       }`}>
                         <button
@@ -648,7 +662,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
                           </span>
                           <span className={on ? activeGroup.color : 'text-ink-muted'}>{f.label}</span>
                         </button>
-                        {f.desc && <p className="text-[11px] text-ink-faint leading-tight pl-10">{f.desc}</p>}
+                        {f.desc && <p className="text-[11px] text-ink-faint leading-tight pl-10 line-clamp-2">{f.desc}</p>}
                       </div>
                     );
                   })}
@@ -661,7 +675,7 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
 
             {/* Session picker — only in risk tab */}
             {activeTab === 'risk' && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-red-400/80">Trading Session (เวลาไทย)</p>
                 <div className="flex flex-wrap items-center gap-3">
                   {SESSION_OPTIONS.map((s) => {
@@ -689,14 +703,14 @@ const StrategyView: React.FC<StrategyViewProps> = ({ symbol }) => {
           </div>
 
           {/* Footer: Save / Reset */}
-          <div className="flex items-center gap-3 flex-wrap px-4 py-3 border-t border-[var(--hairline)] shrink-0">
-            <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-2 lux-btn-primary disabled:opacity-50">
+          <div className="flex items-center gap-3 flex-wrap px-4 py-2 border-t border-[var(--hairline)] shrink-0">
+            <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-1.5 lux-btn-primary disabled:opacity-50">
               {saving ? 'Saving...' : 'Save Config'}
             </button>
             <button
               onClick={handleResetDefault}
               disabled={resetting}
-              className="ios-pressable flex items-center gap-1.5 px-4 py-2 text-sm rounded-xl border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
+              className="ios-pressable flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-xl border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
               title="Reset เป็นค่า Recommended จาก backtest Apr–Jun 2025"
             >
               <RotateCcw size={13} strokeWidth={2.2} className={resetting ? 'animate-spin' : ''} />

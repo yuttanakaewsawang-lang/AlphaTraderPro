@@ -70,9 +70,10 @@ const ENGINE_BADGE: Record<string, { label: string; color: string }> = {
 interface LiveChartViewProps {
   symbol: string;
   engine?: string; // 'smc' (default) | 'sniper' | 'swing' | 'reversal' | 'grid'
+  comboMode?: boolean; // combo: เผื่อที่ขวาบนให้แถบสลับ SMC/SNIPER ของ App.tsx ไม่ทับแถว TF
 }
 
-const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol, engine = 'smc' }) => {
+const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol, engine = 'smc', comboMode }) => {
   const isSniper = engine === 'sniper';
   // engine ใหม่ 3 ตัว — poll /api/<engine>/status ชุดเดียวกัน (shape ต่างกันแค่ field เฉพาะกลยุทธ์)
   const isAltEngine = engine === 'swing' || engine === 'reversal' || engine === 'grid';
@@ -291,7 +292,9 @@ const LiveChartView: React.FC<LiveChartViewProps> = ({ symbol, engine = 'smc' })
 
   return (
     <div className="ios-fade-in flex flex-col gap-3 h-full">
-      <div className="flex items-center gap-3 flex-wrap shrink-0">
+      {/* แถวเดียวทั้งหมด — เผื่อที่ขวาบนตอน combo กันทับแถบสลับ SMC/SNIPER ที่ลอยขวาบนของ App.tsx
+          (pill อย่างเดียว ~130px ต่ำกว่า lg, +label "COMBO — ดูข้อมูลของ:" อีก ~150px ตั้งแต่ lg ขึ้นไป) */}
+      <div className={`flex items-center gap-3 flex-wrap shrink-0 ${comboMode ? 'pr-36 lg:pr-80' : ''}`}>
         <h1 className="lux-h1">Live Chart — {symbol}</h1>
         {ENGINE_BADGE[engine] && (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"

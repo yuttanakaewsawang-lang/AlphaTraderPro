@@ -18,6 +18,7 @@ const RECOMMENDED_DEFAULTS: Partial<Record<string, string | number>> = {
   min_sl_atr: 0.5, risk_percent: 1.0, max_trades_per_day: 10, max_daily_loss_percent: 15.0,
   max_portfolio_drawdown_pct: 20.0, max_spread_points: 15.0, use_trend_filter: 1,
   trend_filter_mode: 1, swing_lookback: 2, news_filter_minutes: 30, trade_sessions: '',
+  confirm_pullback: 1, confirm_max_bars: 3, retest_buffer_atr: 0.15,
 };
 
 const CONFIG_FIELDS: {
@@ -45,6 +46,9 @@ const CONFIG_FIELDS: {
   { key: 'use_trend_filter', label: 'Trend Filter', desc: 'กรองทิศทางตาม H1 bias ก่อนเข้าไม้ (backtest 12mo: expectancy เพิ่มเกือบเท่าตัว)', group: 'breakout', toggle: true },
   { key: 'trend_filter_mode', label: 'Filter Mode', desc: '0 = EMA50 (H1) · 1 = HH/HL Structure (H1)', step: '1', group: 'breakout', hideWhen: (f) => !Number(f.use_trend_filter) },
   { key: 'swing_lookback', label: 'Swing Lookback', desc: 'จำนวนแท่งรอบข้างที่ใช้นับ swing high/low', group: 'breakout', hideWhen: (f) => !Number(f.use_trend_filter) },
+  { key: 'confirm_pullback', label: 'Breakout+Retest Confirm', desc: 'รอราคาย่อกลับมาใกล้ระดับที่ทะลุก่อนเข้า แทนเข้าทันทีที่แท่งปิดทะลุ (validate 12mo: +122R เทียบ +44R)', group: 'breakout', toggle: true },
+  { key: 'confirm_max_bars', label: 'Confirm Max Bars', desc: 'รอได้กี่แท่งก่อนทิ้ง setup ถ้าราคาไม่ย่อกลับมา', group: 'breakout', hideWhen: (f) => !Number(f.confirm_pullback) },
+  { key: 'retest_buffer_atr', label: 'Retest Buffer ATR×', desc: 'ราคาต้องย่อกลับมาใกล้ระดับแค่ไหน (เป็นสัดส่วนของ ATR)', step: '0.05', group: 'breakout', hideWhen: (f) => !Number(f.confirm_pullback) },
 ];
 
 const CONFIG_GROUPS: { id: 'risk' | 'breakout'; label: string; color: string; accent: string }[] = [
@@ -164,13 +168,13 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
   };
 
   return (
-    <div className="ios-fade-in flex flex-col gap-3 h-full overflow-hidden">
+    <div className="ios-fade-in flex flex-col gap-2 h-full overflow-hidden">
       <div className="flex items-center gap-3 flex-wrap shrink-0">
         <h1 className="lux-h1">Sniper (N-bar Breakout) Monitor</h1>
       </div>
 
       {positions.length > 0 && (
-        <div className="lux-card px-4 py-3 shrink-0">
+        <div className="lux-card px-4 py-2 shrink-0">
           <table className="lux-table text-xs">
             <thead>
               <tr>
@@ -215,7 +219,7 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
 
       {config && (
         <div className="lux-card flex flex-col min-h-0 flex-1">
-          <div className="flex items-center justify-between flex-wrap gap-2 px-4 pt-4 pb-3 border-b border-[var(--hairline)] shrink-0">
+          <div className="flex items-center justify-between flex-wrap gap-2 px-4 pt-2.5 pb-2 border-b border-[var(--hairline)] shrink-0">
             <p className="lux-title">Sniper Configuration</p>
             <div className="flex items-center gap-2">
               <label className="lux-label">Entry TF</label>
@@ -225,7 +229,7 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
             </div>
           </div>
 
-          <div className="flex gap-1 mx-4 mt-3 mb-1 p-1 rounded-xl shrink-0" style={{ background: 'var(--color-surface-3)' }}>
+          <div className="flex gap-1 mx-4 mt-2 mb-1 p-1 rounded-xl shrink-0" style={{ background: 'var(--color-surface-3)' }}>
             {CONFIG_GROUPS.map((g) => (
               <button
                 key={g.id}
@@ -240,14 +244,14 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
             ))}
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+          <div className="flex-1 overflow-y-auto px-4 py-2.5 space-y-3">
             {(() => {
               const numerics = CONFIG_FIELDS.filter((f) => f.group === activeTab && !f.toggle && !f.hideWhen?.(form));
               if (numerics.length === 0) return null;
               return (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5">
                   {numerics.map((f) => (
-                    <div key={f.key} className="flex flex-col gap-1">
+                    <div key={f.key} className="flex flex-col gap-0.5">
                       <label className="flex items-center gap-1.5 lux-label">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${GROUP_DOT[activeTab]}`} />
                         {f.label}
@@ -257,9 +261,9 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
                         step={f.step ?? '1'}
                         value={form[f.key] ?? ''}
                         onChange={(e) => { setSaved(false); setForm((prev) => ({ ...prev, [f.key]: e.target.value })); }}
-                        className="lux-input px-2 py-1.5 text-sm"
+                        className="lux-input px-2 py-1 text-sm"
                       />
-                      {f.desc && <p className="text-[11px] text-ink-faint leading-tight">{f.desc}</p>}
+                      {f.desc && <p className="text-[11px] text-ink-faint leading-tight line-clamp-2">{f.desc}</p>}
                     </div>
                   ))}
                 </div>
@@ -278,12 +282,12 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
                         key={f.key}
                         type="button"
                         onClick={() => { setSaved(false); setForm((prev) => ({ ...prev, [f.key]: on ? '0' : '1' })); }}
-                        className={`ios-pressable flex flex-col items-start gap-0.5 px-3 py-2 rounded-xl border text-left transition-colors ${
+                        className={`ios-pressable flex flex-col items-start gap-0.5 px-3 py-1.5 rounded-xl border text-left transition-colors ${
                           on ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' : 'bg-[var(--color-surface-2)] border-[var(--hairline)] text-ink-muted'
                         }`}
                       >
                         <span className="text-sm font-medium">{f.label}</span>
-                        {f.desc && <span className="text-[11px] text-ink-faint leading-tight">{f.desc}</span>}
+                        {f.desc && <span className="text-[11px] text-ink-faint leading-tight line-clamp-2">{f.desc}</span>}
                       </button>
                     );
                   })}
@@ -292,7 +296,7 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
             })()}
 
             {activeTab === 'risk' && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-red-400/80">Trading Session (เวลาไทย)</p>
                 <div className="flex flex-wrap items-center gap-3">
                   {SESSION_OPTIONS.map((s) => {
@@ -317,14 +321,14 @@ const SniperConfigPanel: React.FC<{ symbol: string }> = ({ symbol }) => {
             )}
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap px-4 py-3 border-t border-[var(--hairline)] shrink-0">
-            <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-2 lux-btn-primary disabled:opacity-50">
+          <div className="flex items-center gap-3 flex-wrap px-4 py-2 border-t border-[var(--hairline)] shrink-0">
+            <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-1.5 lux-btn-primary disabled:opacity-50">
               {saving ? 'Saving...' : 'Save Config'}
             </button>
             <button
               onClick={handleResetDefault}
               disabled={resetting}
-              className="ios-pressable flex items-center gap-1.5 px-4 py-2 text-sm rounded-xl border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
+              className="ios-pressable flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-xl border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
               title="Reset เป็นค่า Recommended จาก backtest 12 เดือน"
             >
               <RotateCcw size={13} strokeWidth={2.2} className={resetting ? 'animate-spin' : ''} />

@@ -8,18 +8,42 @@ declare global {
 
 const isPyWebView = () => !!window.pywebview;
 
+// สีประจำ engine — ตรงกับหน้าเลือกกลยุทธ์ / Live Chart badge
+const ENGINE_META: Record<string, { color: string; label: string }> = {
+  smc: { color: '#0A84FF', label: 'SMC' },
+  sniper: { color: '#30D158', label: 'SNIPER' },
+  swing: { color: '#40C8E0', label: 'SWING' },
+  reversal: { color: '#FF9F0A', label: 'REVERSAL' },
+  grid: { color: '#BF5AF2', label: 'GRID' },
+  combo: { color: '#30D158', label: 'SMC+SNIPER' },
+};
+
 const TitleBar: React.FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [instance, setInstance] = useState('');
+  const [account, setAccount] = useState('');
+  const [engine, setEngine] = useState('');
 
   useEffect(() => {
-    fetch('/api/version')
-      .then((r) => r.json())
-      .then((d) => setInstance(d.instance ?? ''))
-      .catch(() => {});
+    const load = () => {
+      fetch('/api/version')
+        .then((r) => r.json())
+        .then((d) => {
+          setInstance(d.instance ?? '');
+          setAccount(d.account ?? '');
+          setEngine(d.strategy_engine ?? '');
+        })
+        .catch(() => {});
+    };
+    load();
+    // poll เพื่อจับสถานะหลัง login / สลับ engine (badge อัปเดตเองโดยไม่ต้อง refresh)
+    const t = setInterval(load, 5000);
+    return () => clearInterval(t);
   }, []);
 
   if (!isPyWebView()) return null;
+
+  const eng = ENGINE_META[engine];
 
   return (
     <div
@@ -50,6 +74,26 @@ const TitleBar: React.FC = () => {
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
         >
           {instance}
+        </span>
+      )}
+
+      {/* Badge บัญชี + engine ที่กำลังใช้ — กันสับสนว่าหน้าต่างไหนคือบัญชี/กลยุทธ์ไหน */}
+      {account && (
+        <span
+          className="ml-2.5 flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 rounded-md text-[11px] font-semibold tabular-nums"
+          style={{
+            WebkitAppRegion: 'no-drag',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'rgba(235,235,245,0.75)',
+          } as React.CSSProperties}
+          title={`บัญชี ${account}${eng ? ` · ${eng.label}` : ''}`}
+        >
+          {eng && (
+            <span className="inline-block w-1.5 h-1.5 rounded-full shrink-0" style={{ background: eng.color, boxShadow: `0 0 6px ${eng.color}` }} />
+          )}
+          {account}
+          {eng && <span className="font-bold tracking-wide" style={{ color: eng.color }}>{eng.label}</span>}
         </span>
       )}
 
