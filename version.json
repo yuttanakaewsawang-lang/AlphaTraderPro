@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.15",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.15/ApolloAutoTrade.exe",
-    "sha256":  "0947B0ADE2FB58AE3527E5DCB309A88984AF5422650F172E325F85C6F208115F",
-    "notes":  "History + Backtest Export Report เพิ่มข้อมูลให้วิเคราะห์ได้ครบจากไฟล์เดียวโดยไม่ต้องต่อ MT5: SL/TP/ราคาปิด/ระยะเวลาถือ/เหตุผลที่ปิด (SL/TP/ปิดเอง) ต่อไม้, MFE/MAE (ไกลสุดที่วิ่งเข้าทาง-สวนทางก่อนปิด พร้อม %ระยะทาง TP), R-multiple, และสถิติ \u0027ไม้แพ้ที่วิ่งเกิน 50%TP แล้วย้อนแพ้\u0027 สำหรับวิเคราะห์ trailing/partial-TP จากข้อมูลจริง. SL/TP/engine ของ History อ่านจาก MT5 order history โดยตรง (server-side) แทนพึ่ง local DB ของเครื่องที่เปิดไม้ - export ได้ผลถูกต้องจากเครื่องไหนก็ได้แม้บอทรันอยู่บน VPS. รวมงาน UI/backend ที่กักไว้ก่อนหน้า (Combo mode SMC+Sniper, Backtest Replay custom range, History calendar, multi-account scoping, EA3-5 strategies)."
+    "version":  "1.2.16",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.16/ApolloAutoTrade.exe",
+    "sha256":  "87AD80030F13E4C9E502E3691BF0512727C24807604DF1087BF9DF27307CAABF",
+    "notes":  "Sniper: แก้ live ให้ตรง backtest 3 จุด - confirm_pullback ทำงานจริง (เดิมเข้าไม้ทันทีหลังแท่งทะลุปิดโดยไม่รอย่อ), กันยิงซ้ำจากแท่งสัญญาณเดิม, เพิ่ม Min-lot Risk Guard 2x ที่ live ไม่เคยมี"
 }
