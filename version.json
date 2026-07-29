@@ -1,6 +1,6 @@
 {
-    "version":  "1.2.16",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.2.16/ApolloAutoTrade.exe",
-    "sha256":  "87AD80030F13E4C9E502E3691BF0512727C24807604DF1087BF9DF27307CAABF",
-    "notes":  "Sniper: แก้ live ให้ตรง backtest 3 จุด - confirm_pullback ทำงานจริง (เดิมเข้าไม้ทันทีหลังแท่งทะลุปิดโดยไม่รอย่อ), กันยิงซ้ำจากแท่งสัญญาณเดิม, เพิ่ม Min-lot Risk Guard 2x ที่ live ไม่เคยมี"
+    "version":  "1.3.0",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.0/ApolloAutoTrade.exe",
+    "sha256":  "AF12D6E50EDFB6B2A7C3DDE5C1889E120F8685132D29D9A63A5D435BBD68415B",
+    "notes":  "v1.3.0 UI v2 - ออกแบบหน้าจอใหม่ทั้งแอป (Dashboard/Strategy/Live Chart/Backtest Replay/History/Calendar), Live Pipeline ลูกศรอนิเมชัน, ปฏิทินข่าวโฉมใหม่พร้อมคอลัมน์สถานะบอท และแก้ค่าสกุลเงินของ feed ข่าวให้เป็น currency code"
 }
