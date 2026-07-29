@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.1",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.1/ApolloAutoTrade.exe",
-    "sha256":  "A82C33E622EB0E1E7156718E3BA7485343B7CDCE26A08FD7749313B77DF834CF",
-    "notes":  "v1.3.1 - ลูกศร Live Pipeline ไหลจางๆ ช้าๆ ตอน idle ด้วย (เดิมนิ่งสนิทจนดูเหมือนภาพค้างตอนบอทยังไม่ทำงาน) ส่วนขั้นที่มีข้อมูลไหลจริงยังวิ่งเร็วและสว่างเหมือนเดิม"
+    "version":  "1.3.2",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.2/ApolloAutoTrade.exe",
+    "sha256":  "06409FAE034D559F802E8E5AD2DB8069AE3A021F39BD2B9589DCF4490FE24DAF",
+    "notes":  "เลือกเทรดหลายกลยุทธ์พร้อมกันได้ (Engine Deck) — ถอดหน้าเลือกกลยุทธ์หลัง login ออก ย้ายมาเป็นการ์ดในหน้า Strategy เปิดกี่ตัวก็ได้ แต่ละตัวยิงออเดอร์ของตัวเอง คนละ magic คนละ TF · Dashboard มีแถบบอกกลยุทธ์ที่ทำงานอยู่ + P/L แยกรายตัว · Backtest Replay เลือกทดสอบหลายกลยุทธ์พร้อมกันโดยใช้ config จริงจากหน้า Strategy · แจ้งเตือน Discord ติดชื่อกลยุทธ์ · History กรองตามกลยุทธ์ได้"
 }
