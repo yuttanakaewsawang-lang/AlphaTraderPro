@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.2",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.2/ApolloAutoTrade.exe",
-    "sha256":  "06409FAE034D559F802E8E5AD2DB8069AE3A021F39BD2B9589DCF4490FE24DAF",
-    "notes":  "เลือกเทรดหลายกลยุทธ์พร้อมกันได้ (Engine Deck) — ถอดหน้าเลือกกลยุทธ์หลัง login ออก ย้ายมาเป็นการ์ดในหน้า Strategy เปิดกี่ตัวก็ได้ แต่ละตัวยิงออเดอร์ของตัวเอง คนละ magic คนละ TF · Dashboard มีแถบบอกกลยุทธ์ที่ทำงานอยู่ + P/L แยกรายตัว · Backtest Replay เลือกทดสอบหลายกลยุทธ์พร้อมกันโดยใช้ config จริงจากหน้า Strategy · แจ้งเตือน Discord ติดชื่อกลยุทธ์ · History กรองตามกลยุทธ์ได้"
+    "version":  "1.3.3",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.3/ApolloAutoTrade.exe",
+    "sha256":  "C7047AB03EB107D10C80B0C60EC4F285AF9AEF5E9904BD7A98BBBD2A6FC4C0AC",
+    "notes":  "แก้ Backtest Replay โหลดข้อมูลไม่สำเร็จ — exe ขาดโมดูล sniper_backtest/grid_backtest (dynamic import ไม่ถูก bundle)"
 }
