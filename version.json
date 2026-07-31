@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.3",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.3/ApolloAutoTrade.exe",
-    "sha256":  "C7047AB03EB107D10C80B0C60EC4F285AF9AEF5E9904BD7A98BBBD2A6FC4C0AC",
-    "notes":  "แก้ Backtest Replay โหลดข้อมูลไม่สำเร็จ — exe ขาดโมดูล sniper_backtest/grid_backtest (dynamic import ไม่ถูก bundle)"
+    "version":  "1.3.4",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.4/ApolloAutoTrade.exe",
+    "sha256":  "663196BE237E093FA891BFFBC45310CF73C5C59F9289D0E421BE70FE2F731A60",
+    "notes":  "แก้บั๊กหลายเมนู: ปุ่ม START/STOP ค้างเมื่อบอทถูก kill switch หยุด, History กรอง SMC แล้วไม้หาย, สรุปเดือนกินวันที่ 1 ของเดือนถัดไป, ตารางไม้ไม่ตรงปฏิทินเมื่อไม้ปิดข้ามวัน, แยกไม้ตามกลยุทธ์ใน Live Chart/Strategy, badge engine ค้างเป็น SMC, ปุ่มสลับ pipeline ที่กดแล้ว error"
 }
