@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.6",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.6/ApolloAutoTrade.exe",
-    "sha256":  "9B1C1C5418231155C7132DB06FFA30A512A860E7D66500AF44886A027D7356A7",
-    "notes":  "Backtest/live parity: Zone Entry Guard ไม่ทิ้งโซนอีกต่อไป (ข้ามเฉพาะไม้นั้น), Replay ใช้ขอบวันไทย, ไม่ข้ามการประเมินแท่งที่ไม้เพิ่งปิด, ดึงข้อมูลเผื่อท้ายช่วงให้ไม้ปลายช่วงปิดได้"
+    "version":  "1.3.7",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.7/ApolloAutoTrade.exe",
+    "sha256":  "83194FBFD82F6C54492AE68E7195D53C95970545743A0C220940D6BA3A4A7C2D",
+    "notes":  "แก้ Replay: ดึงแท่งเผื่อท้ายช่วงให้กราฟครอบคลุมไม้สุดท้าย (MT5 คืนช่วงสั้นกว่าที่ขอ) แล้วตัดแท่ง/โซนที่เกินช่วงที่เลือกทิ้ง"
 }
