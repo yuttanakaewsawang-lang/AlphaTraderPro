@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.5",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.5/ApolloAutoTrade.exe",
-    "sha256":  "53062F9EB3D46DEE9F51B30B6817B3014D1DE5F96F34E992BDA12048656E64AD",
-    "notes":  "Swing (EA3) live-backtest parity: แก้ live ประเมินแท่งซ้ำจนยิงไม้เกิน backtest 14%, sync หน้าต่างเทรนด์ 61 แท่ง, เพิ่ม daily-loss kill switch เข้า swing_backtest"
+    "version":  "1.3.6",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.6/ApolloAutoTrade.exe",
+    "sha256":  "9B1C1C5418231155C7132DB06FFA30A512A860E7D66500AF44886A027D7356A7",
+    "notes":  "Backtest/live parity: Zone Entry Guard ไม่ทิ้งโซนอีกต่อไป (ข้ามเฉพาะไม้นั้น), Replay ใช้ขอบวันไทย, ไม่ข้ามการประเมินแท่งที่ไม้เพิ่งปิด, ดึงข้อมูลเผื่อท้ายช่วงให้ไม้ปลายช่วงปิดได้"
 }
