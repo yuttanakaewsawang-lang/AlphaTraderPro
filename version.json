@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.8",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.8/ApolloAutoTrade.exe",
-    "sha256":  "E4D5769301C76385002153F0EB62ADF6BE51B66FC0A75B0870F73F23F23A073A",
-    "notes":  "เครื่องมือกำกับดูแลบอทชุดใหม่: ปุ่มหยุดฉุกเฉิน (หยุดทุกกลยุทธ์+ปิดไม้ของบอทในคำสั่งเดียว) · แถบเตือนเชิงรุก (MT5 หลุด/Algo ปิด/ไม้ค้างแต่บอทหยุด/สเปรดเกิน/ใกล้ลิมิตขาดทุน/DD พอร์ต/ข่าว/license ใกล้หมด) · สรุปรายวันว่าบอทไม่เข้าไม้เพราะด่านไหน · ตัวนับไม้วันนี้แยกต่อกลยุทธ์ให้ตรงเพดานจริง · ป้ายเทียบค่า config กับค่าแนะนำครบ 5 กลยุทธ์ · การ์ดเทียบผลงานรายกลยุทธ์ในหน้า History · ประวัติการรัน Backtest ไว้เทียบ A/B · เลือกดูสรุปเดือนย้อนหลังบน Dashboard ได้ | แก้บั๊ก: MAX DD บน Dashboard เคยหารด้วยกำไรสะสมแทนทุนพอร์ตและใช้กรอบ 30 วันทั้งที่การ์ดเขียนว่าเดือนนี้ · auto-login ตอนเปิดโปรแกรมไม่เคยสำเร็จเพราะไม่ได้ส่ง terminal path"
+    "version":  "1.3.9",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.9/ApolloAutoTrade.exe",
+    "sha256":  "167378C5847EA2DF197654B89E15A4D119B80A0D7FAC3FC4A6C35011CD72CF79",
+    "notes":  "แก้ live-backtest parity: เวลาไม้ของ Sniper/Swing/Reversal/Grid เป็นเวลาไทยตรงกับ SMC (เดิมเยื้อง 6-7 ชม. เมื่อดู Replay ทีละ engine) + รายงานไม้ที่ยังเปิดอยู่ตอนจบช่วงเป็น OPEN โดยไม่นับในสถิติ"
 }
