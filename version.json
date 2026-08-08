@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.10",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.10/ApolloAutoTrade.exe",
-    "sha256":  "F06A152C88A63363DF4E1888C1A58D6D65E56B5FC8011664BD146A54BFF5D43E",
-    "notes":  "แก้ reconnect หลัง MT5 หลุดไปเกาะบัญชีอื่นเมื่อเปิด 2 exe (ตรวจเลขบัญชีหลังเชื่อมต่อ + ผูก credential ต่อโปรเซส) · เพิ่มแจ้งเตือน Discord เมื่อลืมกด START / บอทค้าง / ต่อผิดบัญชี · TopBar เปลี่ยนปุ่มหยุดฉุกเฉินเป็นไฟสถานะ ONLINE/หยุดบอท (ปุ่มย้ายไปหน้า Settings)"
+    "version":  "1.3.11",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.11/ApolloAutoTrade.exe",
+    "sha256":  "A00F247635ED087B88FF2C259A9C821B28C9819CF44C8D77A25732A21049DC45",
+    "notes":  "แก้ live-backtest parity 6 จุด (Sniper/SMC กินแท่งค้างหลังไม้ปิด, SMC OB ordering, spread gate ใน bar-mode, Reversal per-bar lock, SL/TP anchor, trend-bias window) + max_spread_points แยกตามโบรก (Exness 300 / IUX 15) + ปิด SMC เป็นดีฟอลต์ตามผลวัด 6 เดือน"
 }
