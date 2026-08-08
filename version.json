@@ -1,6 +1,6 @@
 {
-    "version":  "1.3.11",
-    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.11/ApolloAutoTrade.exe",
-    "sha256":  "A00F247635ED087B88FF2C259A9C821B28C9819CF44C8D77A25732A21049DC45",
-    "notes":  "แก้ live-backtest parity 6 จุด (Sniper/SMC กินแท่งค้างหลังไม้ปิด, SMC OB ordering, spread gate ใน bar-mode, Reversal per-bar lock, SL/TP anchor, trend-bias window) + max_spread_points แยกตามโบรก (Exness 300 / IUX 15) + ปิด SMC เป็นดีฟอลต์ตามผลวัด 6 เดือน"
+    "version":  "1.3.12",
+    "url":  "https://github.com/yuttanakaewsawang-lang/AlphaTraderPro/releases/download/v1.3.12/ApolloAutoTrade.exe",
+    "sha256":  "E3E4126820D22B31805A3D9835FDB8DE1811F925995EDA5BC47109BF4D72004B",
+    "notes":  "แก้เวลาในหน้า History/ปฏิทิน/รายงาน export ให้เป็นเวลาไทยจริง (เดิมใช้ timezone ของเครื่องที่รัน ทำให้คลาด 1 ชม. บนเครื่องไทย และคลาด 6 ชม. ถ้า VPS ตั้ง OS เป็น UTC จนไม้ช่วงหัวค่ำตกวันผิดในสรุปรายวัน) + แก้ duration ของไม้ที่ยังเปิดอยู่ที่คำนวณจาก epoch คนละฐาน"
 }
